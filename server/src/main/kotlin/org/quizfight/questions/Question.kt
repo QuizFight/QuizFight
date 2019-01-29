@@ -8,4 +8,4 @@ package org.quizfight.questions
  * @param type is the type of a question. In QuestionUtils-class is a corresponding enumeration
  * @param correctAnswer is the only correct solution of a question
  */
-open class Question(val category: String, val type: String, val correctAnswer: String)
+open class Question(val text: String, val category: String, val type: String, val correctAnswer: String)
