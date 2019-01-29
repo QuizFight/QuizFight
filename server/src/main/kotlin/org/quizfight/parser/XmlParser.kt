@@ -1,8 +1,6 @@
 package org.quizfight.parser
 
-import org.quizfight.common.question.FourAnswersQuestion
-import org.quizfight.common.question.Question
-import org.quizfight.common.question.RangeQuestion
+import org.quizfight.common.question.*
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -19,8 +17,6 @@ import javax.xml.parsers.DocumentBuilderFactory
 class XmlParser() {
 
     val DIR_OF_XML = ".\\server\\res\\xml"
-    val FOUR_ANSWERS_ID = "fourAnswerQuestion"
-    val RANGED_QUESTIONS_ID = "rangedQuestion"
 
     /**
      * Reads every xmlFile and converts the data to a kotlin-object, representating the questions
@@ -92,8 +88,8 @@ class XmlParser() {
             var temporaryList = mutableListOf<Question>()
 
             when(type){
-                FOUR_ANSWERS_ID     -> temporaryList = getFourAnswerQuestions(document)
-                RANGED_QUESTIONS_ID -> temporaryList = getRangedQuestions(document)
+                Types.FOUR_ANSWERS.id      -> temporaryList = getFourAnswerQuestions(document)
+                Types.RANGED_QUESTIONS.id  -> temporaryList = getRangedQuestions(document)
                 else                -> System.err.println("Found bad XML -> Skipped it")
             }
 
@@ -124,7 +120,7 @@ class XmlParser() {
             val badAnswer_2   = badAnswers.item(1).textContent
             val badAnswer_3   = badAnswers.item(2).textContent
 
-            questionList.add(FourAnswersQuestion(text, category, FOUR_ANSWERS_ID, correctAnswer,
+            questionList.add(FourAnswersQuestion(text, category, Types.FOUR_ANSWERS.id, correctAnswer,
                              badAnswer_1, badAnswer_2, badAnswer_3))
         }
         return questionList
@@ -150,7 +146,7 @@ class XmlParser() {
             val begin   = questionElement.getElementsByTagName("begin").item(0).textContent
             val end     = questionElement.getElementsByTagName("end").item(0).textContent
 
-            questionList.add(RangeQuestion(text, category, RANGED_QUESTIONS_ID, correctAnswer,
+            questionList.add(RangeQuestion(text, category, Types.RANGED_QUESTIONS.id, correctAnswer,
                     begin, end))
         }
         return questionList
