@@ -1,4 +1,4 @@
-package org.quizfight.questions
+package org.quizfight.common.question
 
 /**
  * Class for building Four-Answer-Questions

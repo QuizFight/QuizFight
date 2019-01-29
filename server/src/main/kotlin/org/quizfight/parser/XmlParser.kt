@@ -1,8 +1,8 @@
 package org.quizfight.parser
 
-import org.quizfight.questions.FourAnswersQuestion
-import org.quizfight.questions.Question
-import org.quizfight.questions.RangeQuestion
+import org.quizfight.common.question.FourAnswersQuestion
+import org.quizfight.common.question.Question
+import org.quizfight.common.question.RangeQuestion
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node

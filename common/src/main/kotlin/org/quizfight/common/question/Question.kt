@@ -1,4 +1,4 @@
-package org.quizfight.questions
+package org.quizfight.common.question
 
 /**
  * This class represents a data-sructure to handle and organize questions.
