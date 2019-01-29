@@ -1,5 +1,13 @@
 package org.quizfight.questions
 
+
+/**
+ * Enumeration for easy type-handling of questions
+ * 0: Four answer question
+ * 1: Ranged question, estimation
+ */
+enum class Type {FOUR_ANSWERS, RANGE}
+
 /**
  * This class represents a data-sructure to handle and organize questions.
  * Every class will have a category, a type and a correct answer.

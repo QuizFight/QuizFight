@@ -1,5 +1,9 @@
 package org.quizfight.questions
 
+/**
+ * Class for building ranged questions for estimation
+ * @author Julian Einspenner
+ */
 class RangeQuestion: Question {
 
     val begin: Double

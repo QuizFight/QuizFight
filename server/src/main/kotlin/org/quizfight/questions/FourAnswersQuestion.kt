@@ -1,5 +1,9 @@
 package org.quizfight.questions
 
+/**
+ * Class for building Four-Answer-Questions
+ * @author Julian Einspenner
+ */
 class FourAnswersQuestion: Question{
 
     val badAnswer_1: String
