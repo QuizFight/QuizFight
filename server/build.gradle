@@ -7,7 +7,7 @@ mainClassName = 'org.quizfight.server.ServerKt'
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compile project(path: ':common')
+    compile project(":common")
 }
 
 compileKotlin {
