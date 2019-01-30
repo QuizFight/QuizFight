@@ -1,0 +1,38 @@
+<questions type="rangedQuestion">
+    <category1>
+        <question>
+            <text>Wie viele Liter Bier werden in Deutschland pro Kopf jaehrlich getrunken</text>
+            <correct>100</correct>
+            <begin>5</begin>
+            <end>200</end>
+        </question>
+        <question>
+            <text>Wie viele Einkerbungen hat ein Golfball</text>
+            <correct>336</correct>
+            <begin>80</begin>
+            <end>400</end>
+        </question>
+    </category1>
+    <category2>
+        <question>
+            <text>Wie lange dauerte der 30 jaehrige Krieg</text>
+            <correct>30</correct>
+            <begin>28</begin>
+            <end>31</end>
+        </question>
+        <question>
+            <text>Einige Monate haben 30, einige 31 Tage. Wie viele haben 28 Tage</text>
+            <correct>12</correct>
+            <begin>1</begin>
+            <end>12</end>
+        </question>
+    </category2>
+    <category3>
+        <question>
+            <text>Ein Bauer hat 16 Schafe. Fast alle sterben, außer 9. Wie viele Schafe bleiben uebrig</text>
+            <correct>9</correct>
+            <begin>0</begin>
+            <end>16</end>
+        </question>
+    </category3>
+</questions>
