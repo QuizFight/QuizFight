@@ -6,8 +6,9 @@ plugins {
 mainClassName = 'org.quizfight.server.ServerKt'
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compile project(":common")
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
+    implementation project(":common")
 }
 
 compileKotlin {
