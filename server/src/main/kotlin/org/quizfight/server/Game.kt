@@ -69,7 +69,7 @@ class Game(id: Int, gameName:String, maxPlayer: Int, questionCount: Int) {
     /**
      * Ends all connections between the Server and the mobile devices and clears the players list
      */
-    fun endGame(){
+    fun terminateGame(){
         //TODO: End all connections
         players.clear()
     }

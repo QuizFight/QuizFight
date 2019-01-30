@@ -10,7 +10,7 @@ open class SlaveServer(mip:String, ip:String) {
     private val ip :String
 
     private var gameIds: Int
-    public var games: MutableList<Game>
+    public var games: MutableList<Game>             //TODO:temporary public
 
 
     init {
