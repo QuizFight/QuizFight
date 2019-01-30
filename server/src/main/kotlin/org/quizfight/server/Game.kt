@@ -1,7 +1,6 @@
 package org.quizfight.server
 
 //import java.util.*
-import org.quizfight.common.question.Question
 
 /**
  * Game Class. Manages connections to players, asks Questions and calculates the scores
