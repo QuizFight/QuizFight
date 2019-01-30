@@ -10,17 +10,3 @@ class Connection(private val handler: Map<KClass<*>, (Message) -> Unit>) {
 
     }
 }
-
-data class MsgGetLobbies(val test: String) : Message
-data class MsgSendLobbies(val test: List<String>) : Message
-
-class MasterServer {
-    val connection = Connection(mapOf(
-            MsgGetLobbies::class to { msg -> getLobbies(msg as MsgGetLobbies) }
-    ))
-
-    private fun getLobbies(msgGetLobbies: MsgGetLobbies) {
-        // collect lobbies
-        connection.send(MsgSendLobbies(emptyList()))
-    }
-}
