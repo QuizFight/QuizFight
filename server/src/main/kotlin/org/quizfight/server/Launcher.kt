@@ -5,7 +5,7 @@ package org.quizfight.server
  * You can choose between new Master Server and Slave Server
  */
 fun main(args: Array<String>){
-    println("Start MasterServer (m), SlaveServer(s), or exit (e)?")
+    println("Start MasterServer (m), GameServer(s), or exit (e)?")
     var stringInput = readLine()
 
     while (!stringInput.equals("e")){
@@ -13,7 +13,7 @@ fun main(args: Array<String>){
             println("Master Server IP-Address: ")
             val mip = readLine()
             if (!mip.isNullOrEmpty()){
-                val ms = MasterServer(mip!!)
+                val ms = MasterServer()
                 ms.start()
             }
         } else if (stringInput.equals("s")){
@@ -23,8 +23,10 @@ fun main(args: Array<String>){
             println("Slave Server IP-Address: ")
             val ip = readLine()
             if (!ip.isNullOrEmpty() && !mip.isNullOrEmpty()){
-                val sls = SlaveServer(mip!!, ip!!)
+                val sls = GameServer()
+                sls.addNewGame("testGame", 5, 5)
                 sls.start()
+
             }
         } else {
             println("Wrong input...")

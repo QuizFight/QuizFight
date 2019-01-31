@@ -3,7 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm'
 }
 
-mainClassName = 'org.quizfight.server.ServerKt'
+mainClassName = 'org.quizfight.server.LauncherKt'
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"

@@ -3,17 +3,13 @@ package org.quizfight.server
 /**
  * The Master Server who manages the Slave Servers.
  * First Bootstrap for all connections.
- * Inherits from SlaveServer
+ * Inherits from GameServer
  * @author Thomas Spanier
  */
-class MasterServer (ip: String):SlaveServer(ip, ip) {
-    var servers: MutableList<String>
+class MasterServer(): GameServer() {
+//class MasterServer (ip: String):GameServer(ip, ip) {
+    var servers: MutableList<String> = arrayListOf()
 
-
-    init {
-        servers = arrayListOf(ip)
-
-    }
 
     /**
      * Adds a new Slave Server to the List
@@ -35,7 +31,7 @@ class MasterServer (ip: String):SlaveServer(ip, ip) {
     fun listAllOpenGames(): List<Game>{
         var allGames: List<Game> = arrayListOf()
         for(slaveServer in servers){
-            //TODO: connect to SlaveServer and call listOpenGames
+            //TODO: connect to GameServer and call listOpenGames
         }
         return allGames
     }
