@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">QuizFight</string>
+
+    <!---StartActivity -->
+    <string name="btn_create">Create game</string>
+    <string name="btn_join">Join game</string>
+
+    <!--AllGamesActivity-->
+    <string name="lbl_choose_game">Please choose a game</string>
+    <string name="lbl_available_games">Those games are available : </string>
+
+    <!--Nickname Dialog-->
+    <string name="lbl_enter_nickname">Please enter a nickname for this game</string>
+    <string name="hint_nickname">Nickname </string>
+
 </resources>
