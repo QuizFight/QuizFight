@@ -4,11 +4,13 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Toast
-import kotlinx.android.synthetic.main.activity_all_games.*
 
+/**
+ * This activity is the first activity of the app
+ * It proposes two button to create a game or to join a game
+ * @author Aude Nana
+ */
 class StartActivity : AppCompatActivity() {
 
 
