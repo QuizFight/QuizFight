@@ -1,14 +1,14 @@
 <questions type="fourAnswerQuestion">
     <gaming>
         <question>
-            <text>Welcher dieser Herren ist Teil des Videospielunternehmens Nintendo</text>
+            <text>Welcher dieser Herren ist Teil des Videospielunternehmens Nintendo?</text>
             <correct>Shigeru Miyamoto</correct>
             <bad>Stephen Hillenburg</bad>
             <bad>Alan Turing</bad>
             <bad>Ralf Schmitz</bad>
         </question>
         <question>
-            <text>In welchem Jahr erschien in Deutschland das Super Nintendo Entertainment System</text>
+            <text>In welchem Jahr erschien in Deutschland das Super Nintendo Entertainment System?</text>
             <correct>1992</correct>
             <bad>1990</bad>
             <bad>1991</bad>
@@ -17,14 +17,14 @@
     </gaming>
     <aroundTheWorld>
         <question>
-            <text>In welchem Land steht der schiefe Turm von Pisa</text>
+            <text>In welchem Land steht der schiefe Turm von Pisa?</text>
             <correct>Italien</correct>
             <bad>Turmland</bad>
             <bad>Portugal</bad>
             <bad>Bulgarien</bad>
         </question>
         <question>
-            <text>Wie lautet die Hauptstadt von Weissrussland</text>
+            <text>Wie lautet die Hauptstadt von Weissrussland?</text>
             <correct>Minsk</correct>
             <bad>Nimsk</bad>
             <bad>Tallinn</bad>
@@ -33,7 +33,7 @@
     </aroundTheWorld>
     <history>
         <question>
-            <text>Wann wurde offiziell der EURO eingefuehrt</text>
+            <text>Wann wurde offiziell der EURO eingefuehrt?</text>
             <correct>1. Januar 2002</correct>
             <bad>12. Januar 2002</bad>
             <bad>1. Januar 2001</bad>
