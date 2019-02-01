@@ -2,23 +2,29 @@ package org.quizfight.questionStore
 
 import org.quizfight.common.question.Question
 import org.quizfight.common.question.Types
+import org.quizfight.parser.XmlParser
 
 /**
  * The QuestionStore saves the list of questions for every Game.
  * It will be able to refresh the question list while the server is running.
- * This will allow to add new questions to the database without termination.
+ * This will allow to add or remove questions to the database without termination.
  * Furthermore the Store can ask the QuestionSelector for questions of a chosen type
  * or a chosen category
  * @author Julian Einspenner
  */
-class QuestionStore (var questions: List<Question>){
+class QuestionStore{
+
+    var questions = mutableListOf<Question>()
+
+    constructor(){
+        refreshQuestionList()
+    }
 
     /**
-     * Allows the refreshment of the loaded question list
-     * @param questions is the new list of Question-objects
+     * Allows the refreshment by reloading the Xml-Files
      */
-    fun refreshQuestionList(questions: List<Question>){
-        this.questions = questions
+    fun refreshQuestionList(){
+        questions = XmlParser().convertXmlToQuestions().toMutableList()
     }
 
     /**
@@ -39,6 +45,23 @@ class QuestionStore (var questions: List<Question>){
             if(question.type == ID) count++
         }
         return count
+    }
+
+    /**
+     * Returns a single question, just for prototyping
+     * @return is the random question. If no question was found a hardcoded one will be chosen
+     */
+    fun getQuestionForPrototypeTesting(): Question {
+        return QuestionSelector().getQuestionForPrototypeTesting(questions)
+    }
+
+    /**
+     * Returns a question list for a whole game. The count of questions is limited.
+     * @param count is the count of questions a game will use
+     * @return is the list of questions. Its size is obtained by param count
+     */
+    fun getQuestionsForGame(count: Int): List<Question>{
+        return QuestionSelector().getQuestionsForGame(count, this.questions)
     }
 
     /**
