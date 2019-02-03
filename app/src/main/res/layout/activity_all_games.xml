@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:orientation="vertical"
-    android:layout_gravity="center">
+    android:layout_gravity="center"
+    android:background="@color/background">
 
 
     <TextView
@@ -14,7 +16,9 @@
         android:layout_height="wrap_content"
         android:text="@string/lbl_choose_game"
         android:layout_marginTop="10dp"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:textSize="8pt"
+        android:textColor="#ffffff"/>
 
     <TextView
         android:id="@+id/textView2"
@@ -22,13 +26,26 @@
         android:layout_height="wrap_content"
         android:text="@string/lbl_available_games"
         android:layout_marginTop="10dp"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:textSize="8pt"
+        android:textColor="#ffffff"/>
+
+    <ImageButton
+        android:id="@+id/btn_sync"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        app:srcCompat="@android:drawable/ic_popup_sync"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"/>
 
     <ListView
         android:id="@+id/all_games_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="10dp"
+        android:textColor="#ffffff"
+        android:background="#FFEAE8E8"/>
 
 </LinearLayout>
