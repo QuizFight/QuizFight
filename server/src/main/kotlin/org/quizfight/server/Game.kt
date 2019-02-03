@@ -10,21 +10,14 @@ import java.net.Socket
  * Game Class. Manages connections to players, asks Questions and calculates the scores
  * @author Thomas Spanier
  */
-class Game(val id: Int, val gameName:String, val maxPlayer: Int, val questionCount: Int) {
+class Game(val id: Int, val gameName:String, val maxPlayer: Int, var questions: List<Question>) {
     private val MSG_PLAYER_COUNT = "MaxPlayerCount must be between 2 and 8!"
     private val MSG_GAME_FULL = "The Game is already full!"
 
     private var nextPlayerID: Int = 0
-    var questions: MutableList<Question>
     var players: MutableMap<Int, Player> = mutableMapOf<Int, Player>()
     var open: Boolean = true
 
-    /**
-     * Constructor. Gets the questions
-     */
-    init {
-        questions = mutableListOf<Question>()      //loadQuestions()
-    }
     /**
      * Sets the max number of players. Must be between 2 and 8
      * TODO: Reimplement
@@ -78,6 +71,12 @@ class Game(val id: Int, val gameName:String, val maxPlayer: Int, val questionCou
      */
     fun getNextQuestion(): Message{
         return MsgSendQuestion(questions[0])
+    }
+
+    fun printQuestions(){
+        for(question in questions){
+            println("Frage 1: " + question.text + "\n")
+        }
     }
 
 

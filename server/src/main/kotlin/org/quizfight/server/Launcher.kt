@@ -1,5 +1,7 @@
 package org.quizfight.server
 
+import org.quizfight.questionStore.QuestionStore
+
 /**
  * Starts the Server
  * You can choose between new Master Server and Slave Server
@@ -24,8 +26,19 @@ fun main(args: Array<String>){
             val ip = readLine()
             if (!ip.isNullOrEmpty() && !mip.isNullOrEmpty()){
                 val sls = GameServer()
-                sls.addNewGame("testGame", 5, 5)
+
+                //-------Prototyp Test---------//
+                val store = QuestionStore()
+                val questions = store.getQuestionsForGame(5)
+
+                sls.addNewGame("testGame", 5, questions)
+                var game = sls.games.find { it.gameName == "testGame" }
+                println("Das Game hat folgende Fragen:\n")
+                game!!.printQuestions()
+
                 sls.start()
+
+
 
             }
         } else {
