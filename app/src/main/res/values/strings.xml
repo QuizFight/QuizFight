@@ -12,5 +12,9 @@
     <!--Nickname Dialog-->
     <string name="lbl_enter_nickname">Please enter a nickname for this game</string>
     <string name="hint_nickname">Nickname </string>
+    <string name="lbl_created_by">Created By</string>
+
+    <string name="lbl_players">Players</string>
+    <string name="lbl_number_of_questions">No. of Questions</string>
 
 </resources>
