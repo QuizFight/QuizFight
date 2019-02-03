@@ -57,7 +57,7 @@ class QuizActivity : AppCompatActivity() {
         if (answer == currentQuestion.correctAnswer) {
             selectedButton.setTextColor(Color.GREEN)
         } else {
-            selectedButton.setTextColor(Color.RED)
+            selectedButton.setTextColor(Color.WHITE)
         }
     }
 
