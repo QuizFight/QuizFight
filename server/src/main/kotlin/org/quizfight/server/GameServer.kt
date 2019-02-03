@@ -2,6 +2,7 @@ package org.quizfight.server
 
 import org.quizfight.common.Connection
 import org.quizfight.common.messages.*
+import org.quizfight.common.question.Question
 import java.net.ServerSocket
 
 /**
@@ -29,8 +30,8 @@ open class GameServer(){
     /**
      * Adds a new game to gamesList
      */
-    fun addNewGame(gameName: String, maxPlayer: Int, questionCount: Int){
-        addNewGame(Game(gameIds++, gameName, maxPlayer, questionCount))
+    fun addNewGame(gameName: String, maxPlayer: Int, questions: List<Question>){
+        addNewGame(Game(gameIds++, gameName, maxPlayer, questions))
     }
 
     fun addNewGame(game: Game){
