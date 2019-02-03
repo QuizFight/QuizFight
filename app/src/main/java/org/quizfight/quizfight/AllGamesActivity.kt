@@ -22,20 +22,8 @@ class AllGamesActivity : AppCompatActivity() {
         //create connection to server
        // val connector = Connection()
 
-
-        // read a list of games from server
-        val gameList = listOf("Game1", "Game2", "Game3", "Game4", "Game5", "Game6", "Game7")
-
-        // Create an ArrayAdapter from List
-        val adapter = ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_list_item_1,
-                gameList
-        )
-
-
-        // Finally, data bind the list view object with adapter
-        all_games_container.adapter = adapter;
+        //display available games
+        showGames()
 
         // Set an item click listener for ListView
         all_games_container.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
@@ -47,6 +35,28 @@ class AllGamesActivity : AppCompatActivity() {
 
         }
 
+        btn_sync.setOnClickListener {
+            showGames()
+        }
+
+
+    }
+
+    /**
+     * Displays all available games
+     */
+    fun showGames(){
+        // read a list of games from server
+        val gameList = listOf("Game1", "Game2", "Game3", "Game4", "Game5", "Game6", "Game7")
+
+        // Create an ArrayAdapter from List
+        val adapter = ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_list_item_1,
+                gameList
+        )
+        // Finally, data bind the list view object with adapter
+        all_games_container.adapter = adapter;
 
     }
 
