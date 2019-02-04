@@ -1,7 +1,9 @@
 package org.quizfight.server
 
 //import java.util.*
+import org.quizfight.common.Connection
 import org.quizfight.common.messages.Message
+import org.quizfight.common.messages.MsgGameJoined
 import org.quizfight.common.messages.MsgSendQuestion
 import org.quizfight.common.question.Question
 import java.net.Socket
@@ -34,9 +36,10 @@ class Game(val id: Int, val gameName:String, val maxPlayer: Int, var questions: 
      * Adds a player to the game
      *
      */
-    fun addPlayer(name: String, socket: Socket){
-        val player = Player(name, this, socket)
+    fun addPlayer(name: String, connection: Connection){
+        val player = Player(name, this, connection)
         addPlayer(player)
+        //conn.send(MsgGameJoined(gameToGameData(games[msgJoinGame.id])))
     }
 
     fun addPlayer(player: Player) {
@@ -86,8 +89,7 @@ class Game(val id: Int, val gameName:String, val maxPlayer: Int, var questions: 
      */
     fun terminateGame(){
         players.values.forEach{
-            //it.connection.socket.close()
-            //it.socket.close()                   //TODO: Useless?
+            it.connection.close()
         }
         players.clear()
     }

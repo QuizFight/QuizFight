@@ -1,20 +1,18 @@
 package org.quizfight.server
 
 import org.quizfight.common.Connection
-import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.MsgSendAnswer
 import org.quizfight.common.messages.MsgStartGame
-import java.net.Socket
 
 /**
  * Player Class. Manages the Connection between a mobile device and the Server.
  * Includes player's score
  * @author Thomas Spanier
  */
-class Player(val name : String, val game: Game, val socket: Socket) {
+class Player(val name : String, val game: Game, oldConnection: Connection) {
     //private val name: String
     var score: Int = 0
-    val connection = SocketConnection(socket, mapOf(
+    val connection = oldConnection.withHandlers(mapOf(
             //TODO: Vote, Timeout, etc
             MsgStartGame::class to { conn, msg -> startGame(conn, msg as MsgStartGame) },
             MsgSendAnswer::class to { conn, msg -> receiveAnswer(conn, msg as MsgSendAnswer) }
