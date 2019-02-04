@@ -1,5 +1,6 @@
 package org.quizfight.server
 
+import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.MsgSendAnswer
 import org.quizfight.common.messages.MsgStartGame
@@ -15,22 +16,22 @@ class Player(val name : String, val game: Game, val socket: Socket) {
     var score: Int = 0
     val connection = SocketConnection(socket, mapOf(
             //TODO: Vote, Timeout, etc
-            MsgStartGame::class to { conn, msg -> startGame(conn as SocketConnection, msg as MsgStartGame) },
-            MsgSendAnswer::class to { conn, msg -> receiveAnswer(conn as SocketConnection, msg as MsgSendAnswer) }
+            MsgStartGame::class to { conn, msg -> startGame(conn, msg as MsgStartGame) },
+            MsgSendAnswer::class to { conn, msg -> receiveAnswer(conn, msg as MsgSendAnswer) }
     ))
 
 
     /**
      * Forces the game to send the first question
      */
-    private fun startGame(conn: SocketConnection, msgStartGame: MsgStartGame) {
+    private fun startGame(conn: Connection, msgStartGame: MsgStartGame) {
         game.broadcast(game.getNextQuestion())
     }
 
     /**
      * Calculates score, removes game's first question and forces the game to send the next question
      */
-    private fun receiveAnswer(conn: SocketConnection, msgSendAnswer: MsgSendAnswer) {
+    private fun receiveAnswer(conn: Connection, msgSendAnswer: MsgSendAnswer) {
         addToScore(msgSendAnswer.score)
 
         //TODO: temporary for first prototype
