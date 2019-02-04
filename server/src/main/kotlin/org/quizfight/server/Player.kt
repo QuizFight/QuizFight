@@ -1,6 +1,7 @@
 package org.quizfight.server
 
 import org.quizfight.common.Connection
+import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.MsgSendAnswer
 import org.quizfight.common.messages.MsgStartGame
 import java.net.Socket
@@ -13,7 +14,7 @@ import java.net.Socket
 class Player(val name : String, val game: Game, val socket: Socket) {
     //private val name: String
     var score: Int = 0
-    val connection = Connection(socket, mapOf(
+    val connection = SocketConnection(socket, mapOf(
             //TODO: Vote, Timeout, etc
             MsgStartGame::class to { conn, msg -> startGame(conn, msg as MsgStartGame) },
             MsgSendAnswer::class to { conn, msg -> receiveAnswer(conn, msg as MsgSendAnswer) }

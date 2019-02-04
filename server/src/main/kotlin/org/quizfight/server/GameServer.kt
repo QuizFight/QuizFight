@@ -1,6 +1,7 @@
 package org.quizfight.server
 
 import org.quizfight.common.Connection
+import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import org.quizfight.common.question.Question
 import java.net.ServerSocket
@@ -16,7 +17,7 @@ open class GameServer(){
     private var gameIds: Int = 0
     var games= mutableListOf<Game>()
 
-    val connection = Connection(socket.accept(), mapOf(
+    val connection = SocketConnection(socket.accept(), mapOf(
             //TODO: implement all handlers for Masterserver communication
             MsgGetOpenGames::class to   { conn, msg -> getOpenGames(conn, msg as MsgGetOpenGames) },
             MsgJoinGame::class to       { conn, msg -> joinGame(conn, msg as MsgJoinGame) },
@@ -100,7 +101,7 @@ open class GameServer(){
      * Adds the Player to a Game
      */
     private fun joinGame(conn: Connection, msgJoinGame: MsgJoinGame) {
-        games[msgJoinGame.id].addPlayer(msgJoinGame.playerName, conn.socket)
+        games[msgJoinGame.id].addPlayer(msgJoinGame.playerName, (conn as SocketConnection).socket)
         conn.send(MsgGameJoined(gameToGameData(games[msgJoinGame.id])))
     }
 
