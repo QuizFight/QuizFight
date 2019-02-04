@@ -86,14 +86,14 @@ class Game(val id: Int, val gameName:String, val maxPlayer: Int, var questions: 
      */
     fun terminateGame(){
         players.values.forEach{
-            it.connection.socket.close()
+            //it.connection.socket.close()
             //it.socket.close()                   //TODO: Useless?
         }
         players.clear()
     }
 
     override fun toString(): String {
-        return "Game(id=$id, gameName='$gameName', maxPlayer=$maxPlayer, questionCount=$questionCount, open=$open)"
+        return "Game(id=$id, gameName='$gameName', maxPlayer=$maxPlayer, open=$open)"
     }
 
 
