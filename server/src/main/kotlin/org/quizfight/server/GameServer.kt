@@ -101,8 +101,7 @@ open class GameServer(){
      * Adds the Player to a Game
      */
     private fun joinGame(conn: Connection, msgJoinGame: MsgJoinGame) {
-        games[msgJoinGame.id].addPlayer(msgJoinGame.playerName, (conn as SocketConnection).socket)
-        conn.send(MsgGameJoined(gameToGameData(games[msgJoinGame.id])))
+        games[msgJoinGame.id].addPlayer(msgJoinGame.playerName, conn)
     }
 
 
