@@ -1,6 +1,6 @@
 package org.quizfight.server
 
-import org.quizfight.common.Connection
+import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import java.net.ServerSocket
 
@@ -15,11 +15,11 @@ open class GameServer(){
     private var gameIds: Int = 0
     var games= mutableListOf<Game>()
 
-    val connection = Connection(socket.accept(), mapOf(
+    val connection = SocketConnection(socket.accept(), mapOf(
             //TODO: implement all handlers for Masterserver communication
-            MsgGetOpenGames::class to   { conn, msg -> getOpenGames(conn, msg as MsgGetOpenGames) },
-            MsgJoinGame::class to       { conn, msg -> joinGame(conn, msg as MsgJoinGame) },
-            MsgCreateGame::class to     { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame)}
+            MsgGetOpenGames::class to   { conn, msg -> getOpenGames(conn as SocketConnection, msg as MsgGetOpenGames) },
+            MsgJoinGame::class to       { conn, msg -> joinGame(conn as SocketConnection, msg as MsgJoinGame) },
+            MsgCreateGame::class to     { conn, msg -> receiveCreateGame(conn as SocketConnection, msg as MsgCreateGame)}
     ))
 
     init {
@@ -77,7 +77,7 @@ open class GameServer(){
      * Creates a new game and adds it to the games list
      * Sends feedback to Client
      */
-    private fun receiveCreateGame(conn: Connection, msgCreateGame: MsgCreateGame) {
+    private fun receiveCreateGame(conn: SocketConnection, msgCreateGame: MsgCreateGame) {
         val gd = msgCreateGame.gameData
         this.addNewGame(gameDataToGame(gd))
         conn.send(MsgSendGameCreated(gd))   //App gets Feedback, that the game was successfully created
@@ -88,7 +88,7 @@ open class GameServer(){
      *  Sends the list of open games over own connection object
      *  TODO: use conn or connection?
      */
-    private fun getOpenGames(conn: Connection, msgGetOpenGames: MsgGetOpenGames) {
+    private fun getOpenGames(conn: SocketConnection, msgGetOpenGames: MsgGetOpenGames) {
         conn.send(MsgSendOpenGames(listOpenGames()))
         //connection.send(MsgSendOpenGames(listOpenGames()))
     }
@@ -98,7 +98,7 @@ open class GameServer(){
      * Gets called, if MsgJoinGame incomes.
      * Adds the Player to a Game
      */
-    private fun joinGame(conn: Connection, msgJoinGame: MsgJoinGame) {
+    private fun joinGame(conn: SocketConnection, msgJoinGame: MsgJoinGame) {
         games[msgJoinGame.id].addPlayer(msgJoinGame.playerName, conn.socket)
         conn.send(MsgGameJoined(gameToGameData(games[msgJoinGame.id])))
     }
