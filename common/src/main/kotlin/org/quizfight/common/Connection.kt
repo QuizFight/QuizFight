@@ -3,9 +3,12 @@ package org.quizfight.common
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.quizfight.common.messages.Message
+import java.io.EOFException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.net.Socket
+import java.net.SocketException
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KClass
 
 interface Connection {
@@ -23,7 +26,9 @@ class SocketConnection(
     private val outStream = ObjectOutputStream(socket.getOutputStream())
     private val inStream  = ObjectInputStream(socket.getInputStream())
     // Flag to stop handling messages when withHandlers is called
-    private var handleMessages = true
+    private var handleMessages = AtomicBoolean(true)
+    // Flag to ignore EOF exception when closing socket correctly
+    private var shuttingDown = AtomicBoolean(false)
 
     init {
         /* TODO: Type check handler map
@@ -34,8 +39,14 @@ class SocketConnection(
     }
 
     private fun receiveAsync() = GlobalScope.launch {
-        while (!socket.isClosed && handleMessages) {
-            val msg = inStream.readObject() as? Message ?: throw Exception("Received invalid object")
+        while (!socket.isClosed && handleMessages.get()) {
+            val msg = try {
+                inStream.readObject() as? Message ?: throw Exception("Received invalid object")
+            } catch (e: EOFException) {
+                if (!shuttingDown.get()) throw e else break
+            } catch (e: SocketException) {
+                if (!shuttingDown.get()) throw e else break
+            }
             val handler = handlers[msg::class] ?: throw Exception("No handler found for message type ${msg::class}")
             handler(this@SocketConnection, msg)
         }
@@ -46,6 +57,7 @@ class SocketConnection(
     }
 
     override fun close() {
+        shuttingDown.set(true)
         socket.close()
     }
 
@@ -53,7 +65,7 @@ class SocketConnection(
         // TODO: This should probably kill the coroutine, too, in case it's already blocking on readObject.
         // Note: This should only kill the coroutine if this method is not executed within the coroutine!
         //       Otherwise, it suicides and the new Connection is never created.
-        handleMessages = false
+        handleMessages.set(false)
         return SocketConnection(socket, handlers)
     }
 }
