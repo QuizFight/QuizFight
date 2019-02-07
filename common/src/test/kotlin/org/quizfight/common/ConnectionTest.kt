@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.quizfight.common.messages.Message
+import org.quizfight.common.test.DelayedSocket
 import java.net.ServerSocket
 import java.net.Socket
 import java.time.Duration
@@ -23,13 +24,13 @@ class ConnectionTest {
         // Make sure server is available before Client tries to connect
         val serverSocket = ServerSocket(0)
         val job = GlobalScope.launch {
-            val outgoing = SocketConnection(serverSocket.accept(), emptyMap())
+            val outgoing = SocketConnection(DelayedSocket(serverSocket.accept()), emptyMap())
             outgoing.send(StringMessage(testValue))
             outgoing.close()
             serverSocket.close()
         }
 
-        val clientSocket = Socket("localhost", serverSocket.localPort)
+        val clientSocket = DelayedSocket(Socket("localhost", serverSocket.localPort))
         SocketConnection(clientSocket, mapOf(
             StringMessage::class to { conn, msg ->
                 Assertions.assertTrue(msg is StringMessage)
