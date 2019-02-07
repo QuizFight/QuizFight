@@ -16,7 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  */
 class XmlParser() {
 
-    val DIR_OF_XML = ".\\server\\res\\xml"
+    val DIR_OF_XML = "/xml"
 
     /**
      * Reads every xmlFile and converts the data to a kotlin-object, representating the questions
@@ -35,7 +35,11 @@ class XmlParser() {
     fun getPaths() : List<String> {
         var paths = mutableListOf<String>()
 
-        File(DIR_OF_XML).walk().forEach {
+
+        var res = XmlParser::class.java.getResource(DIR_OF_XML)
+        var file = File(res.toURI())
+
+        file.walk().forEach {
             if(it.isFile && it.path.endsWith(".xml", true)){
                 println("Found xml: " + it.name)
                 paths.add(it.path)
