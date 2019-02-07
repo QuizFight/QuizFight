@@ -6,7 +6,7 @@ import java.io.Serializable
 interface Message : Serializable
 
 
-data class GameData(val id: Int, val gameName:String, val maxPlayer: Int, val questionCount: Int) //TODO: Add ip for GameServer
+data class GameData(val id: Int, val gameName:String, val maxPlayer: Int, val questions: MutableList<Question>) //TODO: Add ip for GameServer
 
 
 data class MsgGetAllOpenGames   (val openGames: List<GameData>) : Message

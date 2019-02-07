@@ -6,6 +6,7 @@ import org.quizfight.common.messages.GameData
  * First test class
  */
 fun main(args: Array<String>){
+    /*
     var sls = GameServer()
     sls.addNewGame("Game0", 5, 5)
     sls.addNewGame("Game1", 2, 15)
@@ -15,7 +16,7 @@ fun main(args: Array<String>){
     for(game in list){
         println(game.toString())
     }
-
+    */
 
 
 }

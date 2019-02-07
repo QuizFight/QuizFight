@@ -31,7 +31,7 @@ open class GameServer(){
     /**
      * Adds a new game to gamesList
      */
-    fun addNewGame(gameName: String, maxPlayer: Int, questions: List<Question>){
+    fun addNewGame(gameName: String, maxPlayer: Int, questions: MutableList<Question>){
         addNewGame(Game(gameIds++, gameName, maxPlayer, questions))
     }
 
@@ -54,14 +54,14 @@ open class GameServer(){
      * converts a game into gameData
      */
     private fun gameToGameData(g: Game): GameData {
-        return GameData(g.id, g.gameName, g.maxPlayer, g.questionCount)
+        return GameData(g.id, g.gameName, g.maxPlayer, g.questions)
     }
 
     /**
      * converts gameData into a game
      */
     private fun gameDataToGame(gd: GameData): Game {
-        return Game(gd.id,gd.gameName, gd.maxPlayer, gd.questionCount)
+        return Game(gd.id,gd.gameName, gd.maxPlayer, gd.questions)
     }
 
     /**

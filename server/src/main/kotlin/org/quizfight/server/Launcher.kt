@@ -29,7 +29,7 @@ fun main(args: Array<String>){
 
                 //-------Prototyp Test---------//
                 val store = QuestionStore()
-                val questions = store.getQuestionsForGame(5)
+                val questions = store.getQuestionsForGame(5).toMutableList()
 
                 sls.addNewGame("testGame", 5, questions)
                 var game = sls.games.find { it.gameName == "testGame" }
