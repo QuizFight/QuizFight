@@ -33,7 +33,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection) {
         addToScore(msgSendAnswer.score)
 
         //TODO: temporary for first prototype
-        game.questions.removeAt(0)
+        game.questions.removeAt(0)              //GOTO Next question is better
         game.broadcast(game.getNextQuestion())
     }
 

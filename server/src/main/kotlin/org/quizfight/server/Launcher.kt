@@ -7,7 +7,23 @@ import org.quizfight.questionStore.QuestionStore
  * You can choose between new Master Server and Slave Server
  */
 fun main(args: Array<String>){
-    println("Start MasterServer (m), GameServer(s), or exit (e)?")
+
+
+    val gs = GameServer()
+    //println("2")
+    //-------Prototyp Test---------//
+
+    val store = QuestionStore()
+    val questions = store.getQuestionsForGame(5).toMutableList()
+
+    gs.addNewGame("testGame", 5, questions)
+    var game = gs.games.find { it.gameName == "testGame" }
+    println("Das Game hat folgende Fragen:\n")
+    game!!.printQuestions()
+
+    gs.start()
+
+    /*println("Start MasterServer (m), GameServer(s), or exit (e)?")
     var stringInput = readLine()
 
     while (!stringInput.equals("e")){
@@ -47,5 +63,5 @@ fun main(args: Array<String>){
         stringInput = readLine()
     }
 
-
+*/
 }
