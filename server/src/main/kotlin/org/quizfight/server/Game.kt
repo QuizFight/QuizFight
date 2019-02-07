@@ -83,7 +83,6 @@ class Game(val id: Int, val gameName:String, val maxPlayer: Int, var questions: 
     }
 
 
-
     /**
      * Ends all connections between the Server and the mobile devices and clears the players list
      */
