@@ -30,7 +30,7 @@ class QuizActivity : AppCompatActivity() {
 
         questionCountTotal = questionList.size
 
-        ShowQestionTask(this).execute()
+        ShowQuestionTask(this).execute()
        // showNextQuestion()
     }
 
@@ -69,11 +69,10 @@ class QuizActivity : AppCompatActivity() {
     }
 }
 
-class ShowQestionTask(private var activity: QuizActivity?) : AsyncTask<String, String, String>() {
+class ShowQuestionTask(private var activity: QuizActivity?) : AsyncTask<String, String, String>() {
 
     override fun onPreExecute() {
         super.onPreExecute()
-        // activity?.MyprogressBar?.visibility = View.VISIBLE
     }
 
     override fun doInBackground(vararg p0: String?): String {
