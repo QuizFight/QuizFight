@@ -20,8 +20,7 @@ class QuizActivity : AppCompatActivity() {
         setContentView(R.layout.activity_quiz)
 
         //sollte auch vom Server gelesen werden
-        questionCountTotal = 5
-
+        questionCountTotal = intent.getIntExtra("questionCountTotal", 0)
 
         Thread(Runnable {
             val client = Client("10.0.2.2", 12345, this)

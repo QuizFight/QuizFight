@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
 
     val server = Server(12345)
 
-    val fourAnswersQuestion = FourAnswersQuestion("Wie heisst du? ",
+    val question1 = FourAnswersQuestion("Wie heisst du? ",
             "Test",
             Types.FOUR_ANSWERS.id,
             "richtig",
@@ -31,7 +31,17 @@ fun main(args: Array<String>) {
             "falsch",
             "falsch")
 
-    server.conn.send(MsgSendQuestion(fourAnswersQuestion))
+    val question2 = FourAnswersQuestion("Wie heisst du? ",
+            "Test",
+            Types.FOUR_ANSWERS.id,
+            "richtig",
+            "falsch",
+            "falsch",
+            "falsch")
+
+    server.conn.send(MsgSendQuestion(question1))
+   // server.conn.send(MsgSendQuestion(question2))
+
 
     while(true);
 }
