@@ -23,10 +23,10 @@ class Client(serverIp: String, port: Int , activity: QuizActivity?) {
 
     fun receiveQuestion(msg :MsgSendQuestion){
         question = msg.question as FourAnswersQuestion
-        //println(question.text+ "testquestion")
         ac?.showNextQuestion(question)
 
     }
+
 
 
 

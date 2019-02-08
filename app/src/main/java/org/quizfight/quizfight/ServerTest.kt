@@ -33,6 +33,5 @@ fun main(args: Array<String>) {
 
     server.conn.send(MsgSendQuestion(fourAnswersQuestion))
 
-
     while(true);
 }
