@@ -80,26 +80,18 @@ open class GameServer(){
             println("Waiting for client...")
             val incoming = socket.accept()
             println("${incoming.inetAddress} connected!")
-            /* GlobalScope.launch {
-                SocketConnection(incoming, mapOf(
-                        //TODO: implement all handlers for Masterserver communication
-                        MsgGetOpenGames::class to { conn, msg -> getOpenGames(conn, msg as MsgGetOpenGames) },
-                        MsgJoinGame::class to { conn, msg -> joinGame(conn, msg as MsgJoinGame) },
-                        MsgCreateGame::class to { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame) }
-                ))
-                println("Client connected")
-            } */
+
             val connection = SocketConnection(incoming, mapOf(
-                    MsgSendAnswer::class to { conn, msg ->
-                        println("Received stuff")
-                        val game = games[0]
-                        game.addPlayer("Aude", conn)
-                        game.start()
-                    }
+                    MsgSendAnswer::class to { conn, msg -> println("Komisch, gameServer sollte keine Antworten kriegen.")}
             ))
-            while (true);
+
+            val game = games[0]
+            game.addPlayer("Aude", connection)
+            game.start()
         }
     }
+
+
 
     /**
      * Gets called, if MsgCreateGame incomes.

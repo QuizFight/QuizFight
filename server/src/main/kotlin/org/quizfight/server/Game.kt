@@ -5,7 +5,9 @@ import org.quizfight.common.Connection
 import org.quizfight.common.messages.Message
 import org.quizfight.common.messages.MsgGameJoined
 import org.quizfight.common.messages.MsgSendQuestion
+import org.quizfight.common.question.FourAnswersQuestion
 import org.quizfight.common.question.Question
+import org.quizfight.common.question.Types
 import java.net.Socket
 
 /**
@@ -33,8 +35,10 @@ class Game(val id: Int, val gameName:String, val maxPlayer: Int, var questions: 
     }
 
     fun start() {
-        println(questions[0])
+        //println(questions[0])
         broadcast(MsgSendQuestion(questions[0]))
+        //broadcast(MsgSendQuestion(FourAnswersQuestion("Wer bin ich", "test", Types.FOUR_ANSWERS.id, "richtig", "falsch", "falsch", "falsch")))
+        println("Broadcast has worked")
     }
 
     /**

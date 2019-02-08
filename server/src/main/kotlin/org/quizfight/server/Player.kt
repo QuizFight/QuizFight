@@ -26,10 +26,18 @@ class Player(val name : String, val game: Game, oldConnection: Connection) {
         game.broadcast(game.getNextQuestion())
     }
 
+    fun printReceivedAnswer(msg: MsgSendAnswer) {
+        println("Ich habe eine Antwort erhalten!")
+        println((msg as MsgSendAnswer).score)
+    }
     /**
      * Calculates score, removes game's first question and forces the game to send the next question
      */
     private fun receiveAnswer(conn: Connection, msgSendAnswer: MsgSendAnswer) {
+
+        println("Ich habe eine Antwort erhalten!")
+        println("Der score ist ${msgSendAnswer.score}")
+
         addToScore(msgSendAnswer.score)
 
         //TODO: temporary for first prototype
