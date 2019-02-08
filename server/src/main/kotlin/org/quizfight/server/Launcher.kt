@@ -20,7 +20,6 @@ fun main(args: Array<String>){
     var game = gs.games.find { it.gameName == "testGame" }
     println("Das Game hat folgende Fragen:\n")
     game!!.printQuestions()
-
     gs.start()
 
     /*println("Start MasterServer (m), GameServer(s), or exit (e)?")

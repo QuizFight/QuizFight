@@ -20,7 +20,7 @@ interface Connection {
 
 class SocketConnection(
     private val socket: Socket,
-    override val handlers: Map<KClass<*>, (Connection, Message) -> Unit>
+    override var handlers: Map<KClass<*>, (Connection, Message) -> Unit>
 ) : Connection {
     // Do not switch order of stream creation, will result in deadlock
     private val outStream = ObjectOutputStream(socket.getOutputStream())
@@ -65,7 +65,8 @@ class SocketConnection(
         // TODO: This should probably kill the coroutine, too, in case it's already blocking on readObject.
         // Note: This should only kill the coroutine if this method is not executed within the coroutine!
         //       Otherwise, it suicides and the new Connection is never created.
-        handleMessages.set(false)
-        return SocketConnection(socket, handlers)
+        // handleMessages.set(false)
+        this.handlers = handlers
+        return this // SocketConnection(socket, handlers)
     }
 }

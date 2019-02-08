@@ -5,7 +5,9 @@ import kotlinx.coroutines.launch
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
+import org.quizfight.common.question.FourAnswersQuestion
 import org.quizfight.common.question.Question
+import org.quizfight.common.question.Types
 import java.net.ServerSocket
 
 /**
@@ -75,8 +77,10 @@ open class GameServer(){
         println("Game Server started")
 
         while (!socket.isClosed) {
+            println("Waiting for client...")
             val incoming = socket.accept()
-            GlobalScope.launch {
+            println("${incoming.inetAddress} connected!")
+            /* GlobalScope.launch {
                 SocketConnection(incoming, mapOf(
                         //TODO: implement all handlers for Masterserver communication
                         MsgGetOpenGames::class to { conn, msg -> getOpenGames(conn, msg as MsgGetOpenGames) },
@@ -84,7 +88,16 @@ open class GameServer(){
                         MsgCreateGame::class to { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame) }
                 ))
                 println("Client connected")
-            }
+            } */
+            val connection = SocketConnection(incoming, mapOf(
+                    MsgSendAnswer::class to { conn, msg ->
+                        println("Received stuff")
+                        val game = games[0]
+                        game.addPlayer("Aude", conn)
+                        game.start()
+                    }
+            ))
+            while (true);
         }
     }
 

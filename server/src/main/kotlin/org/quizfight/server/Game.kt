@@ -32,6 +32,11 @@ class Game(val id: Int, val gameName:String, val maxPlayer: Int, var questions: 
         }
     }
 
+    fun start() {
+        println(questions[0])
+        broadcast(MsgSendQuestion(questions[0]))
+    }
+
     /**
      * Adds a player to the game
      *
@@ -48,7 +53,7 @@ class Game(val id: Int, val gameName:String, val maxPlayer: Int, var questions: 
         }
         players[nextPlayerID++] = player
         //TODO: If Game full, then start first question
-        this.broadcast(getNextQuestion())
+        //this.broadcast(getNextQuestion())
     }
 
     /**
