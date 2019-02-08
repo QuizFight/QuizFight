@@ -20,5 +20,5 @@
         <activity android:name=".AllGamesActivity" />
         <activity android:name=".GameDetailActivity" />
     </application>
-
+    <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>
