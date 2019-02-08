@@ -15,7 +15,6 @@ class Server(val port: Int) {
     init {
         conn = SocketConnection(socket.accept(), mapOf(
                 MsgSendQuestion::class to { conn, msg ->  }
-                MsgSendAnswer::class to {conn, msg -> println()}
         ))
     }
 

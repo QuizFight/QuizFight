@@ -28,8 +28,9 @@
             <EditText
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:text="@string/hint_nickname"
-                android:textColor="#ffffff"/>
+                android:inputType="text"
+                android:textColor="#ffffff"
+                android:id="@+id/ed_game_name"/>
         </LinearLayout>
 
 
@@ -48,8 +49,9 @@
             <EditText
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:text="10"
-                android:textColor="#ffffff"/>
+                android:inputType="number"
+                android:textColor="#ffffff"
+                android:id="@+id/ed_number_question"/>
         </LinearLayout>
 
         <LinearLayout
@@ -66,8 +68,9 @@
             <EditText
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:text="10"
-                android:textColor="#ffffff"/>
+                android:textColor="#ffffff"
+                android:inputType="number"
+                android:id="@+id/ed_number_player"/>
         </LinearLayout>
 
         <LinearLayout
@@ -83,9 +86,19 @@
             <EditText
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:text=" player"
-                android:textColor="#ffffff"/>
+                android:inputType="text"
+                android:textColor="#ffffff"
+                android:id="@+id/ed_nickname"/>
         </LinearLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/button_style"
+            android:layout_gravity="center"
+            android:text="@string/btn_create"
+            android:layout_marginTop="20dp"
+            android:id="@+id/btn_create_game"/>
 
 
     </LinearLayout>

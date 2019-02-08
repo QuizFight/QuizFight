@@ -55,7 +55,7 @@ class QuizActivity : AppCompatActivity() {
 
            text_view_question_count.text = ("Question: " + questionCounter
                         + "/" + questionCountTotal)
-           sendScore()
+     //      sendScore()
        } else {
             finishQuiz()
        }
