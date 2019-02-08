@@ -7,33 +7,27 @@ import android.widget.Button
 import kotlinx.android.synthetic.main.activity_quiz.*
 import org.quizfight.common.question.FourAnswersQuestion
 import android.view.View
-import org.quizfight.common.messages.MsgSendAnswer
-import kotlin.concurrent.thread
 
 
 class QuizActivity : AppCompatActivity() {
     var questionCounter: Int = 0
     var questionCountTotal: Int = 0
 
-    lateinit var client: Client
     lateinit var currentQuestion: FourAnswersQuestion
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
+        //sollte auch vom Server gelesen werden
         questionCountTotal = intent.getIntExtra("questionCountTotal", 0)
 
-        thread {
-            client = Client("10.0.2.2", 12345, this@QuizActivity)
-           // client = Client("10.9.40.65", 34567, this@QuizActivity)
-        }
+        Thread(Runnable {
+            val client = Client("10.0.2.2", 12345, this)
+        }).start()
 
     }
 
-    /**
-     * displays a question received from server
-     */
     fun showNextQuestion(question: FourAnswersQuestion) {
        if (questionCounter < questionCountTotal) {
            currentQuestion = question
@@ -43,58 +37,33 @@ class QuizActivity : AppCompatActivity() {
                    currentQuestion.badAnswer_3)
            answerList.shuffle()
 
+           this@QuizActivity.runOnUiThread(java.lang.Runnable {
 
-           text_view_question.text = currentQuestion.text
-           answer_button1.text = answerList[0]
-           answer_button2.text = answerList[1]
-           answer_button3.text = answerList[2]
-           answer_button4.text = answerList[3]
+                text_view_question.text = currentQuestion.text
+                answer_button1.text = answerList[0]
+                answer_button2.text = answerList[1]
+                answer_button3.text = answerList[2]
+                answer_button4.text = answerList[3]
 
-           questionCounter++
+                questionCounter++
 
 
-           text_view_question_count.text = ("Question: " + questionCounter
+                text_view_question_count.text = ("Question: " + questionCounter
                         + "/" + questionCountTotal)
-           sendScore()
+           })
        } else {
             finishQuiz()
        }
     }
 
     fun checkAnswer(view: View) {
-
         val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
         val answer: CharSequence = selectedButton.text
         if (answer == currentQuestion.correctAnswer) {
             selectedButton.setTextColor(Color.GREEN)
-        thread {
-            client.conn.send(MsgSendAnswer(0,10))
-
-        }
         } else {
             selectedButton.setTextColor(Color.WHITE)
-            client.conn.send(MsgSendAnswer(0,0))
         }
-    }
-
-    /**
-     * the score is send every 20 s
-     */
-    fun sendScore(){
-        Thread.sleep(20000)
-        val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
-        val answer: CharSequence = selectedButton.text
-        if (answer == currentQuestion.correctAnswer) {
-            selectedButton.setTextColor(Color.GREEN)
-            thread {
-                client.conn.send(MsgSendAnswer(0,10))
-
-            }
-        } else {
-            selectedButton.setTextColor(Color.WHITE)
-            client.conn.send(MsgSendAnswer(0,0))
-        }
-
     }
 
     fun finishQuiz() {
