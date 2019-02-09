@@ -10,9 +10,9 @@ import org.quizfight.common.messages.Message
  * @param type is the type of a question. In QuestionUtils-class is a corresponding enumeration
  * @param correctAnswer is the only correct solution of a question
  */
-open class Question(val text: String, val category: String, val type: String, val correctAnswer: String): Message
+open class Question(val text: String, val category: String, val type: Type, val correctAnswer: String): Message
 
-enum class Types(var id: String){
-    FOUR_ANSWERS("fourAnswerQuestion"),
-    RANGED_QUESTIONS("rangedQuestion")
+enum class Type{
+    FOUR_ANSWERS_QUESTION,
+    RANGED_QUESTION
 }

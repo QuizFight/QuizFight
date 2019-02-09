@@ -2,7 +2,7 @@ package org.quizfight.questionStore
 
 import org.quizfight.common.question.FourAnswersQuestion
 import org.quizfight.common.question.Question
-import org.quizfight.common.question.Types
+import org.quizfight.common.question.Type
 
 /**
  * Random selection of questions from the question list of the QuestionStore
@@ -19,14 +19,14 @@ class QuestionSelector {
      */
     fun getQuestionForPrototypeTesting(list: List<Question>): Question {
         if(list.size == 0)
-            return FourAnswersQuestion("Fragetext", "Kategorie", Types.FOUR_ANSWERS.id,
+            return FourAnswersQuestion("Fragetext", "Kategorie", Type.FOUR_ANSWERS_QUESTION,
                     "Korrekte Anwort", "Falsch 1", "Falsch 2", "Falsch 3")
 
         var question: Question
         do{
             val randomIndex = (0..list.size).random()
             question = list.get(randomIndex)
-        }while(question.type != Types.FOUR_ANSWERS.id)
+        }while(question.type != Type.FOUR_ANSWERS_QUESTION)
 
         return question
     }
@@ -52,12 +52,12 @@ class QuestionSelector {
             do{
                 random = (0..copyOfList.size-1).random()
                 newQuestion = copyOfList.get(random)
-            }while(tmpType == newQuestion.type && tmpCategory == newQuestion.category && copyOfList.size != 1)
+            }while(tmpType == newQuestion.type.name && tmpCategory == newQuestion.category && copyOfList.size != 1)
 
             copyOfList.removeAt(random)
             listForGame.add(newQuestion)
 
-            tmpType = newQuestion.type
+            tmpType = newQuestion.type.name
             tmpCategory = newQuestion.category
         }
         return listForGame

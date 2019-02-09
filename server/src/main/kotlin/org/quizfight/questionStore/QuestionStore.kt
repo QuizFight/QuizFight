@@ -1,7 +1,7 @@
 package org.quizfight.questionStore
 
 import org.quizfight.common.question.Question
-import org.quizfight.common.question.Types
+import org.quizfight.common.question.Type
 import org.quizfight.parser.XmlParser
 
 /**
@@ -42,7 +42,7 @@ class QuestionStore{
     fun countQuestionsOfType(ID: String): Int{
         var count = 0
         for(question in questions){
-            if(question.type == ID) count++
+            if(question.type.name == ID) count++
         }
         return count
     }
@@ -71,8 +71,8 @@ class QuestionStore{
      */
     override fun toString(): String{
         return "Counted " + getSize() + " questions\n" +
-               "Type FourAnswers: "   + countQuestionsOfType(Types.FOUR_ANSWERS.id)     + "\n" +
-               "Type Ranged: "        + countQuestionsOfType(Types.RANGED_QUESTIONS.id) + "\n"
+               "Type FourAnswers: "   + countQuestionsOfType(Type.FOUR_ANSWERS_QUESTION.name)     + "\n" +
+               "Type Ranged: "        + countQuestionsOfType(Type.RANGED_QUESTION.name) + "\n"
     }
 
 }
