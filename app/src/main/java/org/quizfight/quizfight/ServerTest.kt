@@ -4,7 +4,7 @@ import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.MsgSendQuestion
 import org.quizfight.common.question.FourAnswersQuestion
-import org.quizfight.common.question.Types
+import org.quizfight.common.question.Type
 import java.net.ServerSocket
 
 class Server(val port: Int) {
@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
 
     val question1 = FourAnswersQuestion("Wie heisst du? ",
             "Test",
-            Types.FOUR_ANSWERS.id,
+            Type.FOUR_ANSWERS_QUESTION,
             "richtig",
             "falsch",
             "falsch",
@@ -33,7 +33,7 @@ fun main(args: Array<String>) {
 
     val question2 = FourAnswersQuestion("Wie heisst du? ",
             "Test",
-            Types.FOUR_ANSWERS.id,
+            Type.FOUR_ANSWERS_QUESTION,
             "richtig",
             "falsch",
             "falsch",

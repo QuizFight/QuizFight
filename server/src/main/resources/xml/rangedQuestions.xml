@@ -1,4 +1,4 @@
-<questions type="rangedQuestion">
+<questions type="RANGED_QUESTION">
     <category1>
         <question>
             <text>Wie viele Liter Bier werden in Deutschland pro Kopf jaehrlich getrunken?</text>
