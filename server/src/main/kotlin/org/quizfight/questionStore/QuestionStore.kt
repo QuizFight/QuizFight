@@ -71,8 +71,8 @@ class QuestionStore{
      */
     override fun toString(): String{
         return "Counted " + getSize() + " questions\n" +
-               "Type FourAnswers: "   + countQuestionsOfType(Type.FOUR_ANSWERS_QUESTION as String)     + "\n" +
-               "Type Ranged: "        + countQuestionsOfType(Type.RANGED_QUESTION as String) + "\n"
+               "Type FourAnswers: "   + countQuestionsOfType(Type.FOUR_ANSWERS_QUESTION.name)     + "\n" +
+               "Type Ranged: "        + countQuestionsOfType(Type.RANGED_QUESTION.name) + "\n"
     }
 
 }
