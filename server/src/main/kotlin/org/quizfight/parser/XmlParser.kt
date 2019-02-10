@@ -3,7 +3,6 @@ package org.quizfight.parser
 import org.quizfight.common.question.*
 import org.w3c.dom.Document
 import org.w3c.dom.Element
-import org.w3c.dom.Node
 import org.xml.sax.InputSource
 import java.io.File
 import java.io.StringReader
@@ -16,7 +15,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  */
 class XmlParser() {
 
-    val DIR_OF_XML = ".\\server\\res\\xml"
+    val DIR_OF_XML = "/xml"
 
     /**
      * Reads every xmlFile and converts the data to a kotlin-object, representating the questions
@@ -35,7 +34,11 @@ class XmlParser() {
     fun getPaths() : List<String> {
         var paths = mutableListOf<String>()
 
-        File(DIR_OF_XML).walk().forEach {
+
+        var res = XmlParser::class.java.getResource(DIR_OF_XML)
+        var file = File(res.toURI())
+
+        file.walk().forEach {
             if(it.isFile && it.path.endsWith(".xml", true)){
                 println("Found xml: " + it.name)
                 paths.add(it.path)
@@ -84,13 +87,12 @@ class XmlParser() {
 
         for(document in documents){
             val type = document.documentElement.getAttribute("type")
-
             var temporaryList = mutableListOf<Question>()
 
             when(type){
-                Types.FOUR_ANSWERS.id      -> temporaryList = getFourAnswerQuestions(document)
-                Types.RANGED_QUESTIONS.id  -> temporaryList = getRangedQuestions(document)
-                else                -> System.err.println("Found bad XML -> Skipped it")
+                Type.FOUR_ANSWERS_QUESTION.name -> temporaryList = getFourAnswerQuestions(document)
+                Type.RANGED_QUESTION.name       -> temporaryList = getRangedQuestions(document)
+                else                            -> System.err.println("Found bad XML -> Skipped it")
             }
 
             resultList = (resultList + temporaryList).toMutableList()
@@ -120,7 +122,7 @@ class XmlParser() {
             val badAnswer_2   = badAnswers.item(1).textContent
             val badAnswer_3   = badAnswers.item(2).textContent
 
-            questionList.add(FourAnswersQuestion(text, category, Types.FOUR_ANSWERS.id, correctAnswer,
+            questionList.add(FourAnswersQuestion(text, category, Type.FOUR_ANSWERS_QUESTION, correctAnswer,
                              badAnswer_1, badAnswer_2, badAnswer_3))
         }
         return questionList
@@ -146,7 +148,7 @@ class XmlParser() {
             val begin   = questionElement.getElementsByTagName("begin").item(0).textContent
             val end     = questionElement.getElementsByTagName("end").item(0).textContent
 
-            questionList.add(RangeQuestion(text, category, Types.RANGED_QUESTIONS.id, correctAnswer,
+            questionList.add(RangeQuestion(text, category, Type.RANGED_QUESTION, correctAnswer,
                     begin, end))
         }
         return questionList
