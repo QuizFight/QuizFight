@@ -18,18 +18,6 @@ class StartActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        //bspl fuer client
-      /*  val task = object : AsyncTask<Void, Void, Unit>() {
-            override fun doInBackground(vararg params: Void?) {
-                val client = Client("10.0.2.2", 12345)
-              // println("test" + client.question.text)
-
-            }
-        }
-        task.execute()*/
-       // ShowQestionTask(this).execute()
-
         setContentView(R.layout.activity_start)
     }
 

@@ -17,4 +17,11 @@
     <string name="lbl_players">Players</string>
     <string name="lbl_number_of_questions">No. of Questions</string>
 
+    <!--CreateGameActivity-->
+    <string name="lbl_game_name">Game name</string>
+    <string name="lbl_number_question">Number of questions</string>
+    <string name="lbl_number_player">Number of players</string>
+    <string name="lbl_nickname">Your nickname </string>
+    <string name="required">Requiered ! </string>
+
 </resources>
