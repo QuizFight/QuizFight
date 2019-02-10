@@ -7,13 +7,17 @@ import android.widget.Button
 import kotlinx.android.synthetic.main.activity_quiz.*
 import org.quizfight.common.question.FourAnswersQuestion
 import android.view.View
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.quizfight.common.messages.MsgSendAnswer
 
 
 class QuizActivity : AppCompatActivity() {
-    var questionCounter: Int = 0
-    var questionCountTotal: Int = 0
+    private var questionCounter: Int = 0
+    private var questionCountTotal: Int = 0
 
-    lateinit var currentQuestion: FourAnswersQuestion
+    private lateinit var currentQuestion: FourAnswersQuestion
+    private lateinit var client : Client
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +27,7 @@ class QuizActivity : AppCompatActivity() {
         questionCountTotal = intent.getIntExtra("questionCountTotal", 0)
 
         Thread(Runnable {
-            val client = Client("10.0.2.2", 12345, this)
+            client = Client("10.0.2.2", 34567, this)
         }).start()
 
     }
@@ -63,6 +67,10 @@ class QuizActivity : AppCompatActivity() {
             selectedButton.setTextColor(Color.GREEN)
         } else {
             selectedButton.setTextColor(Color.WHITE)
+        }
+
+        GlobalScope.launch{
+            client.conn.send(MsgSendAnswer(0, 10))
         }
     }
 
