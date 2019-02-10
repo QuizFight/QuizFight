@@ -13,7 +13,7 @@ import kotlin.coroutines.CoroutineContext
 
 class QuizActivity : CoroutineScope, AppCompatActivity() {
 
-    // The code in a "launch" block should run on the main thread.
+    // The code in a "launch" block will run on the main thread.
     // Use launch{} whenever you want to change UI elements.
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
@@ -46,7 +46,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     //  = launch {} tells the function to run in the main thread if not stated otherwise
     // use = launch {} whenever the function could possibly be called from a non main thread
-    // for example all handlers!
+    // for example calls from message handlers!
     fun showNextQuestion(question: FourAnswersQuestion) = launch {
        if (questionCounter < questionCountTotal) {
            currentQuestion = question
