@@ -15,12 +15,12 @@ interface Connection {
     fun send(msg: Message)
     fun close()
     fun withHandlers(handlers: Map<KClass<*>, (Connection, Message) -> Unit>): Connection
-    val handlers: Map<KClass<*>, (Connection, Message) -> Unit>
+    var handlers: Map<KClass<*>, (Connection, Message) -> Unit>
 }
 
 class SocketConnection(
     private val socket: Socket,
-    override val handlers: Map<KClass<*>, (Connection, Message) -> Unit>
+    override var handlers: Map<KClass<*>, (Connection, Message) -> Unit>
 ) : Connection {
     // Do not switch order of stream creation, will result in deadlock
     private val outStream = ObjectOutputStream(socket.getOutputStream())
@@ -66,6 +66,7 @@ class SocketConnection(
         // Note: This should only kill the coroutine if this method is not executed within the coroutine!
         //       Otherwise, it suicides and the new Connection is never created.
         handleMessages.set(false)
-        return SocketConnection(socket, handlers)
+        this.handlers = handlers
+        return this
     }
 }
