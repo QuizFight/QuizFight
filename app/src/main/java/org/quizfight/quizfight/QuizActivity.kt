@@ -84,7 +84,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
             selectedButton.setTextColor(Color.WHITE)
         }
 
-        launch(Dispatchers.Default){
+        launch(Dispatchers.IO){
             println("Answer sent from thread ${Thread.currentThread().name}")
             client.conn.send(MsgSendAnswer(0, 10))
         }
