@@ -33,7 +33,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
         // Use launch(Dispatchers.IO){} for networking operations
         launch(Dispatchers.IO) {
-            println("launch runs in thread ${Thread.currentThread().name}")
             client = Client("10.0.2.2", 34567, this@QuizActivity)
         }
 
@@ -56,7 +55,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                    currentQuestion.badAnswer_3)
            answerList.shuffle()
 
-           println("Message displayed from thread ${Thread.currentThread().name}")
            text_view_question.text = currentQuestion.text
            answer_button1.text = answerList[0]
            answer_button2.text = answerList[1]
@@ -85,8 +83,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         }
 
         launch(Dispatchers.IO){
-            println("Answer sent from thread ${Thread.currentThread().name}")
-            client.conn.send(MsgSendAnswer(0, 10))
+            //TODO: Send score
         }
     }
 
