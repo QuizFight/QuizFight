@@ -34,7 +34,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection) {
         addToScore(msgSendAnswer.score)
         game.questionIncome++
 
-        if(game.questionIncome >= game.questions.size) {
+        if(game.questionIncome >= game.players.size) {
             game.questionIncome = 0
             game.questions.removeAt(0)
             game.broadcast(game.getNextQuestion())
