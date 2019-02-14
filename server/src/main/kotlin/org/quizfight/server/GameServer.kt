@@ -21,17 +21,12 @@ open class GameServer(val masterServerIp: String, val port: Int){
     val socket = ServerSocket(port)
     private var gameIds: Int = 0
     var games= mutableListOf<Game>()
+    private val ip = "localhost"
 
-    /*val connection = SocketConnection(socket.accept(), mapOf(
-            //TODO: implement all handlers for Masterserver communication
-            MsgGetOpenGames::class to   { conn, msg -> getOpenGames(conn, msg as MsgGetOpenGames) },
-            MsgJoinGame::class to       { conn, msg -> joinGame(conn, msg as MsgJoinGame) },
-            MsgCreateGame::class to     { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame)}
-    ))*/
 
     init {
-        registerWithMaster()
-        GlobalScope.launch {start()}
+        GlobalScope.launch {registerWithMaster()}
+        start()
     }
 
     private fun registerWithMaster()  {
@@ -44,13 +39,10 @@ open class GameServer(val masterServerIp: String, val port: Int){
     }
 
     private fun toGameServerData() : GameServerData {
-        val gamesAsData = mutableListOf<GameData>()
-        for (game in games) {
-            val gameData = gameToGameData(game)
-            gamesAsData.add(gameData)
-        }
 
-        return GameServerData(socket.inetAddress.toString(), port, gamesAsData)
+        val gamesAsGameData = games.map{game -> gameToGameData(game)}
+
+        return GameServerData(ip, port, gamesAsGameData)
     }
 
 
@@ -95,7 +87,7 @@ open class GameServer(val masterServerIp: String, val port: Int){
     /**
      * starts Slave Server
      */
-    open fun start(){
+    open fun start() = GlobalScope.launch {
         //TODO: Implement
         println("Game Server started")
 
@@ -108,7 +100,7 @@ open class GameServer(val masterServerIp: String, val port: Int){
                         MsgJoinGame::class to { conn, msg -> joinGame(conn, msg as MsgJoinGame) },
                         MsgCreateGame::class to { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame) }
                 ))
-                println("Client connected")
+                println("Client connected to Gameserver")
             }
         }
     }

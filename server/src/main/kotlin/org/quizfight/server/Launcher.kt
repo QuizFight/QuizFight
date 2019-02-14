@@ -1,7 +1,10 @@
 package org.quizfight.server
 
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.quizfight.common.messages.MsgJoinGame
+import org.quizfight.common.messages.MsgRequestAllGames
 import org.quizfight.common.question.FourAnswersQuestion
 import org.quizfight.common.question.Type
 import org.quizfight.questionStore.QuestionStore
@@ -23,6 +26,22 @@ fun main(args: Array<String>){
     val gs = GameServer("localhost", 2)
     gs.addNewGame(gameName = "Test", maxPlayer = 2, questions = mutableListOf(FourAnswersQuestion("Wer?", "politics", Type.FOUR_ANSWERS_QUESTION, "Ich", "Du", "Er", "Sie")))
 
+
+    GlobalScope.launch {
+        delay(2000)
+        val client = Client("localhost", 1)
+        client.connection.send(MsgRequestAllGames())
+
+
+        delay(2000)
+        client.connection.send(MsgJoinGame(client.games[0].id, "Udo"))
+
+        delay(2000)
+        client.connection.send(MsgJoinGame(client.games[0].id, "Udo"))
+
+        while(true);
+
+    }
 
     while(true);
     //-------Prototyp Test---------//

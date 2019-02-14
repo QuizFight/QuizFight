@@ -79,7 +79,8 @@ class MasterServer(private val port : Int) {
 
 
     private fun GameServerData.hasGameWithId(gameId: Int) : Boolean {
-        return games.find { it.id == gameId} != null
+        val hasIt = games.find { it.id == gameId} != null
+        return hasIt
     }
 
 
@@ -106,6 +107,7 @@ class MasterServer(private val port : Int) {
         if (gameServer != null) {
             conn.send(MsgTransferToGameServer(gameServer))
         }
+        conn.close()
     }
 
     /**
@@ -118,7 +120,10 @@ class MasterServer(private val port : Int) {
     }
 
 
-
+    /**
+     * Handler function for Register game server requests.
+     * Accepts a GameServerData object and updates its gameServers list accordingly.
+     */
     private fun registerGameServer(conn: Connection, msg : MsgRegisterGameServer) {
         println("Master received MsgRegisterGameServer")
         val gameServer = msg.gameServer
