@@ -15,8 +15,7 @@ class Client(val serverIp: String, val port: Int , val activity: QuizActivity?) 
 
     init {
         connection = SocketConnection(socket,
-                mapOf( MsgSendQuestion ::class to { conn, msg -> receiveQuestion(msg as MsgSendQuestion )},
-                        MsgGameList::class to { conn, msg -> acceptGameList(conn, msg as MsgGameList) },
+                mapOf(  MsgGameList::class to { conn, msg -> acceptGameList(conn, msg as MsgGameList) },
                         MsgTransferToGameServer::class to { conn, msg -> acceptGameServer(conn, msg as MsgTransferToGameServer) }
                 ))
         connection.send(MsgRequestAllGames())
@@ -40,7 +39,7 @@ class Client(val serverIp: String, val port: Int , val activity: QuizActivity?) 
 
         conn.close()
         socket = Socket(msg.gameServer.ip, msg.gameServer.port)
-        connection = SocketConnection(socket, emptyMap())
+        connection = SocketConnection(socket, mapOf(MsgSendQuestion ::class to { conn, msg -> receiveQuestion(msg as MsgSendQuestion )}))
     }
 
 }

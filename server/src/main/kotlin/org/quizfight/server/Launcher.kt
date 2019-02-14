@@ -17,26 +17,32 @@ import javax.xml.bind.JAXBElement
 fun main(args: Array<String>){
 
     GlobalScope.launch {
+        // 1) Master server launches
         MasterServer(1)
     }
 
 
     Thread.sleep(3000)
 
+    // 2) Game server launches
     val gs = GameServer("localhost", 2)
     gs.addNewGame(gameName = "Test", maxPlayer = 2, questions = mutableListOf(FourAnswersQuestion("Wer?", "politics", Type.FOUR_ANSWERS_QUESTION, "Ich", "Du", "Er", "Sie")))
 
 
     GlobalScope.launch {
         delay(2000)
+        // 3) Client launches
         val client = Client("localhost", 1)
+
+        // 4) Client connects to master server and requests all games from all servers. Master responds with list of all games
         client.connection.send(MsgRequestAllGames())
 
-
+        // 5) Client has chosen a game and asks master to join it, Master responds with game server data
         delay(2000)
         client.connection.send(MsgJoinGame(client.games[0].id, "Udo"))
 
         delay(2000)
+        // 6) Client asks game server to join the game. Game server adds him to game and starts
         client.connection.send(MsgJoinGame(client.games[0].id, "Udo"))
 
         while(true);
