@@ -1,19 +1,22 @@
 package org.quizfight.server
 
+import jdk.nashorn.internal.objects.Global
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import org.quizfight.common.question.Question
 import java.net.ServerSocket
+import java.net.Socket
 
 /**
  * Game Server Class. Manages several Games.
  * @author Thomas Spanier
  */
 //open class GameServer(val mip:String, val ip:String){
-open class GameServer(val port: Int){
+open class GameServer(val masterServerIp: String, val port: Int){
 
     val socket = ServerSocket(port)
     private var gameIds: Int = 0
@@ -27,8 +30,29 @@ open class GameServer(val port: Int){
     ))*/
 
     init {
-        //start()
+        registerWithMaster()
+        GlobalScope.launch {start()}
     }
+
+    private fun registerWithMaster()  {
+        val masterSocket = Socket(masterServerIp, 1)
+        val masterConnection = SocketConnection(masterSocket, emptyMap())
+
+        val gameServerData = toGameServerData()
+        masterConnection.send(MsgRegisterGameServer(gameServerData))
+        masterConnection.close()
+    }
+
+    private fun toGameServerData() : GameServerData {
+        val gamesAsData = mutableListOf<GameData>()
+        for (game in games) {
+            val gameData = gameToGameData(game)
+            gamesAsData.add(gameData)
+        }
+
+        return GameServerData(socket.inetAddress.toString(), port, gamesAsData)
+    }
+
 
     /**
      * Adds a new game to gamesList
@@ -39,6 +63,7 @@ open class GameServer(val port: Int){
 
     fun addNewGame(game: Game){
         games.add(game)
+        registerWithMaster()
     }
 
     /**
@@ -105,7 +130,7 @@ open class GameServer(val port: Int){
      *  TODO: use conn or connection?
      */
     private fun getOpenGames(conn: Connection, msgGetOpenGames: MsgGetOpenGames) {
-        conn.send(MsgSendOpenGames(listOpenGames()))
+        conn.send(MsgGameList(listOpenGames()))
         //connection.send(MsgSendOpenGames(listOpenGames()))
     }
 
@@ -120,3 +145,51 @@ open class GameServer(val port: Int){
 
 
 }
+
+
+// GAMESERVER
+/**
+class GameServer(val port : Int) : Serializable  {
+
+    var games = mutableListOf<Game>()
+    val ip = "192.168.178.90"
+
+    init {
+        registerWithMaster()
+        acceptClients()
+    }
+
+
+    private fun acceptClients() = GlobalScope.launch {
+        val clientSocket = ServerSocket(port)
+
+        while(!clientSocket.isClosed) {
+            val clientConnection = SocketConnection(clientSocket.accept(), mapOf(
+                    MsgJoinGame::class to { conn, msg -> handleMsgJoinGame(conn, msg as MsgJoinGame) }
+            ))
+            println("Client connected to Game server")
+        }
+    }
+
+
+    fun hasGameWithId(id : Int) : Boolean {
+        return games.any { game -> game.id == id}}
+
+    fun addGameToList(game : Game) {
+        games.add(game)
+    }
+
+    fun removeGameFromList(game: Game) {
+        games.remove(game)
+    }
+
+    // HANDLERS
+
+    private fun handleMsgJoinGame(connection : Connection, msg: MsgJoinGame) {
+        println("handleMsgJoinGame in GameServer called")
+        games.find { game -> game.id == msg.gameId}?.addPlayer(msg.playerName, connection)
+        print("Game ${games[0]} now has players : ")
+        games[0].players.values.forEach { player -> println("${player.name} ")}
+    }
+}
+*/

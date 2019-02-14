@@ -120,13 +120,14 @@ class MasterServer(private val port : Int) {
 
 
     private fun registerGameServer(conn: Connection, msg : MsgRegisterGameServer) {
-
+        println("Master received MsgRegisterGameServer")
         val gameServer = msg.gameServer
 
         if (gameServerIsKnown(gameServer)) {
             removeServerFromList(gameServer)
         }
         addServerToList(gameServer)
+        conn.close()
     }
 }
 

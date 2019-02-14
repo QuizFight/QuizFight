@@ -2,6 +2,8 @@ package org.quizfight.server
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.quizfight.common.question.FourAnswersQuestion
+import org.quizfight.common.question.Type
 import org.quizfight.questionStore.QuestionStore
 import javax.xml.bind.JAXBElement
 
@@ -16,22 +18,25 @@ fun main(args: Array<String>){
     }
 
 
+    Thread.sleep(3000)
 
-    val gs = GameServer(2)
+    val gs = GameServer("localhost", 2)
+    gs.addNewGame(gameName = "Test", maxPlayer = 2, questions = mutableListOf(FourAnswersQuestion("Wer?", "politics", Type.FOUR_ANSWERS_QUESTION, "Ich", "Du", "Er", "Sie")))
 
 
+    while(true);
     //-------Prototyp Test---------//
 
-    val store = QuestionStore()
-    val questions = store.getQuestionsForGame(5).toMutableList()
+    //val store = QuestionStore()
+    //val questions = store.getQuestionsForGame(5).toMutableList()
 
-    gs.addNewGame("testGame", 5, questions)
-    var game = gs.games.find { it.gameName == "testGame" }
-    println("Das Game hat folgende Fragen:\n")
+    //gs.addNewGame("testGame", 5, questions)
+    //var game = gs.games.find { it.gameName == "testGame" }
+    //println("Das Game hat folgende Fragen:\n")
 
-    game?.printQuestions()
+    //game?.printQuestions()
 
-    gs.start()
+    //gs.start()
 
     /*println("Start MasterServer (m), GameServer(s), or exit (e)?")
     var stringInput = readLine()
