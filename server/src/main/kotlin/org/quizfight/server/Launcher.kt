@@ -1,6 +1,9 @@
 package org.quizfight.server
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.quizfight.questionStore.QuestionStore
+import javax.xml.bind.JAXBElement
 
 /**
  * Starts the Server
@@ -8,9 +11,15 @@ import org.quizfight.questionStore.QuestionStore
  */
 fun main(args: Array<String>){
 
+    GlobalScope.launch {
+        MasterServer(1)
+    }
 
-    val gs = GameServer()
-    //println("2")
+
+
+    val gs = GameServer(2)
+
+
     //-------Prototyp Test---------//
 
     val store = QuestionStore()
@@ -19,7 +28,8 @@ fun main(args: Array<String>){
     gs.addNewGame("testGame", 5, questions)
     var game = gs.games.find { it.gameName == "testGame" }
     println("Das Game hat folgende Fragen:\n")
-    game!!.printQuestions()
+
+    game?.printQuestions()
 
     gs.start()
 

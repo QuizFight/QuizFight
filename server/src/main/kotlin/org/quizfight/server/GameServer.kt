@@ -13,9 +13,9 @@ import java.net.ServerSocket
  * @author Thomas Spanier
  */
 //open class GameServer(val mip:String, val ip:String){
-open class GameServer(){
+open class GameServer(val port: Int){
 
-    val socket = ServerSocket(34567)
+    val socket = ServerSocket(port)
     private var gameIds: Int = 0
     var games= mutableListOf<Game>()
 
@@ -115,7 +115,7 @@ open class GameServer(){
      * Adds the Player to a Game
      */
     private fun joinGame(conn: Connection, msgJoinGame: MsgJoinGame) {
-        games[msgJoinGame.id].addPlayer(msgJoinGame.playerName, conn)
+        games[msgJoinGame.gameId].addPlayer(msgJoinGame.playerName, conn)
     }
 
 

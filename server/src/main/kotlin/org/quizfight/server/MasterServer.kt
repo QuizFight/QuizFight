@@ -1,8 +1,9 @@
 package org.quizfight.server
 
 import org.quizfight.common.Connection
-
-
+import org.quizfight.common.SocketConnection
+import org.quizfight.common.messages.*
+import java.net.ServerSocket
 
 
 /**
@@ -11,7 +12,7 @@ import org.quizfight.common.Connection
  * @author Phillip Persch
  */
 class MasterServer(private val port : Int) {
-    private var gameServers = mutableListOf<GameServer>()
+    private var gameServers = mutableListOf<GameServerData>()
 
     init{
         acceptConnections()
@@ -36,7 +37,7 @@ class MasterServer(private val port : Int) {
     /**
      * Checks if a gameServer already is known.
      */
-    private fun gameServerIsKnown(gameServer: GameServer) : Boolean {
+    private fun gameServerIsKnown(gameServer: GameServerData) : Boolean {
         val knownGameServer = gameServers.find {gs -> gs.ip == gameServer.ip && gs.port == gameServer.port}
         return knownGameServer != null
     }
@@ -44,27 +45,27 @@ class MasterServer(private val port : Int) {
     /**
      * Adds a game server to gameServers.
      */
-    private fun addServerToList(gameServer: GameServer){
+    private fun addServerToList(gameServer: GameServerData){
         gameServers.add(gameServer)
     }
 
     /**
      * Removes a game server from gameServers.
      */
-    private fun removeServerFromList(gameServer: GameServer){
+    private fun removeServerFromList(gameServer: GameServerData){
         gameServers.remove(gameServer)
     }
     /**
      * returns a List with all open Games from all game servers.
      */
-    private fun listAllOpenGames(): List<Game>{
+    private fun listAllOpenGames(): List<GameData>{
         return gameServers.map {gameServer -> gameServer.games}.flatten()
     }
 
     /**
      * Returns the game server with the lowest amount of games.
      */
-    private fun getLeastUsedGameServer() : GameServer {
+    private fun getLeastUsedGameServer() : GameServerData {
         gameServers.sortBy { it.games.size}
         return gameServers.first()
     }
@@ -72,8 +73,13 @@ class MasterServer(private val port : Int) {
     /**
      * Returns the server that hosts the game with param gameId.
      */
-    private fun getServerByGameId(gameId : Int) : GameServer? {
+    private fun getServerByGameId(gameId : Int) : GameServerData? {
         return gameServers.find{ gameServer -> gameServer.hasGameWithId(gameId)}
+    }
+
+
+    private fun GameServerData.hasGameWithId(gameId: Int) : Boolean {
+        return games.find { it.id == gameId} != null
     }
 
 
