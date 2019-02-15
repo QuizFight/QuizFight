@@ -23,6 +23,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection) {
      * Forces the game to send the first question
      */
     private fun startGame(conn: Connection, msgStartGame: MsgStartGame) {
+        game.questionIncome = 0
         game.broadcast(game.getNextQuestion())
     }
 
@@ -31,10 +32,13 @@ class Player(val name : String, val game: Game, oldConnection: Connection) {
      */
     private fun receiveAnswer(conn: Connection, msgSendAnswer: MsgSendAnswer) {
         addToScore(msgSendAnswer.score)
+        game.questionIncome++
 
-        //TODO: temporary for first prototype
-        game.questions.removeAt(0)              //GOTO Next question is better
-        game.broadcast(game.getNextQuestion())
+        if(game.questionIncome >= game.players.size) {
+            game.questionIncome = 0
+            game.questions.removeAt(0)
+            game.broadcast(game.getNextQuestion())
+        }
     }
 
 
