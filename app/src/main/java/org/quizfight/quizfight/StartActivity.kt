@@ -28,7 +28,6 @@ class StartActivity : AppCompatActivity() {
     fun showAllGamesActivity(view: View) {
         // Create an Intent to start the AllGamesActivity
         val intent = Intent(this, AllGamesActivity::class.java)
-        // Start the new activity.
         startActivity(intent)
 
     }
@@ -38,9 +37,10 @@ class StartActivity : AppCompatActivity() {
      * where the user can create a new Game
      */
     fun showCreateGameActivity(view: View) {
-        // val myToast = Toast.makeText(this, message, duration);
-        val myToast = Toast.makeText(this, "CreateGameActivity comes soon", Toast.LENGTH_SHORT)
-        myToast.show()
+       /* val myToast = Toast.makeText(this, "CreateGameActivity comes soon", Toast.LENGTH_SHORT)
+        myToast.show()*/
+        val intent = Intent(this, CreateGameActivity::class.java)
+        startActivity(intent)
     }
 
 }

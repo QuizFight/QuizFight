@@ -3,6 +3,7 @@ package org.quizfight.quizfight
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.widget.Button
 import kotlinx.android.synthetic.main.activity_quiz.*
 import org.quizfight.common.question.FourAnswersQuestion
@@ -24,18 +25,20 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     private lateinit var currentQuestion: FourAnswersQuestion
     private lateinit var client : Client
 
+    private var answerSelected : Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
-        //sollte auch vom Server gelesen werden
+        //TODO : read questionCountTotal from Server
         questionCountTotal = intent.getIntExtra("questionCountTotal", 0)
 
         // Use launch(Dispatchers.IO){} for networking operations
         launch(Dispatchers.IO) {
-            println("launch runs in thread ${Thread.currentThread().name}")
             client = Client("10.0.2.2", 34567, this@QuizActivity)
         }
+
 
     }
 
@@ -48,6 +51,10 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     // use = launch {} whenever the function could possibly be called from a non main thread
     // for example calls from message handlers!
     fun showNextQuestion(question: FourAnswersQuestion) = launch {
+
+        //reset all selected buttons
+        radio_group.clearCheck()
+
        if (questionCounter < questionCountTotal) {
            currentQuestion = question
            var answerList: MutableList<String> = mutableListOf(currentQuestion.correctAnswer,
@@ -56,7 +63,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                    currentQuestion.badAnswer_3)
            answerList.shuffle()
 
-           println("Message displayed from thread ${Thread.currentThread().name}")
            text_view_question.text = currentQuestion.text
            answer_button1.text = answerList[0]
            answer_button2.text = answerList[1]
@@ -68,29 +74,38 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
            text_view_question_count.text = ("Question: " + questionCounter
                        + "/" + questionCountTotal)
 
-
        } else {
             finishQuiz()
        }
     }
 
     fun checkAnswer(view: View) {
+        answerSelected = true
 
-        val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
-        val answer: CharSequence = selectedButton.text
-        if (answer == currentQuestion.correctAnswer) {
-            selectedButton.setTextColor(Color.GREEN)
-        } else {
-            selectedButton.setTextColor(Color.WHITE)
-        }
-
-        launch(Dispatchers.Default){
-            println("Answer sent from thread ${Thread.currentThread().name}")
-            client.conn.send(MsgSendAnswer(0, 10))
-        }
     }
 
     fun finishQuiz() {
         finish()
     }
+
+    fun sendScore(){
+
+        var score : Int = 0
+
+        if(answerSelected) {
+            val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
+            val answer: CharSequence = selectedButton.text
+            if (answer == currentQuestion.correctAnswer) {
+                score = 10
+            }
+
+        }
+        launch(Dispatchers.Default){
+            client.conn.send(MsgSendAnswer(0, score))
+        }
+
+        answerSelected = false
+
+    }
+
 }

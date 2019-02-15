@@ -24,6 +24,8 @@ class Client(serverIp: String, port: Int , activity: QuizActivity?) {
     fun receiveQuestion(msg :MsgSendQuestion){
         question = msg.question as FourAnswersQuestion
         ac?.showNextQuestion(question)
+        Thread.sleep(20000)
+        ac?.sendScore()
 
     }
 

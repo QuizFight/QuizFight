@@ -19,6 +19,7 @@
         </activity>
         <activity android:name=".AllGamesActivity" />
         <activity android:name=".GameDetailActivity" />
+        <activity android:name=".CreateGameActivity" />
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>

@@ -15,7 +15,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  */
 class XmlParser() {
 
-    val DIR_OF_XML = "/xml"
+    val DIR_OF_XML = File.separator+"xml"
 
     /**
      * Reads every xmlFile and converts the data to a kotlin-object, representating the questions

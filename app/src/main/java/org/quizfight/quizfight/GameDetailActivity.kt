@@ -14,7 +14,7 @@ class GameDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_detail)
 
-        updateUi()
+        //updateUi()
     }
 
     fun showQuizActivity(view: View) {
