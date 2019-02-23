@@ -33,7 +33,7 @@ open class GameServer(){
     /**
      * Adds a new game to gamesList
      */
-    fun addNewGame(gameName: String, maxPlayer: Int, questions: MutableList<Question>){
+    fun addNewGame(gameName: String, maxPlayer: Int, questions: MutableList<Question<Any>>){
         addNewGame(Game(gameIds++, gameName, maxPlayer, questions))
     }
 
@@ -56,15 +56,22 @@ open class GameServer(){
      * converts a game into gameData
      */
     private fun gameToGameData(g: Game): GameData {
-        return GameData(g.id, g.gameName, g.maxPlayer, g.questions)
+        var players = listOf<String>()
+
+        for(i in 0..g.players.size){
+            players.plus(g.players[i]!!.name)
+        }
+
+        return GameData(g.id, g.gameName, g.maxPlayer, players)
     }
 
     /**
      * converts gameData into a game
      */
-    private fun gameDataToGame(gd: GameData): Game {
-        return Game(gd.id,gd.gameName, gd.maxPlayer, gd.questions)
-    }
+   /* private fun gameDataToGame(gd: GameData): Game {
+        // TODO: Game braucht Question list
+        return Game(gd.id,gd.name, gd.maxPlayers)
+    }*/
 
 
     /**
@@ -79,8 +86,8 @@ open class GameServer(){
             GlobalScope.launch {
                 SocketConnection(incoming, mapOf(
                         //TODO: implement all handlers for Masterserver communication
-                        MsgGetOpenGames::class to { conn, msg -> getOpenGames(conn, msg as MsgGetOpenGames) },
-                        MsgJoinGame::class to { conn, msg -> joinGame(conn, msg as MsgJoinGame) },
+                        MsgGameList::class to { conn, msg -> getOpenGames(conn, msg as MsgGameList) },
+                        MsgJoin::class to { conn, msg -> joinGame(conn, msg as MsgJoin) },
                         MsgCreateGame::class to { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame) }
                 ))
                 println("Client connected")
@@ -94,9 +101,12 @@ open class GameServer(){
      * Sends feedback to Client
      */
     private fun receiveCreateGame(conn: Connection, msgCreateGame: MsgCreateGame) {
-        val gd = msgCreateGame.gameData
-        this.addNewGame(gameDataToGame(gd))
-        conn.send(MsgSendGameCreated(gd))   //App gets Feedback, that the game was successfully created
+        // TODO Game Data hat keine questions mehr, der auskommentierte code kann also kein Game erstellen
+
+        val gameRequest = msgCreateGame.game
+       // this.addNewGame(gameDataToGame(gd))
+        //conn.send(MsgSendGameCreated(gd))   //App gets Feedback, that the game was successfully created
+
     }
 
     /**
@@ -104,8 +114,8 @@ open class GameServer(){
      *  Sends the list of open games over own connection object
      *  TODO: use conn or connection?
      */
-    private fun getOpenGames(conn: Connection, msgGetOpenGames: MsgGetOpenGames) {
-        conn.send(MsgSendOpenGames(listOpenGames()))
+    private fun getOpenGames(conn: Connection, msgGetOpenGames: MsgGameList) {
+        conn.send(MsgGameList(listOpenGames()))
         //connection.send(MsgSendOpenGames(listOpenGames()))
     }
 
@@ -114,8 +124,8 @@ open class GameServer(){
      * Gets called, if MsgJoinGame incomes.
      * Adds the Player to a Game
      */
-    private fun joinGame(conn: Connection, msgJoinGame: MsgJoinGame) {
-        games[msgJoinGame.id].addPlayer(msgJoinGame.playerName, conn)
+    private fun joinGame(conn: Connection, msgJoinGame: MsgJoin) {
+        games[msgJoinGame.gameId].addPlayer(msgJoinGame.nickName, conn)
     }
 
 
