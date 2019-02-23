@@ -1,5 +1,5 @@
-<questions type="RANGED_QUESTION">
-    <category1>
+<questions type="GuessQuestion">
+    <CATEGORY1>
         <question>
             <text>Wie viele Liter Bier werden in Deutschland pro Kopf jaehrlich getrunken?</text>
             <correct>100</correct>
@@ -12,8 +12,8 @@
             <begin>80</begin>
             <end>400</end>
         </question>
-    </category1>
-    <category2>
+    </CATEGORY1>
+    <CATEGORY2>
         <question>
             <text>Wie lange dauerte der 30 jaehrige Krieg?</text>
             <correct>30</correct>
@@ -26,13 +26,13 @@
             <begin>1</begin>
             <end>12</end>
         </question>
-    </category2>
-    <category3>
+    </CATEGORY2>
+    <CATEGORY3>
         <question>
             <text>Ein Bauer hat 16 Schafe. Fast alle sterben, außer 9. Wie viele Schafe bleiben uebrig?</text>
             <correct>9</correct>
             <begin>0</begin>
             <end>16</end>
         </question>
-    </category3>
+    </CATEGORY3>
 </questions>

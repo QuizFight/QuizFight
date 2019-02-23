@@ -4,9 +4,12 @@ import org.quizfight.common.messages.Message
 
 enum class Category {
     //TODO: Impelement
-    POLITICS,
-    BADGER,
-    MUSHROOM
+    GAMING,
+    AROUND_THE_WORLD,
+    HISTORY,
+    CATEGORY1,
+    CATEGORY2,
+    CATEGORY3
 }
 
 interface Question<T> {

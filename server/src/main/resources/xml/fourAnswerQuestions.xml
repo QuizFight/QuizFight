@@ -1,5 +1,5 @@
-<questions type="FOUR_ANSWERS_QUESTION">
-    <gaming>
+<questions type="ChoiceQuestion">
+    <GAMING>
         <question>
             <text>Welcher dieser Herren ist Teil des Videospielunternehmens Nintendo?</text>
             <correct>Shigeru Miyamoto</correct>
@@ -14,8 +14,8 @@
             <bad>1991</bad>
             <bad>1993</bad>
         </question>
-    </gaming>
-    <aroundTheWorld>
+    </GAMING>
+    <AROUND_THE_WORLD>
         <question>
             <text>In welchem Land steht der schiefe Turm von Pisa?</text>
             <correct>Italien</correct>
@@ -30,8 +30,8 @@
             <bad>Tallinn</bad>
             <bad>Riga</bad>
         </question>
-    </aroundTheWorld>
-    <history>
+    </AROUND_THE_WORLD>
+    <HISTORY>
         <question>
             <text>Wann wurde offiziell der EURO eingefuehrt?</text>
             <correct>1. Januar 2002</correct>
@@ -39,5 +39,5 @@
             <bad>1. Januar 2001</bad>
             <bad>12. Januar 2001</bad>
         </question>
-    </history>
+    </HISTORY>
 </questions>
