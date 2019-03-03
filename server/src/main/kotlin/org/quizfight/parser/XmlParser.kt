@@ -20,7 +20,7 @@ class XmlParser() {
     /**
      * Reads every xmlFile and converts the data to a kotlin-object, representating the questions
      */
-    fun convertXmlToQuestions(): List<Question<Any>>{
+    fun convertXmlToQuestions(): List<Question<*>>{
         val paths: List<String> = getPaths()
         val documents = getDocumentsFromPaths(paths)
 
@@ -82,16 +82,17 @@ class XmlParser() {
      * The attribute type of the xml-node 'questions' is read for getting the
      * correct case.
      */
-    fun createQuestionObjectList(documents: List<Document>): List<Question<Any>>{
-        var resultList = mutableListOf<Question<Any>>()
+    fun createQuestionObjectList(documents: List<Document>): List<Question<*>>{
+        var resultList = mutableListOf<Question<*>>()
 
         for(document in documents){
             val type = document.documentElement.getAttribute("type")
-            var temporaryList = mutableListOf<Question<Any>>()
+            var temporaryList = mutableListOf<Question<*>>()
 
+            var question: Question<*>
             when(type){
-                "ChoiceQuestion" -> temporaryList = getChoiceQuestions(document) as MutableList<Question<Any>>
-                "GuessQuestion"  -> temporaryList = getGuessQuestions(document)  as MutableList<Question<Any>>
+                "ChoiceQuestion" -> temporaryList = getChoiceQuestions(document) as MutableList<Question<*>>
+                "GuessQuestion"  -> temporaryList = getGuessQuestions(document)  as MutableList<Question<*>>
                 else             -> System.err.println("Found bad XML -> Skipped it")
             }
 

@@ -33,7 +33,7 @@ open class GameServer(){
     /**
      * Adds a new game to gamesList
      */
-    fun addNewGame(gameName: String, maxPlayer: Int, questions: MutableList<Question<Any>>){
+    fun addNewGame(gameName: String, maxPlayer: Int, questions: MutableList<Question<*>>){
         addNewGame(Game(gameIds++, gameName, maxPlayer, questions))
     }
 

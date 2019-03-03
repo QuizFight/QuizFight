@@ -1,5 +1,6 @@
 package org.quizfight.server
 
+import org.quizfight.common.question.Question
 import org.quizfight.questionStore.QuestionStore
 
 /**
@@ -7,6 +8,8 @@ import org.quizfight.questionStore.QuestionStore
  * You can choose between new Master Server and Slave Server
  */
 fun main(args: Array<String>){
+    var q: Question<*>
+
 
 
     val gs = GameServer()

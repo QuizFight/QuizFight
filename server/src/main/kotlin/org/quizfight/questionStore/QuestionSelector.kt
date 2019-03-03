@@ -15,16 +15,16 @@ class QuestionSelector {
      * @param count is the count of questions a game will use
      * @return is the list of questions. Its size is obtained by param count
      */
-    fun getQuestionsForGame(count: Int, list: List<Question<Any>>): List<Question<Any>>{
-        if(count > list.size || count < 4 || count > 20) return listOf<Question<Any>>()
+    fun getQuestionsForGame(count: Int, list: List<Question<*>>): List<Question<*>>{
+        if(count > list.size || count < 4 || count > 20) return listOf<Question<*>>()
 
         var tmpType = "tmpType"
         var tmpCategory = "tmpCategory"
 
         var copyOfList = list.toMutableList()
-        var listForGame = mutableListOf<Question<Any>>()
+        var listForGame = mutableListOf<Question<*>>()
 
-        var newQuestion: Question<Any>
+        var newQuestion: Question<*>
         var random: Int
 
         for(i in 1..count){

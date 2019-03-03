@@ -14,7 +14,7 @@ import org.quizfight.parser.XmlParser
  */
 class QuestionStore{
 
-    var questions = mutableListOf<Question<Any>>()
+    var questions = mutableListOf<Question<*>>()
 
     constructor(){
         refreshQuestionList()
@@ -51,7 +51,7 @@ class QuestionStore{
      * @param count is the count of questions a game will use
      * @return is the list of questions. Its size is obtained by param count
      */
-    fun getQuestionsForGame(count: Int): List<Question<Any>>{
+    fun getQuestionsForGame(count: Int): List<Question<*>>{
         return QuestionSelector().getQuestionsForGame(count, this.questions)
     }
 
