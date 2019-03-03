@@ -18,7 +18,7 @@ interface Question<T> {
     fun evaluate(answer: T): Int
 }
 
-class ChoiceQuestion(
+class ChoiceQuestion (
         override val text: String,
         override val category: Category,
         val choices: List<String>,

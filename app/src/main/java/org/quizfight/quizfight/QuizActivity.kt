@@ -5,10 +5,9 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import kotlinx.android.synthetic.main.activity_quiz.*
-import org.quizfight.common.question.FourAnswersQuestion
 import android.view.View
 import kotlinx.coroutines.*
-import org.quizfight.common.messages.MsgSendAnswer
+import org.quizfight.common.question.ChoiceQuestion
 import kotlin.coroutines.CoroutineContext
 
 class QuizActivity : CoroutineScope, AppCompatActivity() {
@@ -21,7 +20,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     private var questionCounter: Int = 0
     private var questionCountTotal: Int = 0
 
-    private lateinit var currentQuestion: FourAnswersQuestion
+    private lateinit var currentQuestion: ChoiceQuestion
     private lateinit var client : Client
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +28,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         setContentView(R.layout.activity_quiz)
 
         //sollte auch vom Server gelesen werden
-        questionCountTotal = intent.getIntExtra("questionCountTotal", 0)
+        questionCountTotal = intent.getIntExtra("questionCountTotal", 5)
 
         // Use launch(Dispatchers.IO){} for networking operations
         launch(Dispatchers.IO) {
@@ -46,13 +45,11 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     //  = launch {} tells the function to run in the main thread if not stated otherwise
     // use = launch {} whenever the function could possibly be called from a non main thread.
     // for example all message handlers call from non main threads!
-    fun showNextQuestion(question: FourAnswersQuestion) = launch {
+    fun showNextQuestion(question: ChoiceQuestion) = launch {
        if (questionCounter < questionCountTotal) {
            currentQuestion = question
-           var answerList: MutableList<String> = mutableListOf(currentQuestion.correctAnswer,
-                   currentQuestion.badAnswer_1,
-                   currentQuestion.badAnswer_2,
-                   currentQuestion.badAnswer_3)
+           var answerList: MutableList<String> = mutableListOf(currentQuestion.correctChoice)
+           answerList.addAll(currentQuestion.choices)
            answerList.shuffle()
 
            text_view_question.text = currentQuestion.text
@@ -76,14 +73,14 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
         val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
         val answer: CharSequence = selectedButton.text
-        if (answer == currentQuestion.correctAnswer) {
+        if (answer == currentQuestion.correctChoice) {
             selectedButton.setTextColor(Color.GREEN)
         } else {
             selectedButton.setTextColor(Color.WHITE)
         }
 
         launch(Dispatchers.IO){
-            //TODO: Send score
+            currentQuestion.evaluate(answer.toString())
         }
     }
 
