@@ -1,14 +1,13 @@
 package org.quizfight.quizfight
 
-import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import kotlinx.android.synthetic.main.activity_quiz.*
 import android.view.View
 import kotlinx.coroutines.*
+import org.quizfight.common.messages.MsgScore
 import org.quizfight.common.question.ChoiceQuestion
-import kotlin.coroutines.CoroutineContext
 
 class QuizActivity : CoroutineScope, AppCompatActivity() {
 
@@ -21,6 +20,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     private var questionCountTotal: Int = 0
 
     private lateinit var currentQuestion: ChoiceQuestion
+    private var answerSelected : Boolean = false
     private lateinit var client : Client
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,7 +28,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         setContentView(R.layout.activity_quiz)
 
         //sollte auch vom Server gelesen werden
-        questionCountTotal = intent.getIntExtra("questionCountTotal", 5)
+        questionCountTotal = intent.getIntExtra("questionCountTotal", 4)
 
         // Use launch(Dispatchers.IO){} for networking operations
         launch(Dispatchers.IO) {
@@ -46,6 +46,10 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     // use = launch {} whenever the function could possibly be called from a non main thread.
     // for example all message handlers call from non main threads!
     fun showNextQuestion(question: ChoiceQuestion) = launch {
+
+        //reset all selected buttons
+        radio_group.clearCheck()
+
        if (questionCounter < questionCountTotal) {
            currentQuestion = question
            var answerList: MutableList<String> = mutableListOf(currentQuestion.correctChoice)
@@ -63,28 +67,31 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
            text_view_question_count.text = ("Question: " + questionCounter
                        + "/" + questionCountTotal)
 
-
        } else {
             finishQuiz()
        }
     }
 
+    //ob user geantwortet hat oder nicht
     fun checkAnswer(view: View) {
-
-        val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
-        val answer: CharSequence = selectedButton.text
-        if (answer == currentQuestion.correctChoice) {
-            selectedButton.setTextColor(Color.GREEN)
-        } else {
-            selectedButton.setTextColor(Color.WHITE)
-        }
-
-        launch(Dispatchers.IO){
-            currentQuestion.evaluate(answer.toString())
-        }
+        answerSelected = true
     }
 
     fun finishQuiz() {
         finish()
+    }
+
+    fun sendScore(){
+        var answer: String = " "
+        if(answerSelected) {
+            val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
+            answer = selectedButton.text.toString()
+        }
+
+        launch(Dispatchers.Default){
+            client.conn.send(MsgScore(currentQuestion.evaluate(answer.toString())))
+        }
+
+        answerSelected = false
     }
 }
