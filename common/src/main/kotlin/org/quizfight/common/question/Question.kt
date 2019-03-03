@@ -1,6 +1,7 @@
 package org.quizfight.common.question
 
 import org.quizfight.common.messages.Message
+import java.io.Serializable;
 
 enum class Category {
     //TODO: Impelement
@@ -12,7 +13,7 @@ enum class Category {
     CATEGORY3
 }
 
-interface Question<T> {
+interface Question<T> : Serializable {
     val text: String
     val category: Category
     fun evaluate(answer: T): Int
