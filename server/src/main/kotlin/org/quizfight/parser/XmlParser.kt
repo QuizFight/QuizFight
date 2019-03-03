@@ -15,6 +15,10 @@ import javax.xml.parsers.DocumentBuilderFactory
  */
 class XmlParser() {
 
+    /* Types of questions for reading the type from XML */
+    val CHOICE_QUESTION = "CHOICE_QUESTION";
+    val GUESS_QUESTION  = "GUESS_QUESTION";
+
     val DIR_OF_XML = "/xml"
 
     /**
@@ -40,7 +44,6 @@ class XmlParser() {
 
         file.walk().forEach {
             if(it.isFile && it.path.endsWith(".xml", true)){
-                println("Found xml: " + it.name)
                 paths.add(it.path)
             }
         }
@@ -56,7 +59,6 @@ class XmlParser() {
         var documents = mutableListOf<Document>()
 
         for(path in paths){
-            println("path: " + path)
             documents.add(readXmlFile(path))
         }
         return documents
@@ -91,8 +93,8 @@ class XmlParser() {
 
             var question: Question<*>
             when(type){
-                "ChoiceQuestion" -> temporaryList = getChoiceQuestions(document) as MutableList<Question<*>>
-                "GuessQuestion"  -> temporaryList = getGuessQuestions(document)  as MutableList<Question<*>>
+                CHOICE_QUESTION -> temporaryList = getChoiceQuestions(document) as MutableList<Question<*>>
+                GUESS_QUESTION  -> temporaryList = getGuessQuestions(document)  as MutableList<Question<*>>
                 else             -> System.err.println("Found bad XML -> Skipped it")
             }
 

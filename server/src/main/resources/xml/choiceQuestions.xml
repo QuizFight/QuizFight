@@ -1,4 +1,4 @@
-<questions type="ChoiceQuestion">
+<questions type="CHOICE_QUESTION">
     <GAMING>
         <question>
             <text>Welcher dieser Herren ist Teil des Videospielunternehmens Nintendo?</text>

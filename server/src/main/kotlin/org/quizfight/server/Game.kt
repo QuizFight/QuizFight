@@ -81,7 +81,7 @@ class Game(val id: Int, val gameName:String, val maxPlayer: Int, var questions: 
     fun printQuestions(){
         var i = 1;
         for(question in questions){
-            println("Frage " + i + ": " + question.text + "\n")
+            println("Frage " + i + ": " + question.text)
             i++
         }
     }

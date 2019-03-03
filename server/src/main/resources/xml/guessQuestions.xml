@@ -1,4 +1,4 @@
-<questions type="GuessQuestion">
+<questions type="GUESS_QUESTION">
     <CATEGORY1>
         <question>
             <text>Wie viele Liter Bier werden in Deutschland pro Kopf jaehrlich getrunken?</text>
