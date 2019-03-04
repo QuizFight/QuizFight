@@ -16,6 +16,9 @@ interface Connection {
     fun close()
     fun withHandlers(handlers: Map<KClass<*>, (Connection, Message) -> Unit>): Connection
     var handlers: Map<KClass<*>, (Connection, Message) -> Unit>
+
+    // TEMPORARY
+    val id: String
 }
 
 class SocketConnection(
@@ -29,6 +32,9 @@ class SocketConnection(
     private var handleMessages = AtomicBoolean(true)
     // Flag to ignore EOF exception when closing socket correctly
     private var shuttingDown = AtomicBoolean(false)
+
+    // TEMPORARY
+    override val id = "1"
 
     init {
         /* TODO: Type check handler map
