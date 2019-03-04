@@ -9,7 +9,8 @@ interface Message : Serializable
 data class GameData(val id: Int,
                     val name:String,
                     val maxPlayers: Int,
-                    val players: List<String>) : Serializable
+                    val players: List<String>,
+                    val questionCount: Int) : Serializable
 
 data class GameRequest(val name : String,
                        val maxPlayers : Int,
@@ -22,11 +23,11 @@ data class ServerData(val ip: String,
 class MsgRegisterGameServer : Message
 class MsgRequestOpenGames : Message
 data class MsgGameList(val games : List<GameData>) : Message
-data class MsgJoin(val gameId: Int, val nickName: String) : Message
+data class MsgJoin(val gameId: Int, val nickname: String) : Message
 class MsgLeave : Message
 data class MsgTransferToGameServer(val gameServer : ServerData) : Message
 data class MsgGameInfo(val game : GameData) : Message
-data class MsgCreateGame(val game : GameRequest) : Message
+data class MsgCreateGame(val game : GameRequest, val nickname : String) : Message
 class MsgStartGame : Message
 data class MsgQuestion(val question : Question<*>) : Message
 data class MsgScore(val score : Int) : Message
