@@ -3,8 +3,8 @@ package org.quizfight.server
 //import java.util.*
 import org.quizfight.common.Connection
 import org.quizfight.common.messages.Message
-import org.quizfight.common.messages.MsgGameJoined
-import org.quizfight.common.messages.MsgSendQuestion
+import org.quizfight.common.messages.MsgJoin
+import org.quizfight.common.messages.MsgQuestion
 import org.quizfight.common.question.Question
 import java.net.Socket
 
@@ -12,7 +12,7 @@ import java.net.Socket
  * Game Class. Manages connections to players, asks Questions and calculates the scores
  * @author Thomas Spanier
  */
-class Game(val id: Int, val gameName:String, val maxPlayer: Int, var questions: MutableList<Question>) {
+class Game(val id: Int, val gameName:String, val maxPlayer: Int, var questions: MutableList<Question<*>>) {
     private val MSG_PLAYER_COUNT = "MaxPlayerCount must be between 2 and 8!"
     private val MSG_GAME_FULL = "The Game is already full!"
 
@@ -65,8 +65,8 @@ class Game(val id: Int, val gameName:String, val maxPlayer: Int, var questions: 
     /**
      * gets questions from questionSelector and stores them into questions
      */
-    private fun loadQuestions(): MutableList<Question>{
-        var qs: MutableList<Question> = mutableListOf<Question>()
+    private fun loadQuestions(): MutableList<Question<*>>{
+        var qs: MutableList<Question<*>> = mutableListOf<Question<*>>()
         return qs
     }
 
@@ -75,13 +75,13 @@ class Game(val id: Int, val gameName:String, val maxPlayer: Int, var questions: 
      * prepares the next question to be sended
      */
     fun getNextQuestion(): Message{
-        return MsgSendQuestion(questions[0])
+        return MsgQuestion(questions[0])
     }
 
     fun printQuestions(){
         var i = 1;
         for(question in questions){
-            println("Frage " + i + ": " + question.text + "\n")
+            println("Frage " + i + ": " + question.text)
             i++
         }
     }

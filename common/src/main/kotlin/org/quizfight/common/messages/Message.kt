@@ -2,21 +2,37 @@ package org.quizfight.common.messages
 
 import org.quizfight.common.question.Question
 import java.io.Serializable
+import java.util.*
 
 interface Message : Serializable
 
+data class GameData(val id: Int,
+                    val name:String,
+                    val maxPlayers: Int,
+                    val players: List<String>) : Serializable
 
-data class GameData(val id: Int, val gameName:String, val maxPlayer: Int, val questions: MutableList<Question>) //TODO: Add ip for GameServer
+data class GameRequest(val name : String,
+                       val maxPlayers : Int,
+                       val questionCount: Int) : Serializable
 
+data class ServerData(val ip: String,
+                      val port: Int,
+                      val games: List<GameData>) : Serializable
 
-data class MsgGetAllOpenGames   (val openGames: List<GameData>) : Message
-//data class MsgGetOpenGames      (val openGames: List<GameData>) : Message
-data class MsgGetOpenGames      (val tmp: Boolean) : Message
-data class MsgJoinGame          (val id: Int, val playerName: String) : Message
-data class MsgGameJoined        (val gameData: GameData) : Message
-data class MsgCreateGame        (val gameData: GameData) :Message
-data class MsgSendGameCreated   (val gameData: GameData) :Message
-data class MsgSendQuestion      (val question: Question) : Message
-data class MsgSendAnswer        (val id: Int, val score: Int): Message
-data class MsgStartGame         (val id: Int) : Message
-data class MsgSendOpenGames     (val openGames: List<GameData>) : Message
+class MsgRegisterGameServer : Message
+class MsgRequestOpenGames : Message
+data class MsgGameList(val games : List<GameData>) : Message
+data class MsgJoin(val gameId: Int, val nickName: String) : Message
+class MsgLeave : Message
+data class MsgTransferToGameServer(val gameServer : ServerData) : Message
+data class MsgGameInfo(val game : GameData) : Message
+data class MsgCreateGame(val game : GameRequest) : Message
+class MsgStartGame : Message
+data class MsgQuestion(val question : Question<*>) : Message
+data class MsgScore(val score : Int) : Message
+data class MsgRanking(val totalScore : SortedMap<String, Int>) : Message
+data class MsgConnectionLost(val name : String) : Message
+data class MsgVote(val waitForPlayer : Boolean, val name : String): Message
+data class MsgWait(val name : String): Message
+data class MsgConnectionResumed(val name : String) : Message
+class MsgGameOver : Message

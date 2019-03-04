@@ -15,12 +15,16 @@ import javax.xml.parsers.DocumentBuilderFactory
  */
 class XmlParser() {
 
+    /* Types of questions for reading the type from XML */
+    val CHOICE_QUESTION = "CHOICE_QUESTION";
+    val GUESS_QUESTION  = "GUESS_QUESTION";
+
     val DIR_OF_XML = "/xml"
 
     /**
      * Reads every xmlFile and converts the data to a kotlin-object, representating the questions
      */
-    fun convertXmlToQuestions(): List<Question>{
+    fun convertXmlToQuestions(): List<Question<*>>{
         val paths: List<String> = getPaths()
         val documents = getDocumentsFromPaths(paths)
 
@@ -40,7 +44,6 @@ class XmlParser() {
 
         file.walk().forEach {
             if(it.isFile && it.path.endsWith(".xml", true)){
-                println("Found xml: " + it.name)
                 paths.add(it.path)
             }
         }
@@ -56,7 +59,6 @@ class XmlParser() {
         var documents = mutableListOf<Document>()
 
         for(path in paths){
-            println("path: " + path)
             documents.add(readXmlFile(path))
         }
         return documents
@@ -82,17 +84,18 @@ class XmlParser() {
      * The attribute type of the xml-node 'questions' is read for getting the
      * correct case.
      */
-    fun createQuestionObjectList(documents: List<Document>): List<Question>{
-        var resultList = mutableListOf<Question>()
+    fun createQuestionObjectList(documents: List<Document>): List<Question<*>>{
+        var resultList = mutableListOf<Question<*>>()
 
         for(document in documents){
             val type = document.documentElement.getAttribute("type")
-            var temporaryList = mutableListOf<Question>()
+            var temporaryList = mutableListOf<Question<*>>()
 
+            var question: Question<*>
             when(type){
-                Type.FOUR_ANSWERS_QUESTION.name -> temporaryList = getFourAnswerQuestions(document)
-                Type.RANGED_QUESTION.name       -> temporaryList = getRangedQuestions(document)
-                else                            -> System.err.println("Found bad XML -> Skipped it")
+                CHOICE_QUESTION -> temporaryList = getChoiceQuestions(document) as MutableList<Question<*>>
+                GUESS_QUESTION  -> temporaryList = getGuessQuestions(document)  as MutableList<Question<*>>
+                else             -> System.err.println("Found bad XML -> Skipped it")
             }
 
             resultList = (resultList + temporaryList).toMutableList()
@@ -105,8 +108,8 @@ class XmlParser() {
      * @param document is the xml-representation
      * @return is the question list parsed from xml
      */
-    fun getFourAnswerQuestions(document: Document): MutableList<Question>{
-        var questionList = mutableListOf<Question>()
+    fun getChoiceQuestions(document: Document): MutableList<ChoiceQuestion> {
+        var questionList = mutableListOf<ChoiceQuestion>()
 
         val questionNodes = document.getElementsByTagName("question")
 
@@ -115,15 +118,16 @@ class XmlParser() {
 
             val text          = questionElement.getElementsByTagName("text").item(0).textContent
             val correctAnswer = questionElement.getElementsByTagName("correct").item(0).textContent
-            val category      = questionElement.parentNode.nodeName
+            val category      = Category.valueOf(questionElement.parentNode.nodeName)
 
             val badAnswers   = questionElement.getElementsByTagName("bad")
             val badAnswer_1   = badAnswers.item(0).textContent
             val badAnswer_2   = badAnswers.item(1).textContent
             val badAnswer_3   = badAnswers.item(2).textContent
 
-            questionList.add(FourAnswersQuestion(text, category, Type.FOUR_ANSWERS_QUESTION, correctAnswer,
-                             badAnswer_1, badAnswer_2, badAnswer_3))
+            val answers = listOf(correctAnswer, badAnswer_1, badAnswer_2, badAnswer_3)
+
+            questionList.add(ChoiceQuestion(text, category, answers, correctAnswer))
         }
         return questionList
     }
@@ -133,8 +137,8 @@ class XmlParser() {
      * @param document is the xml-representation
      * @return is the question list parsed from xml
      */
-    fun getRangedQuestions(document: Document): MutableList<Question>{
-        var questionList = mutableListOf<Question>()
+    fun getGuessQuestions(document: Document): MutableList<GuessQuestion>{
+        var questionList = mutableListOf<GuessQuestion>()
 
         val questionNodes = document.getElementsByTagName("question")
 
@@ -142,14 +146,15 @@ class XmlParser() {
             val questionElement: Element = questionNodes.item(i) as Element
 
             val text          = questionElement.getElementsByTagName("text").item(0).textContent
-            val correctAnswer = questionElement.getElementsByTagName("correct").item(0).textContent
-            val category      = questionElement.parentNode.nodeName
+            val correctAnswer = questionElement.getElementsByTagName("correct").item(0).textContent.toInt()
+            val category      = Category.valueOf(questionElement.parentNode.nodeName)
 
             val begin   = questionElement.getElementsByTagName("begin").item(0).textContent
             val end     = questionElement.getElementsByTagName("end").item(0).textContent
 
-            questionList.add(RangeQuestion(text, category, Type.RANGED_QUESTION, correctAnswer,
-                    begin, end))
+            val range = IntRange(begin.toInt(), end.toInt())
+
+            questionList.add(GuessQuestion(text, category, range, correctAnswer))
         }
         return questionList
     }

@@ -1,7 +1,7 @@
 package org.quizfight.questionStore
 
+import org.quizfight.common.question.GuessQuestion
 import org.quizfight.common.question.Question
-import org.quizfight.common.question.Type
 import org.quizfight.parser.XmlParser
 
 /**
@@ -14,7 +14,7 @@ import org.quizfight.parser.XmlParser
  */
 class QuestionStore{
 
-    var questions = mutableListOf<Question>()
+    var questions = mutableListOf<Question<*>>()
 
     constructor(){
         refreshQuestionList()
@@ -40,19 +40,10 @@ class QuestionStore{
      * @return count is the count of the questions of this type
      */
     fun countQuestionsOfType(ID: String): Int{
-        var count = 0
         for(question in questions){
-            if(question.type.name == ID) count++
+            //TODO implement counting
         }
-        return count
-    }
-
-    /**
-     * Returns a single question, just for prototyping
-     * @return is the random question. If no question was found a hardcoded one will be chosen
-     */
-    fun getQuestionForPrototypeTesting(): Question {
-        return QuestionSelector().getQuestionForPrototypeTesting(questions)
+        return 0
     }
 
     /**
@@ -60,7 +51,7 @@ class QuestionStore{
      * @param count is the count of questions a game will use
      * @return is the list of questions. Its size is obtained by param count
      */
-    fun getQuestionsForGame(count: Int): List<Question>{
+    fun getQuestionsForGame(count: Int): List<Question<*>>{
         return QuestionSelector().getQuestionsForGame(count, this.questions)
     }
 
@@ -70,9 +61,11 @@ class QuestionStore{
      * @return information is the information String
      */
     override fun toString(): String{
-        return "Counted " + getSize() + " questions\n" +
+        return "Counted " + getSize() + " questions\n"
+        //TODO implement amount of types
+                /* +
                "Type FourAnswers: "   + countQuestionsOfType(Type.FOUR_ANSWERS_QUESTION.name)     + "\n" +
-               "Type Ranged: "        + countQuestionsOfType(Type.RANGED_QUESTION.name) + "\n"
+               "Type Ranged: "        + countQuestionsOfType(Type.RANGED_QUESTION.name) + "\n" */
     }
 
 }

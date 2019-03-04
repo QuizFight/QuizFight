@@ -1,7 +1,7 @@
 package org.quizfight.server
 
 import org.quizfight.common.Connection
-import org.quizfight.common.messages.MsgSendAnswer
+import org.quizfight.common.messages.MsgScore
 import org.quizfight.common.messages.MsgStartGame
 
 /**
@@ -15,7 +15,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection) {
     val connection = oldConnection.withHandlers(mapOf(
             //TODO: Vote, Timeout, etc
             MsgStartGame::class to { conn, msg -> startGame(conn, msg as MsgStartGame) },
-            MsgSendAnswer::class to { conn, msg -> receiveAnswer(conn, msg as MsgSendAnswer) }
+            MsgScore::class to { conn, msg -> receiveAnswer(conn, msg as MsgScore) }
     ))
 
 
@@ -30,7 +30,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection) {
     /**
      * Calculates score, removes game's first question and forces the game to send the next question
      */
-    private fun receiveAnswer(conn: Connection, msgSendAnswer: MsgSendAnswer) {
+    private fun receiveAnswer(conn: Connection, msgSendAnswer: MsgScore) {
         addToScore(msgSendAnswer.score)
         game.questionIncome++
 
