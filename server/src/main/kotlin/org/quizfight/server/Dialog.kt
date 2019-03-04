@@ -43,12 +43,7 @@ class Dialog{
     }
 
     private fun startMasterServer() {
-        println(TYPE_MASTER_IP)
-        val masterIp = readLine()
-
-        if (!masterIp.isNullOrEmpty()){
-            MasterServer(34567)
-        }
+        MasterServer(34567)
     }
 
     private fun selectAgain(): String? {
