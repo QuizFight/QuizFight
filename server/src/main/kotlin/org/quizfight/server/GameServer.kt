@@ -27,7 +27,7 @@ open class GameServer(){
     ))*/
 
     init {
-        //start()
+        start()
     }
 
     /**
