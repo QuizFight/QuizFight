@@ -27,7 +27,7 @@ open class GameServer(val port: Int){
     ))*/
 
     init {
-        //start()
+        start()
     }
 
     /**
