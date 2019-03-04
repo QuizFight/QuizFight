@@ -62,7 +62,7 @@ open class GameServer(){
             players.plus(g.players[i]!!.name)
         }
 
-        return GameData(g.id, g.gameName, g.maxPlayer, players)
+        return GameData(g.id, g.gameName, g.maxPlayer, players, 1) //TODO
     }
 
     /**
@@ -125,7 +125,7 @@ open class GameServer(){
      * Adds the Player to a Game
      */
     private fun joinGame(conn: Connection, msgJoinGame: MsgJoin) {
-        games[msgJoinGame.gameId].addPlayer(msgJoinGame.nickName, conn)
+        games[msgJoinGame.gameId].addPlayer(msgJoinGame.nickname, conn)
     }
 
 
