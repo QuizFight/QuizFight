@@ -11,6 +11,9 @@ class Dialog{
     private val BAD_INPUT        = "Bad Input, try again"
     private val EXIT             = "Bye"
 
+    private val MASTER_PORT      = 34567
+    private val GAME_SERVER_PORT = MASTER_PORT
+
     init{
         start()
     }
@@ -38,12 +41,12 @@ class Dialog{
         val gameServerIp = readLine()
 
         if (!gameServerIp.isNullOrEmpty() && !masterIp.isNullOrEmpty()){
-            GameServer()
+            GameServer(GAME_SERVER_PORT)
         }
     }
 
     private fun startMasterServer() {
-        MasterServer(34567)
+        MasterServer(MASTER_PORT)
     }
 
     private fun selectAgain(): String? {
