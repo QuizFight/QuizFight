@@ -2,7 +2,6 @@ package org.quizfight.quizfight
 
 import android.support.v7.app.AppCompatActivity
 import org.quizfight.common.SocketConnection
-import org.quizfight.common.messages.MsgCreateGame
 import org.quizfight.common.messages.MsgGameInfo
 import org.quizfight.common.messages.MsgQuestion
 import org.quizfight.common.question.ChoiceQuestion
