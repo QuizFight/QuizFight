@@ -8,18 +8,17 @@ import org.quizfight.questionStore.QuestionStore
  * You can choose between new Master Server and Slave Server
  */
 fun main(args: Array<String>){
-    var q: Question<*>
-
-
-
     val gs = GameServer()
-    //println("2")
-    //-------Prototyp Test---------//
+    gs.addNewGame("1", "testGame", 2, 5)
+    gs.games[0].printQuestions()
+    gs.start() // muss zuallererst passieren. danach kann aber aktuell kein Game hinzugefügt werden
 
+    //-------Prototyp Test---------//
+/*
     val store = QuestionStore()
     val questions = store.getQuestionsForGame(5).toMutableList()
 
-    gs.addNewGame("testGame", 5, questions)
+    gs.addNewGame("testGame", 5, 5)
     var game = gs.games.find { it.gameName == "testGame" }
     println("Das Game hat folgende Fragen:\n")
     game!!.printQuestions()
@@ -66,5 +65,5 @@ fun main(args: Array<String>){
         stringInput = readLine()
     }
 
-*/
+*/*/
 }

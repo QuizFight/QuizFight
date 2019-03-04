@@ -6,17 +6,19 @@ import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import org.quizfight.common.question.Question
+import org.quizfight.questionStore.QuestionStore
 import java.net.ServerSocket
 
 /**
  * Game Server Class. Manages several Games.
  * @author Thomas Spanier
  */
-//open class GameServer(val mip:String, val ip:String){
 open class GameServer(){
+    val questionStore = QuestionStore()    // hat ab diesem Zeitpunkt schon ALLE Fragen der XML-Dateien
 
     val socket = ServerSocket(34567)
-    private var gameIds: Int = 0
+
+    lateinit private var gameId: String
     var games= mutableListOf<Game>()
 
     /*val connection = SocketConnection(socket.accept(), mapOf(
@@ -30,12 +32,7 @@ open class GameServer(){
         //start()
     }
 
-    /**
-     * Adds a new game to gamesList
-     */
-    fun addNewGame(gameName: String, maxPlayer: Int, questions: MutableList<Question<*>>){
-        addNewGame(Game(gameIds++, gameName, maxPlayer, questions))
-    }
+
 
     fun addNewGame(game: Game){
         games.add(game)
@@ -100,13 +97,28 @@ open class GameServer(){
      * Creates a new game and adds it to the games list
      * Sends feedback to Client
      */
-    private fun receiveCreateGame(conn: Connection, msgCreateGame: MsgCreateGame) {
-        // TODO Game Data hat keine questions mehr, der auskommentierte code kann also kein Game erstellen
+    private fun receiveCreateGame(conn: Connection, request: GameRequest) {
+        var conn = conn as (SocketConnection)
+        var id = "ID wird zu Socket IP:PORT" // TODO wird aus der Connection kommen
 
-        val gameRequest = msgCreateGame.game
-       // this.addNewGame(gameDataToGame(gd))
-        //conn.send(MsgSendGameCreated(gd))   //App gets Feedback, that the game was successfully created
+        val name = request.name
+        val maxPlayers = request.maxPlayers
+        val questionCount = request.questionCount
 
+        addNewGame(id, name, maxPlayers, questionCount)
+
+        var playerList = listOf<String>("") // TODO hier muss der nickName rein
+        val gameData = GameData(1, "name", maxPlayers, playerList) // TODO id wird IP:PORT als Int oder String
+        conn.send(MsgGameInfo(gameData))
+
+    }
+
+    /**
+     * Adds a new game to gamesList
+     */
+    fun addNewGame(gameId: String, gameName: String, maxPlayer: Int, questionAmount: Int){
+        val gameQuestions = questionStore.getQuestionsForGame(questionAmount).toMutableList()
+        games.add(Game(gameId, gameName, maxPlayer, gameQuestions))
     }
 
     /**
