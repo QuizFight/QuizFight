@@ -1,7 +1,5 @@
 package org.quizfight.server
 
-import com.sun.xml.internal.ws.wsdl.writer.document.PortType
-
 class Dialog{
 
     private val QUIT             = "q"
