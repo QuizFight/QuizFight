@@ -59,7 +59,7 @@ open class GameServer(){
             players.plus(g.players[i]!!.name)
         }
 
-        return GameData(g.id, g.gameName, g.maxPlayer, players)
+        return GameData(1, g.gameName, g.maxPlayer, players) // TODO id anpassen
     }
 
     /**
@@ -97,13 +97,13 @@ open class GameServer(){
      * Creates a new game and adds it to the games list
      * Sends feedback to Client
      */
-    private fun receiveCreateGame(conn: Connection, request: GameRequest) {
+    private fun receiveCreateGame(conn: Connection, msg: MsgCreateGame) {
         var conn = conn as (SocketConnection)
         var id = "ID wird zu Socket IP:PORT" // TODO wird aus der Connection kommen
 
-        val name = request.name
-        val maxPlayers = request.maxPlayers
-        val questionCount = request.questionCount
+        val name = msg.game.name
+        val maxPlayers = msg.game.maxPlayers
+        val questionCount = msg.game.questionCount
 
         addNewGame(id, name, maxPlayers, questionCount)
 
