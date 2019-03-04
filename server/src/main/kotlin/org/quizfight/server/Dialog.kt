@@ -1,59 +1,58 @@
 package org.quizfight.server
 
-import org.quizfight.questionStore.QuestionStore
-
 class Dialog{
 
-    private val
-    private val HELLO_MSG = "Start MasterServer (m), GameServer(s), or quit (q)?"
-
-
+    private val QUIT             = "q"
+    private val MASTER_SERVER    = "m"
+    private val GAME_SERVER      = "g"
+    private val MENU_MSG         = "MasterServer (${MASTER_SERVER}), GameServer (${GAME_SERVER}), Quit (${QUIT})?"
+    private val TYPE_MASTER_IP   = "Master Server IP-Address: "
+    private val TYPE_GAME_IP     = "Game Server IP-Address: "
+    private val BAD_INPUT        = "Bad Input, try again"
+    private val EXIT             = "Bye"
 
     init{
         start()
     }
 
-
     private fun start(){
-        println(HELLO_MSG)
-        val selection = readLine()
+        println(MENU_MSG)
+        var selection = readLine()
 
-        while (!selection.equals("q")){
-            if(stringInput.equals("m")){
-                println("Master Server IP-Address: ")
-                val mip = readLine()
-                if (!mip.isNullOrEmpty()){
-                    val ms = MasterServer(1234)
-                }
-            } else if (stringInput.equals("s")){
-                println("Master Server IP-Address: ")
-                val mip = readLine()
-
-                println("Slave Server IP-Address: ")
-                val ip = readLine()
-                if (!ip.isNullOrEmpty() && !mip.isNullOrEmpty()){
-                    val gs = GameServer()
-
-                    //-------Prototyp Test---------//
-                    val store = QuestionStore()
-                    val questions = store.getQuestionsForGame(5).toMutableList()
-
-                    gs.addNewGame("testGame", 5, questions)
-                    var game = gs.games.find { it.gameName == "testGame" }
-                    println("Das Game hat folgende Fragen:\n")
-                    game!!.printQuestions()
-
-                    gs.start()
-
-
-
-                }
-            } else {
-                println("Wrong input...")
+        while (!selection!!.equals(QUIT)){
+            when(selection){
+                MASTER_SERVER -> startMasterServer()
+                GAME_SERVER   -> startGameServer()
+                else          -> selection = selectAgain()
             }
-            stringInput = readLine()
+        }
+        
+        println(EXIT)
+    }
+
+    private fun startGameServer() {
+        println(TYPE_MASTER_IP)
+        val masterIp = readLine()
+
+        println(TYPE_GAME_IP)
+        val gameServerIp = readLine()
+
+        if (!gameServerIp.isNullOrEmpty() && !masterIp.isNullOrEmpty()){
+            GameServer()
         }
     }
 
+    private fun startMasterServer() {
+        println(TYPE_MASTER_IP)
+        val masterIp = readLine()
 
+        if (!masterIp.isNullOrEmpty()){
+            MasterServer(34567)
+        }
+    }
+
+    private fun selectAgain(): String? {
+        println("${BAD_INPUT} \n${MENU_MSG}")
+        return readLine()
+    }
 }
