@@ -1,5 +1,6 @@
 package org.quizfight.server
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.quizfight.common.Connection
@@ -7,26 +8,20 @@ import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import org.quizfight.common.question.Question
 import java.net.ServerSocket
+import java.net.Socket
+import java.net.SocketException
 
 /**
  * Game Server Class. Manages several Games.
  * @author Thomas Spanier
  */
-//open class GameServer(val mip:String, val ip:String){
-open class GameServer(val port: Int){
-
+open class GameServer(val masterIp: String, val port: Int){
     val socket = ServerSocket(port)
     private var gameIds: Int = 0
     var games= mutableListOf<Game>()
 
-    /*val connection = SocketConnection(socket.accept(), mapOf(
-            //TODO: implement all handlers for Masterserver communication
-            MsgGetOpenGames::class to   { conn, msg -> getOpenGames(conn, msg as MsgGetOpenGames) },
-            MsgJoinGame::class to       { conn, msg -> joinGame(conn, msg as MsgJoinGame) },
-            MsgCreateGame::class to     { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame)}
-    ))*/
-
     init {
+        connectWithMaster()
         start()
     }
 
@@ -78,9 +73,6 @@ open class GameServer(val port: Int){
      * starts Slave Server
      */
     open fun start(){
-        //TODO: Implement
-        println("Game Server started")
-
         while (!socket.isClosed) {
             val incoming = socket.accept()
             GlobalScope.launch {
@@ -93,6 +85,22 @@ open class GameServer(val port: Int){
                 println("Client connected")
             }
         }
+    }
+
+    private fun connectWithMaster() {
+        val masterSocket = Socket(masterIp, port)
+        val masterConn = SocketConnection(masterSocket, mapOf())
+
+        try {
+            masterConn.send(MsgRegisterGameServer())
+        }catch(socEx: SocketException){
+            println("Failed while connecting to Master")
+            return
+        }
+
+        masterConn.close()
+
+        println("Connected to Master")
     }
 
     /**

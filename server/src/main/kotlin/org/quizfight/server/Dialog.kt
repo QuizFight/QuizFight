@@ -37,11 +37,8 @@ class Dialog{
         println(TYPE_MASTER_IP)
         val masterIp = readLine()
 
-        println(TYPE_GAME_IP)
-        val gameServerIp = readLine()
-
-        if (!gameServerIp.isNullOrEmpty() && !masterIp.isNullOrEmpty()){
-            GameServer(GAME_SERVER_PORT)
+        if (!masterIp.isNullOrEmpty()){
+            GameServer(masterIp, GAME_SERVER_PORT)
         }
     }
 
