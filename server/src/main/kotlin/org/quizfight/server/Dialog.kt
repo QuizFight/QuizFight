@@ -12,7 +12,7 @@ class Dialog{
     private val EXIT             = "Bye"
 
     private val MASTER_PORT      = 34567
-    private val GAME_SERVER_PORT = MASTER_PORT
+    private val GAME_SERVER_PORT = 45678
 
     init{
         start()
@@ -38,7 +38,7 @@ class Dialog{
         val masterIp = readLine()
 
         if (!masterIp.isNullOrEmpty()){
-            GameServer(masterIp, GAME_SERVER_PORT)
+            GameServer(masterIp, GAME_SERVER_PORT, MASTER_PORT)
         }
     }
 

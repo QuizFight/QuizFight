@@ -7,6 +7,7 @@ import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import org.quizfight.common.question.Question
+import org.quizfight.questionStore.QuestionStore
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketException
@@ -15,9 +16,10 @@ import java.net.SocketException
  * Game Server Class. Manages several Games.
  * @author Thomas Spanier
  */
-open class GameServer(val masterIp: String, val port: Int){
-    val socket = ServerSocket(port)
-    private var gameIds: Int = 0
+open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: Int){
+    val questionStore = QuestionStore()    // hat ab diesem Zeitpunkt schon ALLE Fragen der XML-Dateien
+
+    val socket = ServerSocket(ownPort)
     var games= mutableListOf<Game>()
 
     init {
@@ -25,16 +27,7 @@ open class GameServer(val masterIp: String, val port: Int){
         start()
     }
 
-    /**
-     * Adds a new game to gamesList
-     */
-    fun addNewGame(gameName: String, maxPlayer: Int, questions: MutableList<Question<*>>){
-        addNewGame(Game(gameIds++, gameName, maxPlayer, questions))
-    }
 
-    fun addNewGame(game: Game){
-        games.add(game)
-    }
 
     /**
      * lists all open games running on this server
@@ -57,7 +50,7 @@ open class GameServer(val masterIp: String, val port: Int){
             players.plus(g.players[i]!!.name)
         }
 
-        return GameData(g.id, g.gameName, g.maxPlayer, players, 1) //TODO
+        return GameData(1, g.gameName, g.maxPlayer, players, 1) //TODO id anpassen
     }
 
     /**
@@ -88,7 +81,7 @@ open class GameServer(val masterIp: String, val port: Int){
     }
 
     private fun connectWithMaster() {
-        val masterSocket = Socket(masterIp, port)
+        val masterSocket = Socket(masterIp, masterPort)
         val masterConn = SocketConnection(masterSocket, mapOf())
 
         try {
@@ -108,14 +101,39 @@ open class GameServer(val masterIp: String, val port: Int){
      * Creates a new game and adds it to the games list
      * Sends feedback to Client
      */
-    private fun receiveCreateGame(conn: Connection, msgCreateGame: MsgCreateGame) {
-        // TODO Game Data hat keine questions mehr, der auskommentierte code kann also kein Game erstellen
 
-        val gameRequest = msgCreateGame.game
-       // this.addNewGame(gameDataToGame(gd))
-        //conn.send(MsgSendGameCreated(gd))   //App gets Feedback, that the game was successfully created
+    private fun receiveCreateGame(conn: Connection, msg: MsgCreateGame) {
+        val remoteIpPort = ServerUtils().getIpAndPortFromConnection(conn as SocketConnection)
+        val remoteIp     = remoteIpPort[0]
+        val remotePort   = remoteIpPort[1].toInt()
 
+        var id = remoteIp + ":" + remotePort
+
+        val gameName = msg.game.name
+        val maxPlayers = msg.game.maxPlayers
+        val questionCount = msg.game.questionCount
+        val gameCreator = msg.nickname
+
+        val gameQuestions = questionStore.getQuestionsForGame(questionCount).toMutableList()
+
+        val game = Game(id, gameName, maxPlayers, gameQuestions)
+       // game.addPlayer(gameCreator, conn) TODO 
+
+        addNewGame(game)
+
+        val gameData = GameData(1, gameName, maxPlayers, listOf<String>(), questionCount)
+
+        println("Game erstellt. Die ID ist: ${id}")
+        conn.send(MsgGameInfo(gameData))
     }
+
+    /**
+     * Adds a new game to gamesList
+     */
+    fun addNewGame(game: Game){
+        games.add(game)
+    }
+
 
     /**
      *  Gets called, if MsgGetOpenGames Message incomes.

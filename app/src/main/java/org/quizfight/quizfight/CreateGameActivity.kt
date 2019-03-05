@@ -89,7 +89,7 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
     fun sendMsgCreateGameToServer(gameRequest: GameRequest, nickname: String){
         // Use launch(Dispatchers.IO){} for networking operations
         launch(Dispatchers.IO) {
-            client = Client("10.0.2.2", 34567, this@CreateGameActivity)
+            client = Client("192.168.0.33", 22345, this@CreateGameActivity)
             client.conn.send(MsgCreateGame(gameRequest,nickname))
         }
     }

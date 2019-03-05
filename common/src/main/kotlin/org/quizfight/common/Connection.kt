@@ -22,7 +22,8 @@ interface Connection {
 }
 
 class SocketConnection(
-    private val socket: Socket,
+    // TEMPORÄR PUBLIC, SORRY BRAUCHTE ICH UNBEDINGT ZUM TESTEN! (JULIAN)
+    val socket: Socket,
     override var handlers: Map<KClass<*>, (Connection, Message) -> Unit>
 ) : Connection {
     // Do not switch order of stream creation, will result in deadlock
