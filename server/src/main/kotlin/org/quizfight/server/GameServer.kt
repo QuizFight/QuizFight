@@ -103,7 +103,11 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
      */
 
     private fun receiveCreateGame(conn: Connection, msg: MsgCreateGame) {
-        var id = conn.id
+        val remoteIpPort = ServerUtils().getIpAndPortFromConnection(conn as SocketConnection)
+        val remoteIp     = remoteIpPort[0]
+        val remotePort   = remoteIpPort[1].toInt()
+
+        var id = remoteIp + ":" + remotePort
 
         val gameName = msg.game.name
         val maxPlayers = msg.game.maxPlayers
@@ -113,11 +117,11 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         val gameQuestions = questionStore.getQuestionsForGame(questionCount).toMutableList()
 
         val game = Game(id, gameName, maxPlayers, gameQuestions)
-        game.addPlayer(gameCreator, conn)
+       // game.addPlayer(gameCreator, conn) TODO 
 
         addNewGame(game)
 
-        val gameData = GameData(1, "name", maxPlayers, listOf<String>(), questionCount)
+        val gameData = GameData(1, gameName, maxPlayers, listOf<String>(), questionCount)
 
         println("Game erstellt. Die ID ist: ${id}")
         conn.send(MsgGameInfo(gameData))

@@ -5,6 +5,7 @@ import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import java.net.ServerSocket
+import java.net.Socket
 
 /**
  * The master server that manages game servers.
@@ -127,22 +128,19 @@ class MasterServer(private val port : Int) {
      * Accepts a GameServerData object and updates its gameServers list accordingly.
      */
     private fun registerGameServer(conn: Connection, msg : MsgRegisterGameServer) {
+        // TODO ip und port werden wahrscheinlich anders mitgegeben, rücksprache!
+        val remoteIpPort = ServerUtils().getIpAndPortFromConnection(conn as SocketConnection)
+        val remoteIp     = remoteIpPort[0]
+        val remotePort   = remoteIpPort[1].toInt()
 
-        /*
-        Hi Julian, das hier hat mit einer älteren Spezifikation geklappt, bei der MsgRegisterGameServer noch
-        ein ServerData-Objekt von sich selbst mitgeschickt hat. Das haben wir aber rausgenommen. Ggf. müsst
-        ihr das wieder reinmachen!
-        */
-        // TODO ip und port der connection abgreifen, sobald implementiert
-        val gameServer = ServerData("192.168.0.33", 45678, listOf<GameData>())
-        //so war es vorher: val gameServer = msg.gameServer
+        val gameServer = ServerData(remoteIp, remotePort, listOf<GameData>())
 
         if (gameServerIsKnown(gameServer)) {
             removeServerFromList(gameServer)
         }
 
         addServerToList(gameServer)
-        println("GameServer registriert!")
+        println("GameServer registriert! Seine Adresse: ${remoteIp}:${remotePort}")
         conn.close()
     }
 }
