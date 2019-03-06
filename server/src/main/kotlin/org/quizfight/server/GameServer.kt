@@ -1,13 +1,11 @@
 package org.quizfight.server
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
-import org.quizfight.common.question.Question
 import org.quizfight.questionStore.QuestionStore
 import java.net.ServerSocket
 import java.net.Socket
@@ -36,8 +34,11 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
     private fun sendUpdate(){
         GlobalScope.launch {
-            masterConn.send(MsgGameList(gameListToGameDataList()))
-            delay(UPDATE_INTERVALL)
+            while(true) {
+                masterConn.send(MsgGameList(gameListToGameDataList()))
+                delay(UPDATE_INTERVALL)
+                println("Sent GameList to Master")
+            }
         }
     }
 
@@ -105,15 +106,12 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     }
 
     private fun connectWithMaster() {
-
         try {
             masterConn.send(MsgRegisterGameServer())
         }catch(socEx: SocketException){
             println("Failed while connecting to Master")
             return
         }
-
-        masterConn.close()
 
         println("Connected to Master")
     }

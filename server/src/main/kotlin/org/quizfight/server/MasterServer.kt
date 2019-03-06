@@ -26,12 +26,18 @@ class MasterServer(private val port : Int) {
         val socket = ServerSocket(port)
         while (!socket.isClosed) {
             val connection = SocketConnection(socket.accept(), mapOf(
-                    MsgRegisterGameServer::class to { conn, msg -> registerGameServer(conn, msg as MsgRegisterGameServer) },
+                    MsgRegisterGameServer::class to { conn, msg -> registerGameServer(conn, msg as MsgRegisterGameServer)},
                     MsgRequestOpenGames::class to { conn, _ -> sendAllGames(conn) },
                     MsgJoin::class to { conn, msg -> transferToGameServer(conn, msg as MsgJoin) },
-                    MsgCreateGame::class to { conn, msg -> sendLeastUsedGameServer(conn, msg as MsgCreateGame)}
+                    MsgCreateGame::class to { conn, msg -> sendLeastUsedGameServer(conn, msg as MsgCreateGame)},
+                    MsgGameList::class to { conn, msg -> receiveGameServerUpdate(conn, msg as MsgGameList)}
             ))
         }
+    }
+
+    private fun receiveGameServerUpdate(conn: Connection, msgGameList: MsgGameList) {
+        println("Received this Gamelist from " + (conn as SocketConnection).socket.remoteSocketAddress.toString()+": ")
+        println(msgGameList.games)
     }
 
 
@@ -110,7 +116,7 @@ class MasterServer(private val port : Int) {
         if (gameServer != null) {
             conn.send(MsgTransferToGameServer(gameServer))
         }
-        conn.close()
+        //conn.close()
     }
 
     /**
@@ -141,6 +147,5 @@ class MasterServer(private val port : Int) {
 
         addServerToList(gameServer)
         println("GameServer registriert! Seine Adresse: ${remoteIp}:${remotePort}")
-        conn.close()
     }
 }
