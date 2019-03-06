@@ -5,7 +5,6 @@ import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import java.net.ServerSocket
-import java.net.Socket
 
 /**
  * The master server that manages game servers.
@@ -109,14 +108,12 @@ class MasterServer(private val port : Int) {
      * Sends the server that manages the game in question.
      */
     private fun transferToGameServer(conn : Connection, msgJoinGame: MsgJoin) {
-
         val gameServer  = getServerByGameId(msgJoinGame.gameId)
 
         //TODO: What if == null?
         if (gameServer != null) {
             conn.send(MsgTransferToGameServer(gameServer))
         }
-        //conn.close()
     }
 
     /**
