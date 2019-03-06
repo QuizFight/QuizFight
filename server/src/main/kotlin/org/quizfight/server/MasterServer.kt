@@ -74,14 +74,14 @@ class MasterServer(private val port : Int) {
     /**
      * Returns the server that hosts the game with param gameId.
      */
-    private fun getServerByGameId(gameId : Int) : ServerData? {
+    private fun getServerByGameId(gameId : String) : ServerData? {
         return gameServers.find{ gameServer -> gameServer.hasGameWithId(gameId)}
     }
 
     /**
      * Extension method for ServerData. This way we don't have to get the actual game server.
      */
-    private fun ServerData.hasGameWithId(gameId: Int) : Boolean {
+    private fun ServerData.hasGameWithId(gameId: String) : Boolean {
         return games.find { it.id == gameId} != null
     }
 

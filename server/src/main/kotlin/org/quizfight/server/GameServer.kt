@@ -2,6 +2,7 @@ package org.quizfight.server
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
@@ -19,12 +20,25 @@ import java.net.SocketException
 open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: Int){
     val questionStore = QuestionStore()    // hat ab diesem Zeitpunkt schon ALLE Fragen der XML-Dateien
 
+    val masterConn = SocketConnection(Socket(masterIp, masterPort), mapOf())
+
     val socket = ServerSocket(ownPort)
     var games= mutableListOf<Game>()
 
+    val UPDATE_INTERVALL = 4000L
+
     init {
         connectWithMaster()
+        sendUpdate()
         start()
+    }
+
+
+    private fun sendUpdate(){
+        GlobalScope.launch {
+            masterConn.send(MsgGameList(gameListToGameDataList()))
+            delay(UPDATE_INTERVALL)
+        }
     }
 
 
@@ -46,11 +60,21 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     private fun gameToGameData(g: Game): GameData {
         var players = listOf<String>()
 
-        for(i in 0..g.players.size){
-            players.plus(g.players[i]!!.name)
+        for(player in g.players){
+            players.plus(player.value)
         }
 
-        return GameData(1, g.gameName, g.maxPlayer, players, 1) //TODO id anpassen
+        return GameData(g.id, g.gameName, g.maxPlayer, players, g.questions.size)
+    }
+
+    private fun gameListToGameDataList(): List<GameData>{
+        var gameDataList = listOf<GameData>()
+
+        for(game in games){
+            gameDataList.plus(gameToGameData(game))
+        }
+
+        return gameDataList
     }
 
     /**
@@ -81,8 +105,6 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     }
 
     private fun connectWithMaster() {
-        val masterSocket = Socket(masterIp, masterPort)
-        val masterConn = SocketConnection(masterSocket, mapOf())
 
         try {
             masterConn.send(MsgRegisterGameServer())
@@ -121,7 +143,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
         addNewGame(game)
 
-        val gameData = GameData(1, gameName, maxPlayers, listOf<String>(), questionCount)
+        val gameData = GameData(id, gameName, maxPlayers, listOf<String>(), questionCount)
 
         println("Game erstellt. Die ID ist: ${id}")
         conn.send(MsgGameInfo(gameData))
@@ -151,7 +173,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
      * Adds the Player to a Game
      */
     private fun joinGame(conn: Connection, msgJoinGame: MsgJoin) {
-        games[msgJoinGame.gameId].addPlayer(msgJoinGame.nickname, conn)
+        games.find { it.id == msgJoinGame.gameId }!!.addPlayer(msgJoinGame.nickname, conn)
     }
 
 

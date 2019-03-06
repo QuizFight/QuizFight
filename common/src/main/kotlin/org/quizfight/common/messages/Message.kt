@@ -6,7 +6,7 @@ import java.util.*
 
 interface Message : Serializable
 
-data class GameData(val id: Int,
+data class GameData(val id: String,
                     val name:String,
                     val maxPlayers: Int,
                     val players: List<String>,
@@ -23,7 +23,7 @@ data class ServerData(val ip: String,
 class MsgRegisterGameServer : Message
 class MsgRequestOpenGames : Message
 data class MsgGameList(val games : List<GameData>) : Message
-data class MsgJoin(val gameId: Int, val nickname: String) : Message
+data class MsgJoin(val gameId: String, val nickname: String) : Message
 class MsgLeave : Message
 data class MsgTransferToGameServer(val gameServer : ServerData) : Message
 data class MsgGameInfo(val game : GameData) : Message
