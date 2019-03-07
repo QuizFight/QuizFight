@@ -3,7 +3,9 @@ package org.quizfight.quizfight
 import android.support.v7.app.AppCompatActivity
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.MsgGameInfo
+import org.quizfight.common.messages.MsgGameList
 import org.quizfight.common.messages.MsgQuestion
+import org.quizfight.common.messages.MsgStartGame
 import org.quizfight.common.question.ChoiceQuestion
 import java.net.Socket
 
@@ -16,14 +18,15 @@ class Client(serverIp: String, port: Int , activity: AppCompatActivity) {
     init {
         conn = SocketConnection(socket,
                 mapOf( MsgQuestion ::class to { conn, msg -> receiveQuestion(msg as MsgQuestion )},
-                        MsgGameInfo ::class to { conn, msg -> receiveGameInfo(msg as MsgGameInfo )}
+                        MsgGameInfo ::class to { conn, msg -> receiveGameInfo(msg as MsgGameInfo )},
+                        MsgGameList ::class to { conn, msg -> receiveGameList(msg as MsgGameList )},
+                        MsgStartGame ::class to { conn, msg -> receiveGameStart(msg as MsgStartGame )}
                 ))
 
     }
 
     fun receiveQuestion(msg :MsgQuestion){
         if(activity is QuizActivity) {
-
             var question: ChoiceQuestion = msg.question as ChoiceQuestion
             activity.showNextQuestion(question)
             Thread.sleep(20000)
@@ -39,13 +42,25 @@ class Client(serverIp: String, port: Int , activity: AppCompatActivity) {
         }
     }
 
-    fun receivePlayerCount(){
-
-       /* MsgGetPlayersCount(val gameId:Int)
-        MsgPlayersCount(val gameId:Int, count: Int)*/
+    fun receiveGameList(msg: MsgGameList){
+        if(activity is AllGamesActivity){
+            activity.showGames(msg.games)
+        }
     }
 
+    fun receiveGameStart(msg: MsgStartGame) {
+        if (activity is AttemptQuizStartActivity) {
+            activity.showQuizActivity()
+        }
 
+
+        fun receivePlayerCount() {
+
+            /* MsgGetPlayersCount(val gameId:Int)
+        MsgPlayersCount(val gameId:Int, count: Int)*/
+        }
+
+    }
 
 }
 
