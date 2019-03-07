@@ -13,7 +13,7 @@ import org.quizfight.common.messages.MsgJoin
 class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     private var questionCountTotal : Int = 5
-    private var gameId : Int = 0
+    private var gameId : String = ""
     private var nickname = ""
     private var gameName = ""
     private var maxPlayers = 0
@@ -35,7 +35,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     fun updateUi(){
 
         questionCountTotal = intent.getIntExtra("questionCountTotal",0 )
-        gameId = intent.getIntExtra("gameId",0 )
+        gameId = intent.getStringExtra("gameId" )
         gameName = intent.getStringExtra("gameName")
         maxPlayers = intent.getIntExtra("maxPlayers", 0 )
 
