@@ -117,7 +117,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         val gameQuestions = questionStore.getQuestionsForGame(questionCount).toMutableList()
 
         val game = Game(id, gameName, maxPlayers, gameQuestions)
-       // game.addPlayer(gameCreator, conn) TODO 
+       // game.addPlayer(gameCreator, conn) TODO
 
         addNewGame(game)
 
