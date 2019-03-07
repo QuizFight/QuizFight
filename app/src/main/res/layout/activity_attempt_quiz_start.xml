@@ -13,30 +13,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="10dp">
-
-            <TextView
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="@string/lbl_number_players"
-                android:textColor="#ffffff"
-                android:textSize="7pt"/>
-
-            <ProgressBar
-                android:id="@+id/progressBar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-
-        </LinearLayout>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -53,7 +29,7 @@
             <TextView
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:text="MPT"
+                android:text="someGame"
                 android:textColor="#ffffff"
                 android:id="@+id/tv_game_name"
                 android:textSize="8pt"/>
@@ -75,7 +51,7 @@
             <TextView
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:text="Anana"
+                android:text="Someone"
                 android:textColor="#ffffff"
                 android:id="@+id/tv_created_by"
                 android:textSize="8pt"/>
@@ -99,7 +75,7 @@
             <TextView
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:text="10"
+                android:text="0"
                 android:textColor="#ffffff"
                 android:id="@+id/tv_question_count"
                 android:textSize="8pt"/>
@@ -108,7 +84,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp">
 
             <TextView
                 android:layout_width="120dp"
@@ -121,11 +98,48 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:textColor="#ffffff"
-                android:text="Anana"
+                android:text="someone"
                 android:id="@+id/tv_nickname"
                 android:textSize="8pt"/>
         </LinearLayout>
 
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:text="@string/lbl_number_players"
+                android:textColor="#ffffff"
+                android:textSize="7pt"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:text="1/5"
+                android:textColor="#ffffff"
+                android:textSize="7pt"
+                android:layout_gravity="center"
+                android:id="@+id/tv_maxplayers"/>
+
+        </LinearLayout>
+
+
+
+        <com.mikhaellopez.circularprogressbar.CircularProgressBar
+            android:layout_marginTop="40dp"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            app:cpb_background_progressbar_width="20dp"
+            app:cpb_progressbar_color="@color/colorPrimary"
+            app:cpb_progressbar_width="20dp"
+            android:layout_gravity="center"
+            android:id="@+id/progressBar"/>
 
     </LinearLayout>
 
