@@ -39,6 +39,11 @@ class Client(serverIp: String, port: Int , activity: AppCompatActivity) {
         }
     }
 
+    fun receivePlayerCount(){
+
+       /* MsgGetPlayersCount(val gameId:Int)
+        MsgPlayersCount(val gameId:Int, count: Int)*/
+    }
 
 
 
