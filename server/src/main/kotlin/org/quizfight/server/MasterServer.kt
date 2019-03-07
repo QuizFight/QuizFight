@@ -37,6 +37,7 @@ class MasterServer(private val port : Int) {
     private fun receiveGameServerUpdate(conn: Connection, msgGameList: MsgGameList) {
         println("Received this Gamelist from " + (conn as SocketConnection).socket.remoteSocketAddress.toString()+": ")
         println(msgGameList.games)
+        println()
     }
 
 

@@ -23,12 +23,19 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     val socket = ServerSocket(ownPort)
     var games= mutableListOf<Game>()
 
-    val UPDATE_INTERVALL = 4000L
+    val UPDATE_INTERVALL = 8000L
 
     init {
+        addHardcodedGameForTesting()
+
         connectWithMaster()
         sendUpdate()
         start()
+    }
+
+    private fun addHardcodedGameForTesting(){
+        games.add(Game("This is my id", "TestGameName",8,
+                questionStore.getQuestionsForGame(5).toMutableList()))
     }
 
 
@@ -36,8 +43,8 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         GlobalScope.launch {
             while(true) {
                 masterConn.send(MsgGameList(gameListToGameDataList()))
-                delay(UPDATE_INTERVALL)
                 println("Sent GameList to Master")
+                delay(UPDATE_INTERVALL)
             }
         }
     }
@@ -59,20 +66,20 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
      * converts a game into gameData
      */
     private fun gameToGameData(g: Game): GameData {
-        var players = listOf<String>()
+        var players = mutableListOf<String>()
 
         for(player in g.players){
-            players.plus(player.value)
+            players.add(player.value.name)
         }
 
         return GameData(g.id, g.gameName, g.maxPlayer, players, g.questions.size)
     }
 
     private fun gameListToGameDataList(): List<GameData>{
-        var gameDataList = listOf<GameData>()
+        var gameDataList = mutableListOf<GameData>()
 
         for(game in games){
-            gameDataList.plus(gameToGameData(game))
+            gameDataList.add(gameToGameData(game))
         }
 
         return gameDataList
