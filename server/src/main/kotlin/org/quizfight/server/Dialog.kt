@@ -7,7 +7,6 @@ class Dialog{
     private val GAME_SERVER      = "g"
     private val MENU_MSG         = "MasterServer (${MASTER_SERVER}), GameServer (${GAME_SERVER}), Quit (${QUIT})?"
     private val TYPE_MASTER_IP   = "Master Server IP-Address: "
-    private val TYPE_GAME_IP     = "Game Server IP-Address: "
     private val BAD_INPUT        = "Bad Input, try again"
     private val EXIT             = "Bye"
 
