@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
-    private var gameId : Int = 0;
+    private var gameId : String = "";
     private var maxPlayers: Int = 0;
     private var nickname : String = ""
     private var players = 0
@@ -26,7 +26,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attempt_quiz_start)
 
-        gameId = intent.getIntExtra("gameId",0)
+        gameId = intent.getStringExtra("gameId")
         var createdBy = intent.getStringExtra("createdBy")
         nickname = intent.getStringExtra("nickname")
         var gameName = intent.getStringExtra("gameName")
