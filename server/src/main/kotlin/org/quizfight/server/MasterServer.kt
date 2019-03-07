@@ -5,7 +5,6 @@ import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import java.net.ServerSocket
-import java.net.Socket
 
 /**
  * The master server that manages game servers.
@@ -26,12 +25,19 @@ class MasterServer(private val port : Int) {
         val socket = ServerSocket(port)
         while (!socket.isClosed) {
             val connection = SocketConnection(socket.accept(), mapOf(
-                    MsgRegisterGameServer::class to { conn, msg -> registerGameServer(conn, msg as MsgRegisterGameServer) },
+                    MsgRegisterGameServer::class to { conn, msg -> registerGameServer(conn, msg as MsgRegisterGameServer)},
                     MsgRequestOpenGames::class to { conn, _ -> sendAllGames(conn) },
                     MsgJoin::class to { conn, msg -> transferToGameServer(conn, msg as MsgJoin) },
-                    MsgCreateGame::class to { conn, msg -> sendLeastUsedGameServer(conn, msg as MsgCreateGame)}
+                    MsgCreateGame::class to { conn, msg -> sendLeastUsedGameServer(conn, msg as MsgCreateGame)},
+                    MsgGameList::class to { conn, msg -> receiveGameServerUpdate(conn, msg as MsgGameList)}
             ))
         }
+    }
+
+    private fun receiveGameServerUpdate(conn: Connection, msgGameList: MsgGameList) {
+        println("Received this Gamelist from " + (conn as SocketConnection).socket.remoteSocketAddress.toString()+": ")
+        println(msgGameList.games)
+        println()
     }
 
 
@@ -74,14 +80,14 @@ class MasterServer(private val port : Int) {
     /**
      * Returns the server that hosts the game with param gameId.
      */
-    private fun getServerByGameId(gameId : Int) : ServerData? {
+    private fun getServerByGameId(gameId : String) : ServerData? {
         return gameServers.find{ gameServer -> gameServer.hasGameWithId(gameId)}
     }
 
     /**
      * Extension method for ServerData. This way we don't have to get the actual game server.
      */
-    private fun ServerData.hasGameWithId(gameId: Int) : Boolean {
+    private fun ServerData.hasGameWithId(gameId: String) : Boolean {
         return games.find { it.id == gameId} != null
     }
 
@@ -103,14 +109,12 @@ class MasterServer(private val port : Int) {
      * Sends the server that manages the game in question.
      */
     private fun transferToGameServer(conn : Connection, msgJoinGame: MsgJoin) {
-
         val gameServer  = getServerByGameId(msgJoinGame.gameId)
 
         //TODO: What if == null?
         if (gameServer != null) {
             conn.send(MsgTransferToGameServer(gameServer))
         }
-        conn.close()
     }
 
     /**
@@ -141,6 +145,5 @@ class MasterServer(private val port : Int) {
 
         addServerToList(gameServer)
         println("GameServer registriert! Seine Adresse: ${remoteIp}:${remotePort}")
-        conn.close()
     }
 }
