@@ -2,7 +2,13 @@ package org.quizfight.server
 
 import org.quizfight.common.SocketConnection
 
-class ServerUtils{
+    var serverLogger = true
+
+    fun serverLog(message: String){
+        if(serverLogger){
+            println(message)
+        }
+    }
 
     fun getIpAndPortFromConnection(conn: SocketConnection): List<String>{
         val sockConn = conn as SocketConnection
@@ -11,4 +17,3 @@ class ServerUtils{
         return remoteIpPort
     }
 
-}

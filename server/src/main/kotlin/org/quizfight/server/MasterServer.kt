@@ -13,6 +13,7 @@ import java.net.ServerSocket
  */
 class MasterServer(private val port : Int) {
     private var gameServers = mutableListOf<ServerData>()
+    private var gameDataList = mutableListOf<GameData>()
 
     init{
         acceptConnections()
@@ -35,11 +36,15 @@ class MasterServer(private val port : Int) {
     }
 
     private fun receiveGameServerUpdate(conn: Connection, msgGameList: MsgGameList) {
-        println("Received this Gamelist from " + (conn as SocketConnection).socket.remoteSocketAddress.toString()+": ")
-        println(msgGameList.games)
-        println()
-    }
+        val remoteIpPort = getIpAndPortFromConnection(conn as SocketConnection)
+        val remoteIp     = remoteIpPort[0]
+        val remotePort   = remoteIpPort[1].toInt()
 
+        gameServers.find { gs -> gs.ip == remoteIp && gs.port == remotePort }!!.games = msgGameList.games
+
+        serverLog("GameListe erhalten von: ${remoteIp}:${remotePort}")
+        serverLog("Meine aktuelle Liste aller Spiele sieht so aus:\n" + listAllOpenGames() + "\n")
+    }
 
     /**
      * Checks if a gameServer already is known.
@@ -101,6 +106,7 @@ class MasterServer(private val port : Int) {
      */
     private fun sendAllGames(conn : Connection) {
         val games = listAllOpenGames()
+        serverLog("Ich sende dem Client diese offenen Games:\n" + games + "\n")
         conn.send(MsgGameList(games))
     }
 
@@ -133,7 +139,7 @@ class MasterServer(private val port : Int) {
      */
     private fun registerGameServer(conn: Connection, msg : MsgRegisterGameServer) {
         // TODO ip und port werden wahrscheinlich anders mitgegeben, rücksprache!
-        val remoteIpPort = ServerUtils().getIpAndPortFromConnection(conn as SocketConnection)
+        val remoteIpPort = getIpAndPortFromConnection(conn as SocketConnection)
         val remoteIp     = remoteIpPort[0]
         val remotePort   = remoteIpPort[1].toInt()
 
@@ -144,6 +150,7 @@ class MasterServer(private val port : Int) {
         }
 
         addServerToList(gameServer)
-        println("GameServer registriert! Seine Adresse: ${remoteIp}:${remotePort}")
+        serverLog("GameServer registriert! Seine Adresse: ${remoteIp}:${remotePort}")
+        serverLog("Meine GameServer-Liste ist jetzt: \n" + gameServers + "\n")
     }
 }

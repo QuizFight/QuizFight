@@ -26,16 +26,17 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     val UPDATE_INTERVALL = 8000L
 
     init {
-        addHardcodedGameForTesting()
-
         connectWithMaster()
+        addHardcodedGameForTesting()  // TEMPORARY
         sendUpdate()
-        start()
+        //start()
     }
 
     private fun addHardcodedGameForTesting(){
-        games.add(Game("This is my id", "TestGameName",8,
+        games.add(Game("1", "TestGame 1",8,
                 questionStore.getQuestionsForGame(5).toMutableList()))
+        games.add(Game("2", "TestGame 2",5,
+                questionStore.getQuestionsForGame(9).toMutableList()))
     }
 
 
@@ -43,7 +44,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         GlobalScope.launch {
             while(true) {
                 masterConn.send(MsgGameList(gameListToGameDataList()))
-                println("Sent GameList to Master")
+                println("Sent this GameList to Master: " + games + "\n")
                 delay(UPDATE_INTERVALL)
             }
         }
@@ -130,7 +131,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
      */
 
     private fun receiveCreateGame(conn: Connection, msg: MsgCreateGame) {
-        val remoteIpPort = ServerUtils().getIpAndPortFromConnection(conn as SocketConnection)
+        val remoteIpPort = getIpAndPortFromConnection(conn as SocketConnection)
         val remoteIp     = remoteIpPort[0]
         val remotePort   = remoteIpPort[1].toInt()
 
