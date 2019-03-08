@@ -18,7 +18,7 @@ data class GameRequest(val name : String,
 
 data class ServerData(val ip: String,
                       val port: Int,
-                      val games: List<GameData>) : Serializable
+                      var games: List<GameData>) : Serializable
 
 class MsgRegisterGameServer : Message
 class MsgRequestOpenGames : Message
