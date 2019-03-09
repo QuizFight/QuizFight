@@ -57,7 +57,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
      * @return List of all games in GameData format
      */
     fun listOpenGames(): List<GameData> {
-        val openGames: List<Game> = games.filter { it.open }
+        val openGames: List<Game> = games.filter { it.isOpen }
         val gameData: MutableList<GameData> = mutableListOf()
         openGames.forEach { gameData.add(gameToGameData(it))  }
         return gameData

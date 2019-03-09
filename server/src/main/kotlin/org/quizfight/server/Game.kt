@@ -97,7 +97,7 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
     }
 
     override fun toString(): String {
-        return "Game(id=$id, gameName='$gameName', maxPlayer=$maxPlayer, open=$open)"
+        return "Game(id=$id, gameName='$gameName', maxPlayer=$maxPlayer, open=$isOpen)"
     }
 
 
