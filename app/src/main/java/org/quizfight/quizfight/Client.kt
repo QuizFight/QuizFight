@@ -1,5 +1,6 @@
 package org.quizfight.quizfight
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.MsgGameInfo
@@ -19,8 +20,7 @@ class Client(serverIp: String, port: Int , activity: AppCompatActivity) {
         conn = SocketConnection(socket,
                 mapOf( MsgQuestion ::class to { conn, msg -> receiveQuestion(msg as MsgQuestion )},
                         MsgGameInfo ::class to { conn, msg -> receiveGameInfo(msg as MsgGameInfo )},
-                        MsgGameList ::class to { conn, msg -> receiveGameList(msg as MsgGameList )},
-                        MsgStartGame ::class to { conn, msg -> receiveGameStart(msg as MsgStartGame )}
+                        MsgGameList ::class to { conn, msg -> receiveGameList(msg as MsgGameList )}
                 ))
 
     }
@@ -33,26 +33,27 @@ class Client(serverIp: String, port: Int , activity: AppCompatActivity) {
             activity.sendScore()
             //MsgRanking anzeigen bevor nextQuestion anzeigen
         }
+        else if( activity is AttemptQuizStartActivity) {
+            activity.showQuizActivity()
+
+        }
 
     }
 
     fun receiveGameInfo(msg: MsgGameInfo){
         if(activity is CreateGameActivity) {
             activity.showAttemptQuizStartActivity(msg)
-        }
+            conn.close()
+       }
+
     }
 
     fun receiveGameList(msg: MsgGameList){
         if(activity is AllGamesActivity){
             activity.showGames(msg.games)
+            conn.close()
         }
     }
-
-    fun receiveGameStart(msg: MsgStartGame) {
-        if (activity is AttemptQuizStartActivity) {
-            activity.showQuizActivity()
-        }
-
 
         fun receivePlayerCount() {
 
@@ -60,7 +61,7 @@ class Client(serverIp: String, port: Int , activity: AppCompatActivity) {
         MsgPlayersCount(val gameId:Int, count: Int)*/
         }
 
-    }
+
 
 }
 

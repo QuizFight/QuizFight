@@ -22,6 +22,7 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
     override val coroutineContext = Dispatchers.Main + job
 
     var nickname:String = " "
+    private val context = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,13 +90,14 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
     fun sendMsgCreateGameToServer(gameRequest: GameRequest, nickname: String){
         // Use launch(Dispatchers.IO){} for networking operations
         launch(Dispatchers.IO) {
-            client = Client("10.0.2.2", 34567, this@CreateGameActivity)
+            client = Client("10.0.2.2", 23456, this@CreateGameActivity)
             client.conn.send(MsgCreateGame(gameRequest,nickname))
         }
     }
 
-    fun showAttemptQuizStartActivity(gameInfo: MsgGameInfo){
-        val intent = Intent(this,  AttemptQuizStartActivity::class.java)
+
+    fun showAttemptQuizStartActivity(gameInfo: MsgGameInfo) = launch{
+        val intent = Intent(context,  AttemptQuizStartActivity::class.java)
 
         //send game's info to AttemptQuizStartActivity
         intent.putExtra("gameId" , gameInfo.game.id)
@@ -104,8 +106,9 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("gameName" , gameInfo.game.name)
         intent.putExtra("nickname" , nickname)
         intent.putExtra("createdBy" , nickname)
+        intent.putExtra("startEnable", true)
 
         startActivity(intent)
-        this.finish()
+        context.finish()
     }
 }

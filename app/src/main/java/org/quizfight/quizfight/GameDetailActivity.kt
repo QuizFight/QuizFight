@@ -61,6 +61,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("gameName" , gameName)
         intent.putExtra("nickname" , nickname)
         intent.putExtra("createdBy" , "")
+        intent.putExtra("startEnable", false)
 
         startActivity(intent)
         this.finish()

@@ -33,7 +33,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
         // Use launch(Dispatchers.IO){} for networking operations
         launch(Dispatchers.IO) {
-            client = Client("10.0.2.2", 34567, this@QuizActivity)
+           // client = Client("10.0.2.2", 34567, this@QuizActivity)
 
         }
 
@@ -93,7 +93,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         }
 
         launch(Dispatchers.Default){
-            client.conn.send(MsgScore(currentQuestion.evaluate(answer.toString())))
+          //  client.conn.send(MsgScore(currentQuestion.evaluate(answer.toString())))
         }
 
         answerSelected = false

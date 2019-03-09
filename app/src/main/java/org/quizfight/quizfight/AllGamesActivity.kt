@@ -52,16 +52,17 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
             sendRequestOpenGame()
         }
 
-
     }
+
 
     fun sendRequestOpenGame(){
         launch(Dispatchers.IO) {
-            val client = Client("10.0.2.2", 34567, this@AllGamesActivity)
+            val client = Client("10.0.2.2", 23456, this@AllGamesActivity)
             client.conn.send(MsgRequestOpenGames())
         }
 
     }
+
 
     /**
      * Displays all available games
