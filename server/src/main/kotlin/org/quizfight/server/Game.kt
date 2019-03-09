@@ -20,7 +20,10 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
     var questionIncome: Int = 0
     private var nextPlayerID: Int = 0
     var players: MutableMap<Int, Player> = mutableMapOf<Int, Player>()
-    var open: Boolean = true
+
+    var playerCount = 0
+
+    var isOpen: Boolean = true
 
     /**
      * Sets the max number of players. Must be between 2 and 8
@@ -49,8 +52,11 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
             throw Exception(MSG_GAME_FULL)
         }
         players[nextPlayerID++] = player
-        //TODO: If Game full, then start first question
-        this.broadcast(getNextQuestion())
+
+        if(playerCount == maxPlayer) {
+            isOpen = false
+            this.broadcast(getNextQuestion())
+        }
     }
 
     /**
@@ -63,19 +69,12 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
 
 
     /**
-     * gets questions from questionSelector and stores them into questions
-     */
-    private fun loadQuestions(): MutableList<Question<*>>{
-        var qs: MutableList<Question<*>> = mutableListOf<Question<*>>()
-        return qs
-    }
-
-
-    /**
      * prepares the next question to be sended
      */
     fun getNextQuestion(): Message{
-        return MsgQuestion(questions[0])
+        val question = questions[0]
+        questions.removeAt(0)
+        return MsgQuestion(question)
     }
 
     fun printQuestions(){
