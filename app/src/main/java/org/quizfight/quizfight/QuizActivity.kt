@@ -2,6 +2,7 @@ package org.quizfight.quizfight
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.widget.Button
 import kotlinx.android.synthetic.main.activity_quiz.*
 import android.view.View
@@ -9,6 +10,7 @@ import kotlinx.coroutines.*
 import org.quizfight.common.messages.MsgJoin
 import org.quizfight.common.messages.MsgScore
 import org.quizfight.common.question.ChoiceQuestion
+import java.util.Locale
 
 class QuizActivity : CoroutineScope, AppCompatActivity() {
 
@@ -23,6 +25,10 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     private lateinit var currentQuestion: ChoiceQuestion
     private var answerSelected : Boolean = false
     private lateinit var client : Client
+
+    //Countdown Timer
+    val millisInFuture: Long = 21000 // for 20 seconds plus 1 second imprecision
+    val countDownInterval: Long = 1000 // sets the countdown interval to 1 second
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +75,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
            text_view_question_count.text = ("Question: " + questionCounter
                        + "/" + questionCountTotal)
 
+           timer(millisInFuture, countDownInterval).start()
+
        } else {
             finishQuiz()
        }
@@ -97,5 +105,22 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         }
 
         answerSelected = false
+    }
+
+    private fun timer(millisInFuture: Long, countDownInterval: Long): CountDownTimer {
+        return object: CountDownTimer(millisInFuture, countDownInterval) {
+            override fun onTick(millisUntilFinished: Long) {
+                updateCountdownText(millisUntilFinished)
+            }
+
+            override fun onFinish() {
+                TODO("not implemented")
+            }
+        }
+    }
+
+    private fun updateCountdownText(timeLeft: Long) {
+        val seconds: Int = (timeLeft / 1000).toInt()
+        text_view_countdown.text = String.format(Locale.getDefault(), "%02d", seconds)
     }
 }
