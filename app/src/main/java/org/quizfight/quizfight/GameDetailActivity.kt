@@ -7,6 +7,10 @@ import kotlinx.android.synthetic.main.activity_game_detail.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import android.support.v7.app.AlertDialog
+import android.view.View
+import android.widget.EditText
+import kotlinx.android.synthetic.main.layout_alert_enter_nickname.*
 import kotlinx.coroutines.launch
 import org.quizfight.common.messages.MsgJoin
 
@@ -14,9 +18,11 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     private var questionCountTotal : Int = 5
     private var gameId : String = ""
-    private var nickname = ""
+    private lateinit var nickname: String
     private var gameName = ""
     private var maxPlayers = 0
+
+    private var nicknameEntered: Boolean = false
 
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
@@ -27,8 +33,13 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         updateUi()
 
         btn_join.setOnClickListener {
-            showAttemptQuizStart()
+            if (nicknameEntered == false) {
+                displayAlert()
+            } else {
+                showAttemptQuizStart()
+            }
         }
+
     }
 
 
@@ -72,4 +83,31 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         job.cancel()
     }
 
+    fun displayAlert() {
+        val builder = AlertDialog.Builder(this)
+        val view = layoutInflater.inflate(R.layout.layout_alert_enter_nickname, null)
+        val editText = view.findViewById<View>(R.id.enter_nickname) as EditText
+        builder.setView(view)
+
+        builder.setPositiveButton(R.string.btn_confirm) { dialog, x ->
+            nickname = editText.text.toString()
+            if(!nickname.isNullOrBlank()) {
+                nicknameEntered = true
+                sendJoinMessage()
+                showAttemptQuizStart()
+            } else {
+                displayAlert()
+            }
+        }
+
+        builder.create().show()
+    }
+
+    fun sendJoinMessage() {
+        launch(Dispatchers.IO) {
+            val client = Client("192.168.2.100", 34567, this@GameDetailActivity)
+            client.conn.send(MsgJoin(gameId, nickname))
+
+        }
+    }
 }

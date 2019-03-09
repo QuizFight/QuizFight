@@ -22,5 +22,7 @@
     <string name="lbl_number_of_questions">No. of questions</string>
     <string name="lbl_number_players">No. of players</string>
     <string name="required">Requiered ! </string>
+
+    <string name="btn_confirm">Confirm</string>
     
 </resources>
