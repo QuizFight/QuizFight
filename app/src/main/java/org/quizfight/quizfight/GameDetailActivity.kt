@@ -72,6 +72,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("gameName" , gameName)
         intent.putExtra("nickname" , nickname)
         intent.putExtra("createdBy" , "")
+        intent.putExtra("startEnable", true)
 
         startActivity(intent)
         this.finish()
@@ -105,7 +106,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     fun sendJoinMessage() {
         launch(Dispatchers.IO) {
-            val client = Client("192.168.2.100", 34567, this@GameDetailActivity)
+            val client = Client("10.0.2.2", 23456, this@GameDetailActivity)
             client.conn.send(MsgJoin(gameId, nickname))
 
         }
