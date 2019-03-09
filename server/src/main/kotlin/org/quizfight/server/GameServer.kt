@@ -179,7 +179,14 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
      * Adds the Player to a Game
      */
     private fun joinGame(conn: Connection, msgJoinGame: MsgJoin) {
-        games.find { it.id == msgJoinGame.gameId }!!.addPlayer(msgJoinGame.nickname, conn)
+        val game = games.find { game -> game.id == msgJoinGame.gameId }
+        if (game == null){
+        return      // TODO what if?
+        }
+        game!!.addPlayer(msgJoinGame.nickname, conn)
+
+        val gameData = gameToGameData(game!!)
+        conn.send(MsgGameInfo(gameData))
     }
 
 
