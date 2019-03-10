@@ -21,6 +21,7 @@ data class ServerData(val ip: String,
                       var games: List<GameData>) : Serializable
 
 class MsgRegisterGameServer : Message
+data class MsgQuestionList(val questions : List<Question<*>>) : Message
 class MsgRequestOpenGames : Message
 data class MsgGameList(val games : List<GameData>) : Message
 data class MsgJoin(val gameId: String, val nickname: String) : Message

@@ -16,8 +16,8 @@ class QuestionStore{
 
     var questions = mutableListOf<Question<*>>()
 
-    constructor(){
-        refreshQuestionList()
+    constructor(withQuestion: Boolean){
+        if(withQuestion) refreshQuestionList()
     }
 
     /**

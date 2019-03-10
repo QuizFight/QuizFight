@@ -4,6 +4,7 @@ package org.quizfight.server
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
+import org.quizfight.questionStore.QuestionStore
 import java.net.ServerSocket
 
 /**
@@ -13,7 +14,8 @@ import java.net.ServerSocket
  */
 class MasterServer(private val port : Int) {
     private var gameServers = mutableListOf<ServerData>()
-    private var gameDataList = mutableListOf<GameData>()
+
+    val questionStore = QuestionStore(true)
 
     init{
         acceptConnections()
@@ -154,6 +156,9 @@ class MasterServer(private val port : Int) {
 
         addServerToList(gameServer)
         serverLog("GameServer registriert! Seine Adresse: ${remoteIp}:${remotePort}")
-        serverLog("Meine GameServer-Liste ist jetzt: \n" + gameServers + "\n")
+        serverLog("Meine GameServer-Liste ist jetzt: \n" + gameServers)
+
+        serverLog("Der GameServer erhaelt von mir ${questionStore.questions.size} Fragen\n")
+        conn.send(MsgQuestionList(questionStore.questions))
     }
 }

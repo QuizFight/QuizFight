@@ -16,9 +16,9 @@ import java.net.SocketException
  * @author Thomas Spanier
  */
 open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: Int){
-    val questionStore = QuestionStore()    // hat ab diesem Zeitpunkt schon ALLE Fragen der XML-Dateien
-
     val masterConn = SocketConnection(Socket(masterIp, masterPort), mapOf())
+
+    var questionStore = QuestionStore(false)
 
     val socket = ServerSocket(ownPort)
     var games= mutableListOf<Game>()
@@ -44,7 +44,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         GlobalScope.launch {
             while(true) {
                 masterConn.send(MsgGameList(gameListToGameDataList()))
-                println("Sent this GameList to Master: " + games + "\n")
+                println("Sende GameList zum Master: " + games + "\n")
                 delay(UPDATE_INTERVALL)
             }
         }
@@ -106,11 +106,19 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
                         //TODO: implement all handlers for Masterserver communication
                         MsgGameList::class to { conn, msg -> getOpenGames(conn, msg as MsgGameList) },
                         MsgJoin::class to { conn, msg -> joinGame(conn, msg as MsgJoin) },
-                        MsgCreateGame::class to { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame) }
+                        MsgCreateGame::class to { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame) },
+                        MsgQuestionList::class to { conn, msg -> receiveQuestionList(conn, msg as MsgQuestionList) }
                 ))
                 println("Client connected")
             }
         }
+    }
+
+    private fun receiveQuestionList(conn: Connection, msgQuestionList: MsgQuestionList) {
+        serverLog("${msgQuestionList.questions.size} Fragen empfangen\n")
+        questionStore.questions = msgQuestionList.questions.toMutableList()
+
+        println("Die Fragen sind: " + questionStore)
     }
 
     private fun connectWithMaster() {

@@ -149,12 +149,10 @@ class XmlParser() {
             val correctAnswer = questionElement.getElementsByTagName("correct").item(0).textContent.toInt()
             val category      = Category.valueOf(questionElement.parentNode.nodeName)
 
-            val begin   = questionElement.getElementsByTagName("begin").item(0).textContent
-            val end     = questionElement.getElementsByTagName("end").item(0).textContent
+            val begin   = questionElement.getElementsByTagName("begin").item(0).textContent.toInt()
+            val end     = questionElement.getElementsByTagName("end").item(0).textContent.toInt()
 
-            val range = IntRange(begin.toInt(), end.toInt())
-
-            questionList.add(GuessQuestion(text, category, range, correctAnswer))
+            questionList.add(GuessQuestion(text, category, begin, end, correctAnswer))
         }
         return questionList
     }
