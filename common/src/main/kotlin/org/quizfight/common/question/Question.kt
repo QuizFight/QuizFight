@@ -32,7 +32,8 @@ class ChoiceQuestion (
 class GuessQuestion(
         override val text: String,
         override val category: Category,
-        val range: IntRange,
+        val lowest: Int,
+        val highest: Int,
         val correctValue: Int
 ) : Question<Int> {
     override fun evaluate(answer: Int): Int {
