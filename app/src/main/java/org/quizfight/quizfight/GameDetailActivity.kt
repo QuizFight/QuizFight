@@ -12,7 +12,10 @@ import android.view.View
 import android.widget.EditText
 import kotlinx.android.synthetic.main.layout_alert_enter_nickname.*
 import kotlinx.coroutines.launch
+import org.quizfight.common.SocketConnection
+import org.quizfight.common.messages.MsgGameInfo
 import org.quizfight.common.messages.MsgJoin
+import java.net.Socket
 
 class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
@@ -26,6 +29,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
+    private lateinit var conn : SocketConnection
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,10 +62,6 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     fun showAttemptQuizStart(){
 
-      /*  launch(Dispatchers.IO) {
-            val client = Client("10.0.2.2", 34567, this@GameDetailActivity)
-            client.conn.send(MsgJoin(gameId,"someone"))
-        }*/
 
         val intent = Intent(this, AttemptQuizStartActivity::class.java)
 
@@ -72,7 +72,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("gameName" , gameName)
         intent.putExtra("nickname" , nickname)
         intent.putExtra("createdBy" , "")
-        intent.putExtra("startEnable", true)
+        intent.putExtra("startEnable", false)
 
         startActivity(intent)
         this.finish()
@@ -106,8 +106,8 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     fun sendJoinMessage() {
         launch(Dispatchers.IO) {
-            val client = Client("10.0.2.2", 23456, this@GameDetailActivity)
-            client.conn.send(MsgJoin(gameId, nickname))
+            conn = SocketConnection(Socket("10.0.2.2", 34567), mapOf() )
+            conn.send(MsgJoin(gameId, nickname))
 
         }
     }
