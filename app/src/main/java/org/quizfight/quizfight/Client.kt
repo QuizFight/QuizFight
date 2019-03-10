@@ -19,8 +19,7 @@ class Client(serverIp: String, port: Int , activity: AppCompatActivity) {
         conn = SocketConnection(socket,
                 mapOf( MsgQuestion ::class to { conn, msg -> receiveQuestion(msg as MsgQuestion )},
                         MsgGameInfo ::class to { conn, msg -> receiveGameInfo(msg as MsgGameInfo )},
-                        MsgGameList ::class to { conn, msg -> receiveGameList(msg as MsgGameList )},
-                        MsgStartGame ::class to { conn, msg -> receiveGameStart(msg as MsgStartGame )}
+                        MsgGameList ::class to { conn, msg -> receiveGameList(msg as MsgGameList )}
                 ))
 
     }
@@ -48,10 +47,6 @@ class Client(serverIp: String, port: Int , activity: AppCompatActivity) {
         }
     }
 
-    fun receiveGameStart(msg: MsgStartGame) {
-        if (activity is AttemptQuizStartActivity) {
-            activity.showQuizActivity()
-        }
 
 
         fun receivePlayerCount() {
@@ -60,7 +55,6 @@ class Client(serverIp: String, port: Int , activity: AppCompatActivity) {
         MsgPlayersCount(val gameId:Int, count: Int)*/
         }
 
-    }
 
 }
 

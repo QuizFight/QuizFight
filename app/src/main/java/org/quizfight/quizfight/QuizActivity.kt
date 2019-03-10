@@ -9,6 +9,7 @@ import android.view.View
 import kotlinx.coroutines.*
 import org.quizfight.common.messages.MsgJoin
 import org.quizfight.common.messages.MsgScore
+import org.quizfight.common.messages.MsgStartGame
 import org.quizfight.common.question.ChoiceQuestion
 import java.util.Locale
 
@@ -39,7 +40,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
         // Use launch(Dispatchers.IO){} for networking operations
         launch(Dispatchers.IO) {
-            client = Client("10.0.2.2", 23456, this@QuizActivity)
+//            client = Client("10.0.2.2", 23456, this@QuizActivity)
+   //         client.conn.send(MsgStartGame())
 
         }
 

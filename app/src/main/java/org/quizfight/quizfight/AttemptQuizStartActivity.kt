@@ -46,7 +46,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     }
 
     fun sendMsgStartGame() = launch(Dispatchers.IO){
-        client = Client("10.0.2.2", 23456, this@AttemptQuizStartActivity)
+        client = Client("192.168.0.32", 23456, this@AttemptQuizStartActivity)
         client.conn.send(MsgStartGame())
 
     }
