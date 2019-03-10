@@ -10,10 +10,10 @@ import org.quizfight.common.SocketConnection
         }
     }
 
-    fun getIpAndPortFromConnection(conn: SocketConnection): List<String>{
+    fun getIpAndPortFromConnection(conn: SocketConnection): String{
         val sockConn = conn as SocketConnection
         val remoteIpPort = sockConn.socket.remoteSocketAddress.toString().
-                replace("/", "").split(":")
+                replace("/", "")
         return remoteIpPort
     }
 

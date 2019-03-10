@@ -37,8 +37,8 @@ class MasterServer(private val port : Int) {
 
     private fun receiveGameServerUpdate(conn: Connection, msgGameList: MsgGameList) {
         val remoteIpPort = getIpAndPortFromConnection(conn as SocketConnection)
-        val remoteIp     = remoteIpPort[0]
-        val remotePort   = remoteIpPort[1].toInt()
+        val remoteIp     = remoteIpPort.split(":")[0]
+        val remotePort   = remoteIpPort.split(":")[1].toInt()
 
         gameServers.find { gs -> gs.ip == remoteIp && gs.port == remotePort }!!.games = msgGameList.games
 
@@ -140,8 +140,8 @@ class MasterServer(private val port : Int) {
     private fun registerGameServer(conn: Connection, msg : MsgRegisterGameServer) {
         // TODO ip und port werden wahrscheinlich anders mitgegeben, rücksprache!
         val remoteIpPort = getIpAndPortFromConnection(conn as SocketConnection)
-        val remoteIp     = remoteIpPort[0]
-        val remotePort   = remoteIpPort[1].toInt()
+        val remoteIp     = remoteIpPort.split(":")[0]
+        val remotePort   = remoteIpPort.split(":")[1].toInt()
 
         val gameServer = ServerData(remoteIp, remotePort, listOf<GameData>())
 
