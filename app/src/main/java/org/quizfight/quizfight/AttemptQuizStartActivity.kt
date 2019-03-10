@@ -9,24 +9,27 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.quizfight.common.SocketConnection
+import org.quizfight.common.messages.MsgQuestion
 import org.quizfight.common.messages.MsgStartGame
+import java.net.Socket
 
 class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
-    private var gameId : String = "";
-    private var maxPlayers: Int = 0;
+    private var gameId : String = ""
+    private var maxPlayers: Int = 0
     private var nickname : String = ""
     private var players = 0
     private var questionCountTotal = 0
 
     private var startGameEnable : Boolean = false
 
+    private lateinit var conn : SocketConnection
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
     private val context = this
 
-    private lateinit var client : Client
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,14 +45,18 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
         updateUI(nickname, createdBy, gameName, questionCountTotal)
         updateProgressBar()
+    }
+
+
+    fun sendMsgStartGame() {
+        launch(Dispatchers.IO) {
+            conn = SocketConnection(Socket("10.0.2.2", 34567),
+                    mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()} ))
+            conn.send(MsgStartGame())
+        }
 
     }
 
-    fun sendMsgStartGame() = launch(Dispatchers.IO){
-        client = Client("192.168.0.32", 34567, this@AttemptQuizStartActivity)
-        client.conn.send(MsgStartGame())
-
-    }
 
     fun updateUI(nickname: String, createdBy:String, gameName:String, questionCountTotal: Int){
 
@@ -61,7 +68,6 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
             btn_start.visibility = View.VISIBLE
             btn_start.setOnClickListener {
                 sendMsgStartGame()
-                showQuizActivity()
             }
         } else{
             btn_start.visibility = View.GONE
@@ -84,7 +90,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     }
 
 
-    fun showQuizActivity() = launch {
+    fun showQuizActivity(){
         // Create an Intent to start the AllGamesActivity
         val intent = Intent(context, QuizActivity::class.java)
         intent.putExtra("gameId" , gameId)

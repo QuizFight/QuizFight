@@ -10,8 +10,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.quizfight.common.messages.GameData
-import org.quizfight.common.messages.MsgRequestOpenGames
+import org.quizfight.common.SocketConnection
+import org.quizfight.common.messages.*
+import java.net.Socket
 
 /**
  * This activity allows the user to join a game
@@ -22,6 +23,7 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
 
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
+    private lateinit var conn : SocketConnection
 
     private val context = this
     private lateinit var allOpenGames : List<GameData>
@@ -57,8 +59,9 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
 
     fun sendRequestOpenGame(){
         launch(Dispatchers.IO) {
-            val client = Client("10.0.2.2", 34567, this@AllGamesActivity)
-            client.conn.send(MsgRequestOpenGames())
+            conn = SocketConnection(Socket("10.0.2.2", 34567),
+                    mapOf(MsgGameList ::class to { conn, msg -> showGames((msg as MsgGameList).games)}  ))
+            conn.send(MsgRequestOpenGames())
         }
 
     }
