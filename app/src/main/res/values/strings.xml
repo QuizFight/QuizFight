@@ -23,6 +23,8 @@
     <string name="lbl_number_players">No. of players</string>
     <string name="required">Requiered ! </string>
 
+    <string name="btn_start">Start Game</string>
+
     <string name="btn_confirm">Confirm</string>
     
 </resources>
