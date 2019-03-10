@@ -42,6 +42,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
             conn = SocketConnection(Socket("10.0.2.2", 34567),
                     mapOf(MsgQuestion ::class to { conn, msg -> showNextQuestion((msg as MsgQuestion))} ,
                             MsgRanking::class to { conn, msg -> showRanking(msg as MsgRanking)} ))
+
         }
 
 

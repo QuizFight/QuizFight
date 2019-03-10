@@ -99,6 +99,7 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
     fun sendMsgCreateGameToServer(gameRequest: GameRequest, nickname: String){
         launch(Dispatchers.IO) {
             conn.send(MsgCreateGame(gameRequest,nickname))
+
         }
 
     }
