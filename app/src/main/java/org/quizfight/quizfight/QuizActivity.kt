@@ -40,8 +40,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
         // Use launch(Dispatchers.IO){} for networking operations
         launch(Dispatchers.IO) {
-//            client = Client("10.0.2.2", 23456, this@QuizActivity)
-   //         client.conn.send(MsgStartGame())
+            client = Client("10.0.2.2", 34567, this@QuizActivity)
+            client.conn.send(MsgStartGame())
 
         }
 
