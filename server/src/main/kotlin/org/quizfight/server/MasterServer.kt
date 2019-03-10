@@ -121,6 +121,9 @@ class MasterServer(private val port : Int) {
         if (gameServer != null) {
             conn.send(MsgTransferToGameServer(gameServer))
         }
+
+        serverLog("Spieler ${msgJoinGame.nickname} möchte dem Spiel ${msgJoinGame.gameId} joinen")
+        serverLog("Er wurde zu diesem GameServer vermittelt: ${gameServer}\n")
     }
 
     /**
