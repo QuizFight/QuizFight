@@ -24,7 +24,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     private lateinit var currentQuestion: ChoiceQuestion
     private var answerSelected : Boolean = false
-    private lateinit var client : Client
 
     //Countdown Timer
     val millisInFuture: Long = 21000 // for 20 seconds plus 1 second imprecision
@@ -36,13 +35,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
         //sollte auch vom Server gelesen werden
         questionCountTotal = intent.getIntExtra("questionCountTotal", 4)
-
-        // Use launch(Dispatchers.IO){} for networking operations
-        launch(Dispatchers.IO) {
-            client = Client("10.0.2.2", 34567, this@QuizActivity)
-
-        }
-
     }
 
     override fun onDestroy() {
@@ -100,9 +92,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
             answer = selectedButton.text.toString()
         }
 
-        launch(Dispatchers.Default){
-            client.conn.send(MsgScore(currentQuestion.evaluate(answer.toString())))
-        }
+        Client.send(MsgScore(currentQuestion.evaluate(answer)))
 
         answerSelected = false
     }

@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.quizfight.common.messages.GameData
+import org.quizfight.common.messages.MsgGameList
 import org.quizfight.common.messages.MsgRequestOpenGames
 
 /**
@@ -19,7 +20,6 @@ import org.quizfight.common.messages.MsgRequestOpenGames
  * @author Aude Nana
  */
 class AllGamesActivity : CoroutineScope, AppCompatActivity() {
-
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
@@ -30,7 +30,10 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_all_games)
 
-        sendRequestOpenGame()
+        Client.withHandlers(mapOf(
+            MsgGameList::class to { _, msg -> showGames((msg as MsgGameList).games) }
+        ))
+        Client.send(MsgRequestOpenGames())
 
         // Set an item click listener for ListView
         all_games_container.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
@@ -49,25 +52,14 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
         }
 
         btn_sync.setOnClickListener {
-            sendRequestOpenGame()
+            Client.send(MsgRequestOpenGames())
         }
-
-
-    }
-
-    fun sendRequestOpenGame(){
-        launch(Dispatchers.IO) {
-            val client = Client("10.0.2.2", 34567, this@AllGamesActivity)
-            client.conn.send(MsgRequestOpenGames())
-        }
-
     }
 
     /**
      * Displays all available games
      */
     fun showGames(gameList: List<GameData>) = launch {
-
         if(gameList.isEmpty()){
             all_games_container.visibility = View.INVISIBLE
         } else {
@@ -94,5 +86,4 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
         super.onDestroy()
         job.cancel()
     }
-
 }

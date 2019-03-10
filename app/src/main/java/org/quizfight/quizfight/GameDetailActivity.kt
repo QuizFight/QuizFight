@@ -93,7 +93,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
             nickname = editText.text.toString()
             if(!nickname.isNullOrBlank()) {
                 nicknameEntered = true
-                sendJoinMessage()
+                Client.send(MsgJoin(gameId, nickname))
                 showAttemptQuizStart()
             } else {
                 displayAlert()
@@ -101,13 +101,5 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         }
 
         builder.create().show()
-    }
-
-    fun sendJoinMessage() {
-        launch(Dispatchers.IO) {
-            val client = Client("192.168.2.100", 34567, this@GameDetailActivity)
-            client.conn.send(MsgJoin(gameId, nickname))
-
-        }
     }
 }

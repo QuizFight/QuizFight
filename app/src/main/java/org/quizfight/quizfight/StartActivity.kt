@@ -4,6 +4,12 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.quizfight.common.SocketConnection
+import org.quizfight.common.Connection
+import java.net.Socket
 
 /**
  * This activity is the first activity of the app
@@ -11,11 +17,8 @@ import android.view.View
  * @author Aude Nana
  */
 class StartActivity : AppCompatActivity() {
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_start)
     }
 
@@ -26,7 +29,6 @@ class StartActivity : AppCompatActivity() {
     fun showAllGamesActivity(view: View) {
         val intent = Intent(this, AllGamesActivity::class.java)
         startActivity(intent)
-
     }
 
     /**
@@ -36,7 +38,5 @@ class StartActivity : AppCompatActivity() {
     fun showCreateGameActivity(view: View) {
         val intent = Intent(this, CreateGameActivity::class.java)
         startActivity(intent)
-
     }
-
 }
