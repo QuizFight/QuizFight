@@ -29,7 +29,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         connectWithMaster()
         addHardcodedGameForTesting()  // TEMPORARY
         sendUpdate()
-        //start()
+        start()
     }
 
     private fun addHardcodedGameForTesting(){
