@@ -106,13 +106,8 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     fun sendJoinMessage() {
         launch(Dispatchers.IO) {
-<<<<<<< HEAD
             conn = SocketConnection(Socket("10.0.2.2", 34567), mapOf() )
             conn.send(MsgJoin(gameId, nickname))
-=======
-            val client = Client("10.0.2.2", 34567, this@GameDetailActivity)
-            client.conn.send(MsgJoin(gameId, nickname))
->>>>>>> e64e39f54fa4629a653128551a9dd68c60c13065
 
         }
     }
