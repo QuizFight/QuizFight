@@ -68,7 +68,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 answerList.addAll(currentQuestion.choices)
                 answerList.shuffle()
 
-                text_view_question.text = currentQuestion.text
+                question_text_view.text = currentQuestion.text
                 answer_button1.text = answerList[0]
                 answer_button2.text = answerList[1]
                 answer_button3.text = answerList[2]
@@ -132,5 +132,14 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     private fun showRanking(msg : MsgRanking) = launch{
 
+    }
+
+    fun showHide(view: View) {
+        view.visibility =
+                if(view.visibility == View.VISIBLE) {
+                    View.GONE
+                } else {
+                    View.VISIBLE
+                }
     }
 }
