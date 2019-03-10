@@ -106,7 +106,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     fun sendJoinMessage() {
         launch(Dispatchers.IO) {
-            val client = Client("10.0.2.2", 23456, this@GameDetailActivity)
+            val client = Client("10.0.2.2", 34567, this@GameDetailActivity)
             client.conn.send(MsgJoin(gameId, nickname))
 
         }
