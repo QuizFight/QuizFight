@@ -10,6 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.quizfight.common.SocketConnection
+import org.quizfight.common.messages.MsgLeave
+import org.quizfight.common.messages.MsgPlayerCount
 import org.quizfight.common.messages.MsgQuestion
 import org.quizfight.common.messages.MsgStartGame
 import java.net.Socket
@@ -19,7 +21,6 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     private var gameId : String = ""
     private var maxPlayers: Int = 0
     private var nickname : String = ""
-    private var players = 0
     private var questionCountTotal = 0
 
     private var startGameEnable : Boolean = false
@@ -30,10 +31,15 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     private val context = this
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attempt_quiz_start)
+
+        launch(Dispatchers.IO) {
+            conn = SocketConnection(Socket("10.0.2.2", 34567),
+                    mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
+                            MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
+        }
 
         gameId = intent.getStringExtra("gameId")
         var createdBy = intent.getStringExtra("createdBy")
@@ -44,16 +50,30 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         startGameEnable = intent.getBooleanExtra("startEnable", false)
 
         updateUI(nickname, createdBy, gameName, questionCountTotal)
-        updateProgressBar()
+        updateProgressBar(1)
+
+        btn_leave.setOnClickListener {
+            sendMsgLeaveGame()
+        }
+
     }
 
 
     fun sendMsgStartGame() {
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket("10.0.2.2", 34567),
-                    mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()} ))
+            conn = SocketConnection(Socket("10.0.2.2", 34567), mapOf())
             conn.send(MsgStartGame())
         }
+        launch { context.finish() }
+
+    }
+
+    fun sendMsgLeaveGame() {
+        launch(Dispatchers.IO) {
+            conn = SocketConnection(Socket("10.0.2.2", 34567), mapOf())
+            conn.send(MsgLeave())
+        }
+        launch { context.finish() }
 
     }
 
@@ -64,6 +84,9 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         tv_question_count.setText(""+ questionCountTotal)
         tv_game_name.setText(gameName)
         tv_created_by.setText(createdBy)
+
+
+
         if(startGameEnable){
             btn_start.visibility = View.VISIBLE
             btn_start.setOnClickListener {
@@ -75,9 +98,8 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     }
 
-    fun updateProgressBar() {
+    fun updateProgressBar(players: Int)= launch {
 
-        players++
         //update text
         tv_maxplayers.text = ""+ players + "/" + maxPlayers
 
@@ -90,13 +112,13 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     }
 
 
-    fun showQuizActivity(){
+    fun showQuizActivity() = launch{
         // Create an Intent to start the AllGamesActivity
         val intent = Intent(context, QuizActivity::class.java)
         intent.putExtra("gameId" , gameId)
         intent.putExtra("questionCountTotal" , questionCountTotal)
         startActivity(intent)
-
+        context.finish()
     }
 
 
