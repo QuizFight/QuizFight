@@ -18,9 +18,7 @@ import java.net.Socket
 class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
     private lateinit var connMaster : SocketConnection
-    private lateinit var connGame : SocketConnection
-
-   // private lateinit var gameClient : Client
+    //private lateinit var connGame : SocketConnection
 
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job

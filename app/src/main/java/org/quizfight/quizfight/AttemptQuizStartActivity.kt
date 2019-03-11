@@ -31,8 +31,6 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     var masterServerIp = ""
     var gameServerIp = ""
 
-   // private lateinit var gameClient : Client
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attempt_quiz_start)
@@ -43,7 +41,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
 
         launch(Dispatchers.IO) {
-            Client.setServer(gameServerIp, 45678,
+            Client.connection?.withHandlers(
                     mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
                     MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
            /* conn = SocketConnection(Socket(gameServerIp, 45678),
