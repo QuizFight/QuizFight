@@ -43,7 +43,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         gameServerIp = intent.getStringExtra("gameServerIP")
 
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket(gameServerIp, 4567),
+            conn = SocketConnection(Socket(gameServerIp, 45678),
                     mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
                             MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
         }
@@ -68,7 +68,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     fun sendMsgStartGame() {
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket(gameServerIp, 4567), mapOf())
+            conn = SocketConnection(Socket(gameServerIp, 45678), mapOf())
             conn.send(MsgStartGame())
         }
         launch { context.finish() }
@@ -77,7 +77,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     fun sendMsgLeaveGame() {
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket(gameServerIp, 4567), mapOf())
+            conn = SocketConnection(Socket(gameServerIp, 45678), mapOf())
             conn.send(MsgLeave())
         }
         launch { context.finish() }

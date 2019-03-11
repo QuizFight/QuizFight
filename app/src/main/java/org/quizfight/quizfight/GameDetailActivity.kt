@@ -128,8 +128,9 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     fun transferToGameServer(msg : MsgTransferToGameServer){
         gameServerIp = msg.gameServer.ip
         println("gameServer : " + gameServerIp)
+
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket(gameServerIp, 4567), mapOf() )
+            conn = SocketConnection(Socket(gameServerIp, 45678), mapOf() )
             conn.send(MsgJoin(gameId, nickname))
         }
         showAttemptQuizStart()
