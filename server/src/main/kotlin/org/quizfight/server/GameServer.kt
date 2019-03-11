@@ -103,12 +103,10 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
             val incoming = socket.accept()
             GlobalScope.launch {
                 SocketConnection(incoming, mapOf(
-                        //TODO: implement all handlers for Masterserver communication
                         MsgGameList::class to { conn, msg -> getOpenGames(conn, msg as MsgGameList) },
                         MsgJoin::class to { conn, msg -> joinGame(conn, msg as MsgJoin) },
                         MsgCreateGame::class to { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame) }
                 ))
-                println("Client connected")
             }
         }
     }
@@ -116,12 +114,10 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     private fun connectWithMaster() {
         try {
             masterConn.send(MsgRegisterGameServer())
+            serverLog("Mit Master verbunden\n")
         }catch(socEx: SocketException){
             println("Failed while connecting to Master")
-            return
         }
-
-        serverLog("Mit Master verbunden\n")
     }
 
     /**
@@ -175,8 +171,11 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
      * Adds the Player to a Game
      */
     private fun joinGame(conn: Connection, msgJoinGame: MsgJoin) {
+        serverLog("Join Game Anfrage von ${msgJoinGame.nickname}")
+
         val game = games.find { game -> game.id == msgJoinGame.gameId }
         if (game == null){
+            serverLog("Game ist null!")
             return
         }
         game!!.addPlayer(msgJoinGame.nickname, conn)
