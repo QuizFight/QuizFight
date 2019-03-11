@@ -79,7 +79,7 @@ class MasterServer(private val port : Int) {
      */
     private fun getLeastUsedGameServer() : ServerData {
         gameServers.sortBy { it.games.size }
-        return gameServers.first()
+        return gameServers[0]
     }
 
     /**
@@ -135,6 +135,7 @@ class MasterServer(private val port : Int) {
         val gameServer = getLeastUsedGameServer()
         serverLog("Er erhält diesen Server dafür: ${gameServer} \n")
         conn.send(MsgTransferToGameServer(gameServer))
+        conn.close()
     }
 
 
