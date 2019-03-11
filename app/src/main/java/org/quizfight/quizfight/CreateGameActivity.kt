@@ -20,6 +20,8 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
     private lateinit var connMaster : SocketConnection
     private lateinit var connGame : SocketConnection
 
+   // private lateinit var gameClient : Client
+
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
@@ -115,11 +117,16 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
         println("test: " + gameServerIp )
 
         launch(Dispatchers.IO) {
-            connGame = SocketConnection(Socket(gameServerIp, 45678),
+            Client.setServer(gameServerIp, 45678,
+                    mapOf(MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game)}
+            ))
+            Client.connection?.send(MsgCreateGame(gameRequest,nickname))
+          /*  connGame = SocketConnection(Socket(gameServerIp, 45678),
                     mapOf(MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game)}
                     ))
-            connGame.send(MsgCreateGame(gameRequest,nickname))
+            connGame.send(MsgCreateGame(gameRequest,nickname))*/
         }
+
     }
 
 
@@ -145,10 +152,6 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
     }
 
-
-    fun getGameSocket() : SocketConnection{
-        return  connGame
-    }
 
 
 }

@@ -34,6 +34,8 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     var masterServerIp = ""
     var gameServerIp = ""
 
+   // private lateinit var gameClient : Client
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attempt_quiz_start)
@@ -42,12 +44,10 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         masterServerIp = intent.getStringExtra("masterServerIP")
         gameServerIp = intent.getStringExtra("gameServerIP")
 
-        var app: CreateGameActivity =  application as CreateGameActivity
-        conn = app.getGameSocket()
-        conn.withHandlers(mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
-                MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
 
         launch(Dispatchers.IO) {
+            Client.connection?.withHandlers(mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
+                    MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
            /* conn = SocketConnection(Socket(gameServerIp, 45678),
                     mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
                             MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)})) */
@@ -139,10 +139,5 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         job.cancel()
-    }
-
-
-    fun getGameSocket() : SocketConnection{
-        return  conn
     }
 }
