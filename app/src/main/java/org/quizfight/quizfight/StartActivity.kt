@@ -23,7 +23,7 @@ class StartActivity : AppCompatActivity() {
 
     /**
      * This methods shows the AllGamesActivity ,
-     * where all available games are showed
+     * where all open games are displayed
      */
     fun showAllGamesActivity(view: View) {
         val intent = Intent(this, AllGamesActivity::class.java)
