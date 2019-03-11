@@ -23,7 +23,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     val socket = ServerSocket(ownPort)
     var games= mutableListOf<Game>()
 
-    val UPDATE_INTERVALL = 8000L
+    val UPDATE_INTERVALL = 4000L
 
     init {
         connectWithMaster()

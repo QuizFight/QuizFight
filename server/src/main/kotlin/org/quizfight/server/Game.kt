@@ -51,6 +51,7 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
 
     fun addPlayer(player: Player) {
         if(players.size >= maxPlayer) {
+            serverLog("Player size >= maxPlayer")
             throw Exception(MSG_GAME_FULL)
             return
         }
