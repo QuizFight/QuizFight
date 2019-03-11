@@ -13,10 +13,7 @@ import android.widget.EditText
 import kotlinx.android.synthetic.main.layout_alert_enter_nickname.*
 import kotlinx.coroutines.launch
 import org.quizfight.common.SocketConnection
-import org.quizfight.common.messages.MsgGameInfo
-import org.quizfight.common.messages.MsgGameList
-import org.quizfight.common.messages.MsgJoin
-import org.quizfight.common.messages.MsgTransferToGameServer
+import org.quizfight.common.messages.*
 import java.net.Socket
 
 class GameDetailActivity : CoroutineScope, AppCompatActivity() {
@@ -107,7 +104,6 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
             if(!nickname.isNullOrBlank()) {
                 nicknameEntered = true
                 sendJoinMessage()
-                showAttemptQuizStart()
             } else {
                 displayAlert()
             }
@@ -130,7 +126,8 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         println("gameServer : " + gameServerIp)
 
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket(gameServerIp, 45678), mapOf() )
+            conn = SocketConnection(Socket(gameServerIp, 45678),
+                    mapOf( MsgPlayerCount ::class to { conn, msg -> }) )
             conn.send(MsgJoin(gameId, nickname))
         }
         showAttemptQuizStart()
