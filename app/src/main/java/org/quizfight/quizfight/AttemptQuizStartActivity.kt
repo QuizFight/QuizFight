@@ -53,7 +53,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         maxPlayers = intent.getIntExtra("maxPlayers",0)
         questionCountTotal = intent.getIntExtra("questionCountTotal",0)
         startGameEnable = intent.getBooleanExtra("startEnable", false)
-        val playerCount = intent.getIntExtra("playerCount", 1)
+        val playerCount = intent.getIntExtra("playerCount", 0)
 
         updateUI(nickname, createdBy, gameName, questionCountTotal)
         updateProgressBar(playerCount + 1)
