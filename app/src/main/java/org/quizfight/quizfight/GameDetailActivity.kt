@@ -125,6 +125,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     }
 
     fun transferToGameServer(msg : MsgTransferToGameServer){
+        conn.close()
         gameServerIp = msg.gameServer.ip
         println("test : " + gameServerIp)
 

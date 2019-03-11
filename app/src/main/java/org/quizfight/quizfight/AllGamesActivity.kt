@@ -59,6 +59,7 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
 
         btn_sync.setOnClickListener {
             sendRequestOpenGame()
+            btn_sync.isEnabled = false
         }
 
 

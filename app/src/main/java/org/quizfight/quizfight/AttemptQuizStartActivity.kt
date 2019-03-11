@@ -67,8 +67,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     fun sendMsgStartGame() {
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket(gameServerIp, 45678), mapOf())
-            conn.send(MsgStartGame())
+            Client.connection?.send(MsgStartGame())
         }
         launch { context.finish() }
 
@@ -76,8 +75,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     fun sendMsgLeaveGame() {
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket(gameServerIp, 45678), mapOf())
-            conn.send(MsgLeave())
+            Client.connection?.send(MsgLeave())
         }
         launch { context.finish() }
     }
