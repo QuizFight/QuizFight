@@ -121,7 +121,7 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
 
     fun proceed() {
         questionIncome++
-
+        
         if(questionIncome < players.size)
             return
 
@@ -130,10 +130,8 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
 
         if(questions.size == 0){
             broadcast(MsgRanking(createRanking()))
-        }else {
+        }else{
             broadcast(getNextQuestion())
         }
     }
-
-
 }
