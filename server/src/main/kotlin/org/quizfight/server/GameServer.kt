@@ -44,7 +44,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         GlobalScope.launch {
             while(true) {
                 masterConn.send(MsgGameList(gameListToGameDataList()))
-                println("Sent this GameList to Master: " + games + "\n")
+                serverLog("Sende diese GameList zum Master: " + games + "\n")
                 delay(UPDATE_INTERVALL)
             }
         }
@@ -121,7 +121,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
             return
         }
 
-        println("Connected to Master")
+        serverLog("Mit Master verbunden\n")
     }
 
     /**
@@ -147,7 +147,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
         val gameData = GameData(id, gameName, maxPlayers, listOf<String>(), questionCount)
 
-        println("Game erstellt. Die ID ist: ${id}")
+        serverLog("Game erstellt. Die ID ist: ${id}")
         conn.send(MsgGameInfo(gameData))
     }
 
