@@ -3,12 +3,10 @@ package org.quizfight.server
 //import java.util.*
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
-import org.quizfight.common.messages.Message
-import org.quizfight.common.messages.MsgJoin
-import org.quizfight.common.messages.MsgPlayerCount
-import org.quizfight.common.messages.MsgQuestion
+import org.quizfight.common.messages.*
 import org.quizfight.common.question.Question
 import java.net.Socket
+import java.util.*
 
 /**
  * Game Class. Manages connections to players, asks Questions and calculates the scores
@@ -110,6 +108,31 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
 
     override fun toString(): String {
         return "Game(id=$id, gameName='$gameName', maxPlayer=$maxPlayer, open=$isOpen)"
+    }
+
+    fun createRanking(): SortedMap<String, Int> {
+        var ranking = sortedMapOf<String, Int>()
+
+        for (player in players){
+            ranking.put(player.key, player.value.score)
+        }
+        return ranking
+    }
+
+    fun proceed() {
+        questionIncome++
+
+        if(questionIncome < players.size)
+            return
+
+        questionIncome = 0
+        questions.removeAt(0)
+
+        if(questions.size == 0){
+            broadcast(MsgRanking(createRanking()))
+        }else {
+            broadcast(getNextQuestion())
+        }
     }
 
 
