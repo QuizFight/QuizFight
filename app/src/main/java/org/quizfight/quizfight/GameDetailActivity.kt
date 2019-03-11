@@ -44,7 +44,6 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         setContentView(R.layout.activity_game_detail)
 
         masterServerIp = intent.getStringExtra("masterServerIP")
-        gameServerIp = intent.getStringExtra("gameServerIP")
 
         updateUi()
 
@@ -129,8 +128,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     fun transferToGameServer(msg : MsgTransferToGameServer){
         gameServerIp = msg.gameServer.ip
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket(gameServerIp, 34567),
-                    mapOf() )
+            conn = SocketConnection(Socket(gameServerIp, 34567), mapOf() )
             conn.send(MsgJoin(gameId, nickname))
         }
         showAttemptQuizStart()

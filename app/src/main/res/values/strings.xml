@@ -4,6 +4,7 @@
     <!---StartActivity -->
     <string name="btn_create">Create game</string>
     <string name="btn_join">Join game</string>
+    <string name="ed_master">master server ip </string>
 
     <!--AllGamesActivity-->
     <string name="lbl_choose_game">Please choose a game</string>
