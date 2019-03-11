@@ -11,6 +11,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
+import org.quizfight.common.question.ChoiceQuestion
 import java.net.Socket
 
 class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
@@ -41,7 +42,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
         launch(Dispatchers.IO) {
             Client.connection?.withHandlers(
-                    mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
+                    mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity((msg as MsgQuestion).question as ChoiceQuestion)},
                             MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
         }
 
@@ -52,9 +53,10 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         maxPlayers = intent.getIntExtra("maxPlayers",0)
         questionCountTotal = intent.getIntExtra("questionCountTotal",0)
         startGameEnable = intent.getBooleanExtra("startEnable", false)
+        val playerCount = intent.getIntExtra("playerCount", 0)
 
         updateUI(nickname, createdBy, gameName, questionCountTotal)
-        updateProgressBar(maxPlayers)
+        updateProgressBar(playerCount + 1)
 
         btn_leave.setOnClickListener {
             sendMsgLeaveGame()
@@ -78,7 +80,6 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
             conn.send(MsgLeave())
         }
         launch { context.finish() }
-
     }
 
 
@@ -116,13 +117,20 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     }
 
 
-    fun showQuizActivity() = launch{
+    fun showQuizActivity(question: ChoiceQuestion) = launch{
         // Create an Intent to start the AllGamesActivity
         val intent = Intent(context, QuizActivity::class.java)
         intent.putExtra("gameId" , gameId)
         intent.putExtra("questionCountTotal" , questionCountTotal)
         intent.putExtra("masterServerIP", masterServerIp)
         intent.putExtra("gameServerIP", gameServerIp)
+
+        //put 1. question
+        intent.putExtra("questionText" , question.text)
+        intent.putExtra("correctChoice" , question.correctChoice)
+      /*  intent.putExtra("masterServerIP", masterServerIp)
+        intent.putExtra("gameServerIP", gameServerIp)*/
+
         startActivity(intent)
         context.finish()
     }
