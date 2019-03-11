@@ -31,9 +31,16 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     private val context = this
 
+    var masterServerIp = ""
+    private var gameServerIp = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attempt_quiz_start)
+
+
+        masterServerIp = intent.getStringExtra("masterServerIP")
+        gameServerIp = intent.getStringExtra("gameServerIP")
 
         launch(Dispatchers.IO) {
             conn = SocketConnection(Socket("10.0.2.2", 34567),
@@ -117,6 +124,8 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         val intent = Intent(context, QuizActivity::class.java)
         intent.putExtra("gameId" , gameId)
         intent.putExtra("questionCountTotal" , questionCountTotal)
+        intent.putExtra("masterServerIP", masterServerIp)
+        intent.putExtra("gameServerIP", gameServerIp)
         startActivity(intent)
         context.finish()
     }

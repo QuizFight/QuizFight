@@ -12,6 +12,8 @@ import android.view.View
  */
 class StartActivity : AppCompatActivity() {
 
+    val masterServerIp = "192.168.0.166"
+    val gameServerIp = "192.168.0.33"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +27,8 @@ class StartActivity : AppCompatActivity() {
      */
     fun showAllGamesActivity(view: View) {
         val intent = Intent(this, AllGamesActivity::class.java)
+        intent.putExtra("masterServerIP", masterServerIp)
+        intent.putExtra("gameServerIP", gameServerIp)
         startActivity(intent)
 
     }
@@ -35,6 +39,8 @@ class StartActivity : AppCompatActivity() {
      */
     fun showCreateGameActivity(view: View) {
         val intent = Intent(this, CreateGameActivity::class.java)
+        intent.putExtra("masterServerIP", masterServerIp)
+        intent.putExtra("gameServerIP", gameServerIp)
         startActivity(intent)
 
     }

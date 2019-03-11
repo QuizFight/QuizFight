@@ -27,6 +27,9 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     private lateinit var currentQuestion: ChoiceQuestion
     private var answerSelected : Boolean = false
 
+    private var masterServerIP = ""
+    private var gameServer = ""
+
     //Countdown Timer
     val millisInFuture: Long = 21000 // for 20 seconds plus 1 second imprecision
     val countDownInterval: Long = 1000 // sets the countdown interval to 1 second
@@ -34,6 +37,9 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
+
+        masterServerIP = intent.getStringExtra("masterServerIP")
+        gameServer = intent.getStringExtra("gameServerIP")
 
         //sollte auch vom Server gelesen werden
         questionCountTotal = intent.getIntExtra("questionCountTotal", 4)

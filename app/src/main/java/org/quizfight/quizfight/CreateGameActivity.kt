@@ -23,10 +23,15 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
     var nickname:String = " "
 
+    var masterServerIp = ""
+    private var gameServerIp = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_game)
+
+        masterServerIp = intent.getStringExtra("masterServerIP")
+        gameServerIp = intent.getStringExtra("gameServerIP")
 
         launch(Dispatchers.IO) {
 
@@ -115,6 +120,9 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("nickname" , nickname)
         intent.putExtra("createdBy" , nickname)
         intent.putExtra("startEnable", true)
+
+        intent.putExtra("masterServerIP", masterServerIp)
+        intent.putExtra("gameServerIP", gameServerIp)
 
         //intent.putExtra("Client", client)
 

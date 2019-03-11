@@ -31,9 +31,17 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     override val coroutineContext = Dispatchers.Main + job
     private lateinit var conn : SocketConnection
 
+    private var masterServerIp = ""
+    private var gameServerIp = ""
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_detail)
+
+        masterServerIp = intent.getStringExtra("masterServerIP")
+        gameServerIp = intent.getStringExtra("gameServerIP")
+
         updateUi()
 
         btn_join.setOnClickListener {
@@ -73,6 +81,8 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("nickname" , nickname)
         intent.putExtra("createdBy" , "")
         intent.putExtra("startEnable", false)
+        intent.putExtra("masterServerIP", masterServerIp)
+        intent.putExtra("gameServerIP", gameServerIp)
 
         startActivity(intent)
         this.finish()
