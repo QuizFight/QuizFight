@@ -39,11 +39,10 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         masterServerIp = intent.getStringExtra("masterServerIP")
         gameServerIp = intent.getStringExtra("gameServerIP")
 
-
         launch(Dispatchers.IO) {
             Client.connection?.withHandlers(
                     mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
-                    MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
+                            MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
         }
 
         gameId = intent.getStringExtra("gameId")
@@ -55,7 +54,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         startGameEnable = intent.getBooleanExtra("startEnable", false)
 
         updateUI(nickname, createdBy, gameName, questionCountTotal)
-        updateProgressBar(1)
+        updateProgressBar(maxPlayers)
 
         btn_leave.setOnClickListener {
             sendMsgLeaveGame()

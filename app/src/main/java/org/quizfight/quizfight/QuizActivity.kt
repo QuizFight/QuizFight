@@ -45,10 +45,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         questionCountTotal = intent.getIntExtra("questionCountTotal", 4)
 
         launch(Dispatchers.IO) {
-
-            conn = SocketConnection(Socket(masterServerIP, 34567),
-                    mapOf(MsgQuestion ::class to { conn, msg -> showNextQuestion((msg as MsgQuestion))} ,
-                            MsgRanking::class to { conn, msg -> showRanking(msg as MsgRanking)} ))
+            Client.connection?.withHandlers( mapOf(MsgQuestion ::class to { conn, msg -> showNextQuestion((msg as MsgQuestion))},
+                            MsgRanking::class to { conn, msg -> showRanking(msg as MsgRanking)}))
         }
     }
 
