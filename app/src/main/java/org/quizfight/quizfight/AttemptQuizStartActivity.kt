@@ -32,7 +32,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     private val context = this
 
     var masterServerIp = ""
-    private var gameServerIp = ""
+    var gameServerIp = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +43,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         gameServerIp = intent.getStringExtra("gameServerIP")
 
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket("10.0.2.2", 34567),
+            conn = SocketConnection(Socket(gameServerIp, 34567),
                     mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
                             MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
         }
@@ -68,7 +68,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     fun sendMsgStartGame() {
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket("10.0.2.2", 34567), mapOf())
+            conn = SocketConnection(Socket(gameServerIp, 34567), mapOf())
             conn.send(MsgStartGame())
         }
         launch { context.finish() }
@@ -77,7 +77,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     fun sendMsgLeaveGame() {
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket("10.0.2.2", 34567), mapOf())
+            conn = SocketConnection(Socket(gameServerIp, 34567), mapOf())
             conn.send(MsgLeave())
         }
         launch { context.finish() }

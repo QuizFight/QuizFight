@@ -14,7 +14,9 @@ import kotlinx.android.synthetic.main.layout_alert_enter_nickname.*
 import kotlinx.coroutines.launch
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.MsgGameInfo
+import org.quizfight.common.messages.MsgGameList
 import org.quizfight.common.messages.MsgJoin
+import org.quizfight.common.messages.MsgTransferToGameServer
 import java.net.Socket
 
 class GameDetailActivity : CoroutineScope, AppCompatActivity() {
@@ -30,6 +32,8 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
     private lateinit var conn : SocketConnection
+
+    private var context = this
 
     private var masterServerIp = ""
     private var gameServerIp = ""
@@ -68,10 +72,9 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     }
 
 
-    fun showAttemptQuizStart(){
+    fun showAttemptQuizStart() = launch{
 
-
-        val intent = Intent(this, AttemptQuizStartActivity::class.java)
+        val intent = Intent(context, AttemptQuizStartActivity::class.java)
 
         //send game's info to AttemptQuizStartActivity
         intent.putExtra("gameId" , gameId)
@@ -85,7 +88,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("gameServerIP", gameServerIp)
 
         startActivity(intent)
-        this.finish()
+        context.finish()
     }
 
 
@@ -116,9 +119,20 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     fun sendJoinMessage() {
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket(gameServerIp, 34567), mapOf() )
+            conn = SocketConnection(Socket(masterServerIp, 34567),
+                    mapOf(MsgTransferToGameServer ::class to { conn, msg -> transferToGameServer((msg as MsgTransferToGameServer))}) )
             conn.send(MsgJoin(gameId, nickname))
 
         }
+    }
+
+    fun transferToGameServer(msg : MsgTransferToGameServer){
+        gameServerIp = msg.gameServer.ip
+        launch(Dispatchers.IO) {
+            conn = SocketConnection(Socket(gameServerIp, 34567),
+                    mapOf() )
+            conn.send(MsgJoin(gameId, nickname))
+        }
+        showAttemptQuizStart()
     }
 }
