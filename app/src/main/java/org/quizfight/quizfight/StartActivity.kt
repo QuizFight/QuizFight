@@ -6,10 +6,15 @@ import android.os.Bundle
 import android.view.View
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.Connection
 import java.net.Socket
+import android.widget.Toast
+import android.R.attr.data
+import android.util.Log
+
 
 /**
  * This activity is the first activity of the app
@@ -20,6 +25,11 @@ class StartActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
+
+        GlobalScope.launch(Dispatchers.IO) {
+            while (!Client.connected);
+            Log.d("Connection", "Client connected to master server")
+        }
     }
 
     /**

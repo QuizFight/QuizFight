@@ -1,10 +1,12 @@
 package org.quizfight.quizfight
 
+import android.app.Application
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 
 import android.content.Intent
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import kotlinx.android.synthetic.main.activity_create_game.*
 import kotlinx.coroutines.CoroutineScope

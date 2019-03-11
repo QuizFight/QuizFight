@@ -12,12 +12,13 @@ import java.net.Socket
 import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KClass
 
-const val masterServerIP = "10.0.0.2"
+const val masterServerIP = "10.0.2.2"
 const val masterServerPort = 34567
 
 object Client : CoroutineScope, Connection {
     override val coroutineContext = Dispatchers.Main
     private var connection: Connection? = null
+    private var lastMessage: Message? = null
 
     init {
         launch(Dispatchers.IO) {
@@ -29,13 +30,41 @@ object Client : CoroutineScope, Connection {
     val connected: Boolean
         get() = connection != null
 
-    override fun send(msg: Message) { launch(Dispatchers.IO) { connection?.send(msg) } }
-    override fun close() { launch(Dispatchers.IO) { connection?.close() } }
+    override fun send(msg: Message) {
+        lastMessage = msg
+        launch(Dispatchers.IO) {connection?.send(msg) }
+    }
+
     override fun withHandlers(handlers: Map<KClass<*>, (Connection, Message) -> Unit>): Connection {
-        launch(Dispatchers.IO) { connection?.withHandlers(handlers) }
+        val extHandlers = handlers + (
+            MsgTransferToGameServer::class to { _, msg -> handleServerTransfer(msg as MsgTransferToGameServer) }
+        )
+        launch(Dispatchers.IO) { connection?.withHandlers(extHandlers) }
         return this
     }
-    override var handlers = connection!!.handlers
-    override val id = connection!!.id
+
+    private fun handleServerTransfer(msg: MsgTransferToGameServer) {
+        val oldHandlers = connection?.handlers ?: emptyMap()
+        val serverData = msg.gameServer
+        val socket = Socket(serverData.ip, serverData.port)
+        connection = SocketConnection(socket, oldHandlers)
+
+        // Resend last message that caused transfer
+        if (lastMessage != null)
+            connection!!.send(lastMessage!!)
+    }
+
+    fun reconnectToMaster() = launch(Dispatchers.IO) {
+        connection?.close()
+        val socket = Socket(masterServerIP, masterServerPort)
+        connection = SocketConnection(socket, emptyMap())
+    }
+
+    override fun close() { launch(Dispatchers.IO) { connection?.close() } }
+    override var handlers: Map<KClass<*>, (Connection, Message) -> Unit>
+        get() = connection!!.handlers
+        set(value) { connection!!.handlers = value }
+    override val id: String
+        get() = connection!!.id
 }
 
