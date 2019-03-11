@@ -17,7 +17,9 @@ import java.net.Socket
 
 class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
-    private lateinit var conn : SocketConnection
+    private lateinit var connMaster : SocketConnection
+    private lateinit var connGame : SocketConnection
+
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
@@ -98,24 +100,25 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
     fun sendMsgCreateGameToServer(gameRequest: GameRequest, nickname: String){
 
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket(masterServerIp, 34567),
+            connMaster = SocketConnection(Socket(masterServerIp, 34567),
                     mapOf(MsgTransferToGameServer::class to { conn, msg ->
                         transferToGameServer(msg as MsgTransferToGameServer, gameRequest, nickname)}))
-            conn.send(MsgCreateGame(gameRequest,nickname))
+            connMaster.send(MsgCreateGame(gameRequest,nickname))
             println("button gedrückt")
         }
     }
 
 
     fun transferToGameServer(msg :MsgTransferToGameServer, gameRequest: GameRequest, nickname: String){
-        conn.close()
+        connMaster.close()
         gameServerIp = msg.gameServer.ip
         println("test: " + gameServerIp )
 
         launch(Dispatchers.IO) {
-            var conn = SocketConnection(Socket(gameServerIp, 45678),
-                    mapOf(MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game)}))
-            conn.send(MsgCreateGame(gameRequest,nickname))
+            connGame = SocketConnection(Socket(gameServerIp, 45678),
+                    mapOf(MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game)}
+                    ))
+            connGame.send(MsgCreateGame(gameRequest,nickname))
         }
     }
 
@@ -137,7 +140,15 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("gameServerIP", gameServerIp)
 
         startActivity(intent)
+
         context.finish()
 
     }
+
+
+    fun getGameSocket() : SocketConnection{
+        return  connGame
+    }
+
+
 }

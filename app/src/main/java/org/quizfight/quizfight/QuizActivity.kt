@@ -48,11 +48,9 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
             conn = SocketConnection(Socket(masterServerIP, 34567),
                     mapOf(MsgQuestion ::class to { conn, msg -> showNextQuestion((msg as MsgQuestion))} ,
                             MsgRanking::class to { conn, msg -> showRanking(msg as MsgRanking)} ))
-
         }
-
-
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
