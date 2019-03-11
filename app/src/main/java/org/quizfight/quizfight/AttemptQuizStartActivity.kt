@@ -44,9 +44,6 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
             Client.connection?.withHandlers(
                     mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
                     MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
-           /* conn = SocketConnection(Socket(gameServerIp, 45678),
-                    mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
-                            MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)})) */
         }
 
         gameId = intent.getStringExtra("gameId")
