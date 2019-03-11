@@ -3,6 +3,7 @@ package org.quizfight.server
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.MsgLeave
+import org.quizfight.common.messages.MsgRanking
 import org.quizfight.common.messages.MsgScore
 import org.quizfight.common.messages.MsgStartGame
 
@@ -48,13 +49,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
      */
     private fun receiveAnswer(conn: Connection, msgSendAnswer: MsgScore) {
         addToScore(msgSendAnswer.score)
-        game.questionIncome++
-
-        if(game.questionIncome >= game.players.size) {
-            game.questionIncome = 0
-            game.questions.removeAt(0)
-            game.broadcast(game.getNextQuestion())
-        }
+        game.proceed()
     }
 
 
