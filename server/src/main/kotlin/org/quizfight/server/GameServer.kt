@@ -27,7 +27,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
     init {
         connectWithMaster()
-        addHardcodedGameForTesting()  // TEMPORARY
+        //addHardcodedGameForTesting()  // TEMPORARY
         sendUpdate()
         start()
     }

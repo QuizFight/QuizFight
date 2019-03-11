@@ -54,7 +54,7 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
             return
         }
         players.put(player.id, player)
-        
+
         playerCount++
         if(playerCount > 1)
             broadcast(MsgPlayerCount(playerCount))
