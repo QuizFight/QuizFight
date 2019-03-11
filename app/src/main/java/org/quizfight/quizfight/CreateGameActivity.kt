@@ -100,21 +100,23 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
         launch(Dispatchers.IO) {
             conn = SocketConnection(Socket(masterServerIp, 34567),
                     mapOf(MsgTransferToGameServer::class to { conn, msg ->
-                        transferToGameServer(msg as MsgTransferToGameServer, gameRequest , nickname)}))
+                        transferToGameServer(msg as MsgTransferToGameServer, gameRequest, nickname)}))
             conn.send(MsgCreateGame(gameRequest,nickname))
+            println("button gedrückt")
         }
     }
 
 
-    fun transferToGameServer(msg :MsgTransferToGameServer, gameRequest: GameRequest , nickname: String){
+    fun transferToGameServer(msg :MsgTransferToGameServer, gameRequest: GameRequest, nickname: String){
+        conn.close()
         gameServerIp = msg.gameServer.ip
         println("test: " + gameServerIp )
 
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket(gameServerIp, 45678),
+            var conn = SocketConnection(Socket(gameServerIp, 45678),
                     mapOf(MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game)}))
+            conn.send(MsgCreateGame(gameRequest,nickname))
         }
-        conn.send(MsgCreateGame(gameRequest,nickname))
     }
 
 
