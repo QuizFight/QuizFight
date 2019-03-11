@@ -63,6 +63,10 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
             ed_number_question.setError(getString(R.string.required))
             focusView = ed_number_question
             cancel = true
+        }else if(ed_number_question.text.toString().toInt() > 20){
+            ed_number_question.setError(getString(R.string.no_question_not_correct))
+            focusView = ed_number_question
+            cancel = true
         }
 
         if(TextUtils.isEmpty(ed_number_player.text)){
@@ -90,7 +94,7 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
             val gameRequest = GameRequest(gameName, maxPlayer, questionCount)
 
             //create Game in Backend
-            sendMsgCreateGameToServer(gameRequest,nickname )
+            sendMsgCreateGameToServer(gameRequest, nickname )
 
         }
     }
@@ -110,7 +114,7 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
     fun transferToGameServer(msg :MsgTransferToGameServer, gameRequest: GameRequest, nickname: String){
         connMaster.close()
         gameServerIp = msg.gameServer.ip
-        println("test: " + gameServerIp )
+        println("test gameserver: " + gameServerIp )
 
         launch(Dispatchers.IO) {
             Client.setServer(gameServerIp, 45678,

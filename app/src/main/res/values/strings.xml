@@ -23,6 +23,7 @@
     <string name="lbl_number_of_questions">No. of questions</string>
     <string name="lbl_number_players">No. of players</string>
     <string name="required">Requiered ! </string>
+    <string name="no_question_not_correct"> No. of question must be less than 21 </string>
 
     <string name="btn_confirm">Confirm</string>
 
