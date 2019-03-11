@@ -120,6 +120,7 @@ class MasterServer(private val port : Int) {
         //TODO: What if == null?
         if (gameServer != null) {
             conn.send(MsgTransferToGameServer(gameServer))
+            conn.close()
         }
 
         serverLog("Spieler ${msgJoinGame.nickname} möchte dem Spiel ${msgJoinGame.gameId} joinen")

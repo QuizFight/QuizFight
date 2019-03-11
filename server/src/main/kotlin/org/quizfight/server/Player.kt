@@ -3,7 +3,6 @@ package org.quizfight.server
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.MsgLeave
-import org.quizfight.common.messages.MsgRanking
 import org.quizfight.common.messages.MsgScore
 import org.quizfight.common.messages.MsgStartGame
 
@@ -26,6 +25,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
      * Forces the game to send the first question
      */
     private fun startGame(conn: Connection, msgStartGame: MsgStartGame) {
+        serverLog("Ein Spieler hat das Spiel gestartet. Die erste Question wird gesendet\n")
         game.questionIncome = 0
         game.broadcast(game.getNextQuestion())
     }

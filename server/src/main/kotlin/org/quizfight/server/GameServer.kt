@@ -141,7 +141,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
         addNewGame(game)
 
-        val gameData = GameData(id, gameName, maxPlayers, listOf<String>(), questionCount)
+        val gameData = GameData(id, gameName, maxPlayers, listOf<String>(gameCreator), questionCount)
 
         serverLog("Game erstellt. Die ID ist: ${id}")
         serverLog("Der Game-Creator ist ${gameCreator} und dieser wurde dem Game hinzugefügt")
