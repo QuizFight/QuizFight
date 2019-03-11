@@ -10,10 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.quizfight.common.SocketConnection
-import org.quizfight.common.messages.MsgLeave
-import org.quizfight.common.messages.MsgPlayerCount
-import org.quizfight.common.messages.MsgQuestion
-import org.quizfight.common.messages.MsgStartGame
+import org.quizfight.common.messages.*
 import java.net.Socket
 
 class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
@@ -46,7 +43,8 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
 
         launch(Dispatchers.IO) {
-            Client.connection?.withHandlers(mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
+            Client.setServer(gameServerIp, 45678,
+                    mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
                     MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
            /* conn = SocketConnection(Socket(gameServerIp, 45678),
                     mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
