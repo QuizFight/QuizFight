@@ -2,11 +2,11 @@ package org.quizfight.server
 
 //import java.util.*
 import org.quizfight.common.Connection
-import org.quizfight.common.messages.Message
-import org.quizfight.common.messages.MsgJoin
-import org.quizfight.common.messages.MsgQuestion
+import org.quizfight.common.SocketConnection
+import org.quizfight.common.messages.*
 import org.quizfight.common.question.Question
 import java.net.Socket
+import java.util.*
 
 /**
  * Game Class. Manages connections to players, asks Questions and calculates the scores
@@ -18,8 +18,7 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
 
 
     var questionIncome: Int = 0
-    private var nextPlayerID: Int = 0
-    var players: MutableMap<Int, Player> = mutableMapOf<Int, Player>()
+    var players: MutableMap<String, Player> = mutableMapOf<String, Player>()
 
     var playerCount = 0
 
@@ -42,7 +41,9 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
      *
      */
     fun addPlayer(name: String, connection: Connection){
-        val player = Player(name, this, connection)
+        var ipAndPort = getIpAndPortFromConnection(connection as SocketConnection)
+
+        val player = Player(name, this, connection, ipAndPort)
         addPlayer(player)
         //conn.send(MsgGameJoined(gameToGameData(games[msgJoinGame.id])))
     }
@@ -50,8 +51,11 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
     fun addPlayer(player: Player) {
         if(players.size >= maxPlayer) {
             throw Exception(MSG_GAME_FULL)
+            return
         }
-        players[nextPlayerID++] = player
+        players.put(player.id, player)
+
+        broadcast(MsgPlayerCount(++playerCount))
 
         if(playerCount == maxPlayer) {
             isOpen = false
@@ -65,6 +69,12 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
      */
     fun broadcast(msg: Message){
         players.values.forEach{ it.connection.send(msg) }
+    }
+
+
+    fun removePlayer(id: String){
+        players.remove(id)
+        broadcast(MsgPlayerCount(--playerCount))
     }
 
 
@@ -100,5 +110,28 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
         return "Game(id=$id, gameName='$gameName', maxPlayer=$maxPlayer, open=$isOpen)"
     }
 
+    fun createRanking(): SortedMap<String, Int> {
+        var ranking = sortedMapOf<String, Int>()
 
+        for (player in players){
+            ranking.put(player.key, player.value.score)
+        }
+        return ranking
+    }
+
+    fun proceed() {
+        questionIncome++
+        
+        if(questionIncome < players.size)
+            return
+
+        questionIncome = 0
+        questions.removeAt(0)
+
+        if(questions.size == 0){
+            broadcast(MsgRanking(createRanking()))
+        }else{
+            broadcast(getNextQuestion())
+        }
+    }
 }

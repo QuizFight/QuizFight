@@ -10,9 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.quizfight.common.messages.GameData
-import org.quizfight.common.messages.MsgGameList
-import org.quizfight.common.messages.MsgRequestOpenGames
+import org.quizfight.common.messages.*
 
 /**
  * This activity allows the user to join a game

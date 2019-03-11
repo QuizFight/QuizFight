@@ -141,6 +141,34 @@
             android:layout_gravity="center"
             android:id="@+id/progressBar"/>
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:text="@string/btn_start"
+                android:background="@drawable/button_style"
+                android:textSize="20sp"
+                android:id="@+id/btn_start"
+                android:layout_marginRight="20dp" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_style"
+                android:text="@string/btn_leave"
+                android:textSize="20sp"
+                android:id="@+id/btn_leave"/>
+
+        </LinearLayout>
+
+
+
     </LinearLayout>
 
 </LinearLayout>

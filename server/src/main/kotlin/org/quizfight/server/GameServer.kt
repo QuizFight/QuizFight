@@ -29,7 +29,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         connectWithMaster()
         addHardcodedGameForTesting()  // TEMPORARY
         sendUpdate()
-        //start()
+        start()
     }
 
     private fun addHardcodedGameForTesting(){
@@ -131,11 +131,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
      */
 
     private fun receiveCreateGame(conn: Connection, msg: MsgCreateGame) {
-        val remoteIpPort = getIpAndPortFromConnection(conn as SocketConnection)
-        val remoteIp     = remoteIpPort[0]
-        val remotePort   = remoteIpPort[1].toInt()
-
-        var id = remoteIp + ":" + remotePort
+        val id = getIpAndPortFromConnection(conn as SocketConnection)
 
         val gameName = msg.game.name
         val maxPlayers = msg.game.maxPlayers
@@ -145,7 +141,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         val gameQuestions = questionStore.getQuestionsForGame(questionCount).toMutableList()
 
         val game = Game(id, gameName, maxPlayers, gameQuestions)
-       // game.addPlayer(gameCreator, conn) TODO
+        game.addPlayer(gameCreator, conn)
 
         addNewGame(game)
 
@@ -181,11 +177,15 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     private fun joinGame(conn: Connection, msgJoinGame: MsgJoin) {
         val game = games.find { game -> game.id == msgJoinGame.gameId }
         if (game == null){
-        return      // TODO what if?
+            return
         }
         game!!.addPlayer(msgJoinGame.nickname, conn)
 
         val gameData = gameToGameData(game!!)
+
+        serverLog("Spieler ${msgJoinGame.nickname} möchte dem Spiel ${game.gameName} joinen")
+        serverLog("Ihm werden diese GameDaten gesendet: ${gameData}\n")
+
         conn.send(MsgGameInfo(gameData))
     }
 

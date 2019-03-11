@@ -1,6 +1,9 @@
 package org.quizfight.server
 
 import org.quizfight.common.Connection
+import org.quizfight.common.SocketConnection
+import org.quizfight.common.messages.MsgLeave
+import org.quizfight.common.messages.MsgRanking
 import org.quizfight.common.messages.MsgScore
 import org.quizfight.common.messages.MsgStartGame
 
@@ -9,8 +12,8 @@ import org.quizfight.common.messages.MsgStartGame
  * Includes player's score
  * @author Thomas Spanier
  */
-class Player(val name : String, val game: Game, oldConnection: Connection) {
-    //private val name: String
+class Player(val name : String, val game: Game, oldConnection: Connection, val id: String) {
+
     var score: Int = 0
     val connection = oldConnection.withHandlers(mapOf(
             //TODO: Vote, Timeout, etc
@@ -28,17 +31,25 @@ class Player(val name : String, val game: Game, oldConnection: Connection) {
     }
 
     /**
+     * Player leaves game
+     */
+    private fun leaveGame(conn: Connection, msgLeave: MsgLeave) {
+        val ipAndPort = getIpAndPortFromConnection(conn as SocketConnection)
+
+        for(player in game.players){
+            if(player.key == ipAndPort){
+                game.removePlayer(id)
+                return
+            }
+        }
+    }
+
+    /**
      * Calculates score, removes game's first question and forces the game to send the next question
      */
     private fun receiveAnswer(conn: Connection, msgSendAnswer: MsgScore) {
         addToScore(msgSendAnswer.score)
-        game.questionIncome++
-
-        if(game.questionIncome >= game.players.size) {
-            game.questionIncome = 0
-            game.questions.removeAt(0)
-            game.broadcast(game.getNextQuestion())
-        }
+        game.proceed()
     }
 
 

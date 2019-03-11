@@ -13,28 +13,32 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.quizfight.common.messages.GameRequest
-import org.quizfight.common.messages.MsgCreateGame
-import org.quizfight.common.messages.MsgGameInfo
+import org.quizfight.common.SocketConnection
+import org.quizfight.common.messages.*
+import java.net.Socket
 
 class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
-    private lateinit var client : Client
+    private lateinit var conn : SocketConnection
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
     var nickname:String = " "
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_game)
 
+        Client.withHandlers(mapOf(
+            MsgGameInfo::class to { _, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game) }
+        ))
+
         btn_create_game.setOnClickListener {
             validateForm()
         }
-
-
     }
+
 
     fun validateForm(){
 
@@ -82,26 +86,28 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
             nickname = ed_nickname.text.toString()
 
             val gameRequest = GameRequest(gameName, maxPlayer, questionCount)
+
             //create Game in Backend
-            Client.withHandlers(mapOf(
-                MsgGameInfo::class to { _, msg -> showAttemptQuizStartActivity(msg as MsgGameInfo) }
-            ))
             Client.send(MsgCreateGame(gameRequest, nickname))
         }
     }
 
-    fun showAttemptQuizStartActivity(gameInfo: MsgGameInfo){
+    fun showAttemptQuizStartActivity(gameInfo: GameData){
         val intent = Intent(this,  AttemptQuizStartActivity::class.java)
 
         //send game's info to AttemptQuizStartActivity
-        intent.putExtra("gameId" , gameInfo.game.id)
-        intent.putExtra("maxPlayers" , gameInfo.game.maxPlayers)
-        intent.putExtra("questionCountTotal" , gameInfo.game.questionCount)
-        intent.putExtra("gameName" , gameInfo.game.name)
+        intent.putExtra("gameId" , gameInfo.id)
+        intent.putExtra("maxPlayers" , gameInfo.maxPlayers)
+        intent.putExtra("questionCountTotal" , gameInfo.questionCount)
+        intent.putExtra("gameName" , gameInfo.name)
         intent.putExtra("nickname" , nickname)
         intent.putExtra("createdBy" , nickname)
+        intent.putExtra("startEnable", true)
+
+        //intent.putExtra("Client", client)
 
         startActivity(intent)
         this.finish()
+
     }
 }
