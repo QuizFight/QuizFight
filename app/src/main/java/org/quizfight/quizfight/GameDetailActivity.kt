@@ -116,7 +116,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     fun sendJoinMessage() {
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket("10.0.2.2", 34567), mapOf() )
+            conn = SocketConnection(Socket(gameServerIp, 34567), mapOf() )
             conn.send(MsgJoin(gameId, nickname))
 
         }

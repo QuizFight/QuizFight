@@ -35,8 +35,8 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
         launch(Dispatchers.IO) {
 
-            conn = SocketConnection(Socket("10.0.2.2", 34567),
-                    mapOf(MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game)} ))
+            conn = SocketConnection(Socket(masterServerIp, 34567),
+                    mapOf(MsgTransferToGameServer::class to { conn, msg -> readGameServerIp(msg as MsgTransferToGameServer)}))
         }
 
 
@@ -44,6 +44,16 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
             validateForm()
         }
 
+    }
+
+    fun readGameServerIp(msg :MsgTransferToGameServer){
+        gameServerIp = msg.gameServer.ip
+
+        launch(Dispatchers.IO) {
+
+            conn = SocketConnection(Socket(gameServerIp, 34567),
+                    mapOf(MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game)}))
+        }
     }
 
 

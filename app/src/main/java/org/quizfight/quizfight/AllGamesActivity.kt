@@ -68,7 +68,7 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
 
     fun sendRequestOpenGame(){
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket("10.0.2.2", 34567),
+            conn = SocketConnection(Socket(masterServerIp, 34567),
                     mapOf(MsgGameList ::class to { conn, msg -> showGames((msg as MsgGameList).games)}  ))
             conn.send(MsgRequestOpenGames())
         }
