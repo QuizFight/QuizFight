@@ -81,10 +81,10 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
     /**
      * prepares the next question to be sended
      */
-    fun getNextQuestion(): Message{
+    fun getNextQuestion(): Question<*>{
         val question = questions[0]
         questions.removeAt(0)
-        return MsgQuestion(question)
+        return question
     }
 
     fun printQuestions(){
@@ -121,17 +121,16 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
 
     fun proceed() {
         questionIncome++
-        
         if(questionIncome < players.size)
-            return
 
-        questionIncome = 0
-        questions.removeAt(0)
+        if(questionIncome == players.size){
+            questionIncome = 0
 
-        if(questions.size == 0){
-            broadcast(MsgRanking(createRanking()))
-        }else{
-            broadcast(getNextQuestion())
+            if(questions.size == 0){
+                broadcast(MsgRanking(createRanking()))
+            }else{
+                broadcast(MsgQuestion(getNextQuestion()))
+            }
         }
     }
 }
