@@ -69,7 +69,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         launch(Dispatchers.IO) {
             Client.connection?.send(MsgStartGame())
         }
-        launch { context.finish() }
+
 
     }
 
