@@ -21,6 +21,8 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
+    private var context = this
+
     var nickname:String = " "
 
     var masterServerIp = ""
@@ -31,29 +33,11 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
         setContentView(R.layout.activity_create_game)
 
         masterServerIp = intent.getStringExtra("masterServerIP")
-        gameServerIp = intent.getStringExtra("gameServerIP")
-
-        launch(Dispatchers.IO) {
-
-            conn = SocketConnection(Socket(masterServerIp, 34567),
-                    mapOf(MsgTransferToGameServer::class to { conn, msg -> readGameServerIp(msg as MsgTransferToGameServer)}))
-        }
-
 
         btn_create_game.setOnClickListener {
             validateForm()
         }
 
-    }
-
-    fun readGameServerIp(msg :MsgTransferToGameServer){
-        gameServerIp = msg.gameServer.ip
-
-        launch(Dispatchers.IO) {
-
-            conn = SocketConnection(Socket(gameServerIp, 34567),
-                    mapOf(MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game)}))
-        }
     }
 
 
@@ -112,15 +96,31 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
 
     fun sendMsgCreateGameToServer(gameRequest: GameRequest, nickname: String){
+
         launch(Dispatchers.IO) {
+            conn = SocketConnection(Socket(masterServerIp, 34567),
+                    mapOf(MsgTransferToGameServer::class to { conn, msg ->
+                        transferToGameServer(msg as MsgTransferToGameServer, gameRequest , nickname)}))
             conn.send(MsgCreateGame(gameRequest,nickname))
-
         }
-
     }
 
-    fun showAttemptQuizStartActivity(gameInfo: GameData){
-        val intent = Intent(this,  AttemptQuizStartActivity::class.java)
+
+    fun transferToGameServer(msg :MsgTransferToGameServer, gameRequest: GameRequest , nickname: String){
+        gameServerIp = msg.gameServer.ip
+        println("test: " + gameServerIp )
+
+        launch(Dispatchers.IO) {
+            conn = SocketConnection(Socket(gameServerIp, 45678),
+                    mapOf(MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game)}))
+        }
+        conn.send(MsgCreateGame(gameRequest,nickname))
+    }
+
+
+    fun showAttemptQuizStartActivity(gameInfo: GameData) = launch{
+
+        val intent = Intent(context,  AttemptQuizStartActivity::class.java)
 
         //send game's info to AttemptQuizStartActivity
         intent.putExtra("gameId" , gameInfo.id)
@@ -134,10 +134,8 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("masterServerIP", masterServerIp)
         intent.putExtra("gameServerIP", gameServerIp)
 
-        //intent.putExtra("Client", client)
-
         startActivity(intent)
-        this.finish()
+        context.finish()
 
     }
 }
