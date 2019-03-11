@@ -3,9 +3,11 @@ package org.quizfight.server
 //import java.util.*
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
-import org.quizfight.common.messages.*
+import org.quizfight.common.messages.Message
+import org.quizfight.common.messages.MsgPlayerCount
+import org.quizfight.common.messages.MsgQuestion
+import org.quizfight.common.messages.MsgRanking
 import org.quizfight.common.question.Question
-import java.net.Socket
 import java.util.*
 
 /**
@@ -45,7 +47,6 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
 
         val player = Player(name, this, connection, ipAndPort)
         addPlayer(player)
-        //conn.send(MsgGameJoined(gameToGameData(games[msgJoinGame.id])))
     }
 
     fun addPlayer(player: Player) {
@@ -56,8 +57,10 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
         players.put(player.id, player)
 
         playerCount++
-        if(playerCount > 1)
+        if(playerCount > 1) {
             broadcast(MsgPlayerCount(playerCount))
+            serverLog("Der PlayerCount wurde an alle Spieler versendet, aktuell sind ${playerCount} in der Lobby\n")
+        }
 
         if(playerCount == maxPlayer) {
             isOpen = false
