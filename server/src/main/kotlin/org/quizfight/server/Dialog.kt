@@ -1,5 +1,7 @@
 package org.quizfight.server
 
+import org.quizfight.common.*
+
 class Dialog{
 
     private val QUIT             = "q"
@@ -9,9 +11,6 @@ class Dialog{
     private val TYPE_MASTER_IP   = "Master Server IP-Address: "
     private val BAD_INPUT        = "Bad Input, try again"
     private val EXIT             = "Bye"
-
-    private val MASTER_PORT      = 34567
-    private val GAME_SERVER_PORT = 45678
 
     init{
         start()
