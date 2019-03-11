@@ -97,14 +97,13 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
 
     fun sendMsgCreateGameToServer(gameRequest: GameRequest, nickname: String){
-
         launch(Dispatchers.IO) {
             connMaster = SocketConnection(Socket(masterServerIp, 34567),
                     mapOf(MsgTransferToGameServer::class to { conn, msg ->
                         transferToGameServer(msg as MsgTransferToGameServer, gameRequest, nickname)}))
             connMaster.send(MsgCreateGame(gameRequest,nickname))
-            println("button gedrückt")
         }
+        btn_create_game.isEnabled = false
     }
 
 

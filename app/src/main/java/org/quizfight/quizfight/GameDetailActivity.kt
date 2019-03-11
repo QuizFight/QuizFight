@@ -121,7 +121,6 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
             conn = SocketConnection(Socket(masterServerIp, 34567),
                     mapOf(MsgTransferToGameServer ::class to { conn, msg -> transferToGameServer((msg as MsgTransferToGameServer))}) )
             conn.send(MsgJoin(gameId, nickname))
-            println("test1")
         }
     }
 
