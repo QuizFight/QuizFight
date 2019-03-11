@@ -27,8 +27,8 @@ class StartActivity : AppCompatActivity() {
      */
     fun showAllGamesActivity(view: View) {
         val intent = Intent(this, AllGamesActivity::class.java)
-        //if(!ed_masterServerIp.text.isEmpty())
-        //    masterServerIp = ed_masterServerIp.text.toString()
+        if(!ed_masterServerIp.text.toString().isEmpty())
+            masterServerIp = ed_masterServerIp.text.toString()
         intent.putExtra("masterServerIP", masterServerIp)
         startActivity(intent)
 

@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.EditText
 import kotlinx.android.synthetic.main.layout_alert_enter_nickname.*
 import kotlinx.coroutines.launch
+import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import java.net.Socket
@@ -117,19 +118,22 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
             conn = SocketConnection(Socket(masterServerIp, 34567),
                     mapOf(MsgTransferToGameServer ::class to { conn, msg -> transferToGameServer((msg as MsgTransferToGameServer))}) )
             conn.send(MsgJoin(gameId, nickname))
-
+            println("test1")
         }
     }
 
     fun transferToGameServer(msg : MsgTransferToGameServer){
         gameServerIp = msg.gameServer.ip
-        println("gameServer : " + gameServerIp)
+        println("test : " + gameServerIp)
 
         launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket(gameServerIp, 45678),
+            println("test2")
+            var conn2 = SocketConnection(Socket(gameServerIp, 45678),
                     mapOf( MsgPlayerCount ::class to { conn, msg -> }) )
-            conn.send(MsgJoin(gameId, nickname))
+            println("test3")
+            conn2.send(MsgJoin(gameId, nickname))
         }
+
         showAttemptQuizStart()
     }
 }
