@@ -125,21 +125,12 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     fun transferToGameServer(msg : MsgTransferToGameServer){
         gameServerIp = msg.gameServer.ip
         println("test : " + gameServerIp)
-        launch(Dispatchers.IO) {
-            Client.setServer(gameServerIp, 45678,
-                    mapOf( MsgPlayerCount ::class to { conn, msg -> }) )
-            println("test3")
-            Client.connection?.send(MsgJoin(gameId, nickname))
 
-        }
+        Client.setServer(gameServerIp, 45678,
+                mapOf( MsgPlayerCount ::class to { conn, msg -> }) )
+        println("test3")
+        Client.connection?.send(MsgJoin(gameId, nickname))
 
-      /*  launch(Dispatchers.IO) {
-            println("test2")
-            var conn2 = SocketConnection(Socket(gameServerIp, 45678),
-                    mapOf( MsgPlayerCount ::class to { conn, msg -> }) )
-            println("test3")
-            conn2.send(MsgJoin(gameId, nickname))
-        }*/
 
         showAttemptQuizStart()
     }

@@ -18,7 +18,6 @@ import java.net.Socket
 class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
     private lateinit var connMaster : SocketConnection
-    //private lateinit var connGame : SocketConnection
 
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
@@ -119,10 +118,6 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
                     mapOf(MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game)}
             ))
             Client.connection?.send(MsgCreateGame(gameRequest,nickname))
-          /*  connGame = SocketConnection(Socket(gameServerIp, 45678),
-                    mapOf(MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game)}
-                    ))
-            connGame.send(MsgCreateGame(gameRequest,nickname))*/
         }
 
     }
