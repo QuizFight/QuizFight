@@ -79,7 +79,7 @@ class MasterServer(private val port : Int) {
      */
     private fun getLeastUsedGameServer() : ServerData {
         gameServers.sortBy { it.games.size }
-        return gameServers.first()
+        return gameServers[0]
     }
 
     /**
@@ -130,9 +130,12 @@ class MasterServer(private val port : Int) {
      * Handler function for Create Game requests.
      * Sends the server with the lowest amount of games.
      */
-    private fun sendLeastUsedGameServer(conn : Connection, msgJoinGame: MsgCreateGame) {
+    private fun sendLeastUsedGameServer(conn : Connection, msgCreateGame: MsgCreateGame) {
+        serverLog("Client möchte Spiel erstellen: ${msgCreateGame.game.name}")
         val gameServer = getLeastUsedGameServer()
+        serverLog("Er erhält diesen Server dafür: ${gameServer} \n")
         conn.send(MsgTransferToGameServer(gameServer))
+        conn.close()
     }
 
 

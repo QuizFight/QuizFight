@@ -55,7 +55,9 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
         }
         players.put(player.id, player)
 
-        broadcast(MsgPlayerCount(++playerCount))
+        playerCount++
+        if(playerCount > 1)
+            broadcast(MsgPlayerCount(playerCount))
 
         if(playerCount == maxPlayer) {
             isOpen = false
