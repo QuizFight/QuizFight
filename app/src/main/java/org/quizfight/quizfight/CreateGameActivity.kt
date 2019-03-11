@@ -117,7 +117,7 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
                     mapOf(MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game)}))
             conn.send(MsgCreateGame(gameRequest,nickname))
         }
-    }
+    }""
 
 
     fun showAttemptQuizStartActivity(gameInfo: GameData) = launch{
