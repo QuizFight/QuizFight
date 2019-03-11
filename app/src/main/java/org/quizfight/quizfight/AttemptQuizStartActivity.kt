@@ -56,7 +56,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         val playerCount = intent.getIntExtra("playerCount", 1)
 
         updateUI(nickname, createdBy, gameName, questionCountTotal)
-        updateProgressBar(playerCount)
+        updateProgressBar(playerCount + 1)
 
         btn_leave.setOnClickListener {
             sendMsgLeaveGame()

@@ -63,7 +63,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         gameId = intent.getStringExtra("gameId" )
         gameName = intent.getStringExtra("gameName")
         maxPlayers = intent.getIntExtra("maxPlayers", 0 )
-        playerCount= intent.getIntExtra("playerCount",1)
+        playerCount= intent.getIntExtra("playerCount",0)
 
         text_view_actual_no_players.text = ""+ maxPlayers
         text_view_actual_no_questions.text = ""+ questionCountTotal
