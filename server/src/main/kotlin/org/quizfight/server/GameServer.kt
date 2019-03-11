@@ -184,9 +184,6 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         val gameData = gameToGameData(game!!)
 
         serverLog("Spieler ${msgJoinGame.nickname} möchte dem Spiel ${game.gameName} joinen")
-        serverLog("Ihm werden diese GameDaten gesendet: ${gameData}\n")
-
-        conn.send(MsgGameInfo(gameData))
     }
 
 
