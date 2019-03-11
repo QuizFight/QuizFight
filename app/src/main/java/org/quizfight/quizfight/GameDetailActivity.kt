@@ -24,6 +24,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     private lateinit var nickname: String
     private var gameName = ""
     private var maxPlayers = 0
+    private var playerCount = 0
 
     private var nicknameEntered: Boolean = false
 
@@ -62,6 +63,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         gameId = intent.getStringExtra("gameId" )
         gameName = intent.getStringExtra("gameName")
         maxPlayers = intent.getIntExtra("maxPlayers", 0 )
+        playerCount= intent.getIntExtra("playerCount",1)
 
         text_view_actual_no_players.text = ""+ maxPlayers
         text_view_actual_no_questions.text = ""+ questionCountTotal
@@ -83,6 +85,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("startEnable", false)
         intent.putExtra("masterServerIP", masterServerIp)
         intent.putExtra("gameServerIP", gameServerIp)
+        intent.putExtra("playerCount", playerCount)
 
         startActivity(intent)
         context.finish()

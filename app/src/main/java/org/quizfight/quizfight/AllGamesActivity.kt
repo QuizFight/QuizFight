@@ -50,6 +50,7 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
             intent.putExtra("gameId", selectedGame.id)
             intent.putExtra("questionCountTotal", selectedGame.questionCount)
             intent.putExtra("maxPlayers", selectedGame.maxPlayers)
+            intent.putExtra("playerCount", selectedGame.players.size)
 
             intent.putExtra("masterServerIP", masterServerIp)
 
