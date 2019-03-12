@@ -19,7 +19,7 @@ data class ServerData(val ip: String,
                       val port: Int,
                       var games: List<GameData>) : Serializable
 
-class MsgRegisterGameServer : Message
+data class MsgRegisterGameServer(val port : Int) : Message
 class MsgRequestOpenGames : Message
 data class MsgGameList(val games : List<GameData>) : Message
 data class MsgJoin(val gameId: String, val nickname: String) : Message

@@ -148,7 +148,7 @@ class MasterServer(private val port : Int) {
         // TODO ip und port werden wahrscheinlich anders mitgegeben, rücksprache!
         val remoteIpPort = getIpAndPortFromConnection(conn as SocketConnection)
         val remoteIp     = remoteIpPort.split(":")[0]
-        val remotePort   = remoteIpPort.split(":")[1].toInt()
+        val remotePort   = msg.port
 
         val gameServer = ServerData(remoteIp, remotePort, listOf<GameData>())
 
