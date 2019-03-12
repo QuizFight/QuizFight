@@ -80,7 +80,6 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         } else{
             btn_start.visibility = View.GONE
         }
-
     }
 
     fun updateProgressBar(players: Int)= launch {

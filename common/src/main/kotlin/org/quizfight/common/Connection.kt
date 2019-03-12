@@ -59,6 +59,7 @@ class SocketConnection(
             val handler = handlers[msg::class] ?: throw Exception("No handler found for message type ${msg::class}")
             handler(this@SocketConnection, msg)
         }
+        //throw Exception("HELLO DARKNESS MY OLD FRIEND")
     }
 
     override fun send(msg: Message) {
@@ -74,7 +75,6 @@ class SocketConnection(
         // TODO: This should probably kill the coroutine, too, in case it's already blocking on readObject.
         // Note: This should only kill the coroutine if this method is not executed within the coroutine!
         //       Otherwise, it suicides and the new Connection is never created.
-        handleMessages.set(false)
         this.handlers = handlers
         return this
     }

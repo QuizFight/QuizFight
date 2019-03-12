@@ -30,7 +30,6 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
-    private lateinit var conn : SocketConnection
 
     private var context = this
 
@@ -51,7 +50,6 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         }
 
     }
-
 
     fun updateUi(){
 
