@@ -49,7 +49,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
         Client.withHandlers(mapOf(
                 MsgQuestion ::class to { _, msg -> showNextQuestion((msg as MsgQuestion))},
-                MsgRanking::class to { _, msg -> showRanking(msg as MsgRanking)}
+                MsgRanking::class to { _, msg -> showRanking(msg as MsgRanking)},
+                MsgGameInfo::class to { _, msg -> finishQuiz()}
         ))
     }
 
@@ -63,32 +64,37 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     // use = launch {} whenever the function could possibly be called from a non main thread.
     // for example all message handlers call from non main threads!
     fun showNextQuestion(question: MsgQuestion) {
+
         launch() {
 
-            //reset all selected buttons
-            radio_group.clearCheck()
+            if (question.question is ChoiceQuestion) {
+                //reset all selected buttons
+                radio_group.clearCheck()
 
-            if (questionCounter < questionCountTotal) {
-                currentQuestion = question.question as ChoiceQuestion
-                var answerList: MutableList<String> = mutableListOf(currentQuestion.correctChoice)
-                answerList.addAll(currentQuestion.choices)
-                answerList.shuffle()
+                if (questionCounter < questionCountTotal) {
+                    currentQuestion = question.question as ChoiceQuestion
+                    var answerList: MutableList<String> = mutableListOf(currentQuestion.correctChoice)
+                    answerList.addAll(currentQuestion.choices)
+                    answerList.shuffle()
 
-                question_text_view.text = currentQuestion.text
-                answer_button1.text = answerList[0]
-                answer_button2.text = answerList[1]
-                answer_button3.text = answerList[2]
-                answer_button4.text = answerList[3]
+                    question_text_view.text = currentQuestion.text
+                    answer_button1.text = answerList[0]
+                    answer_button2.text = answerList[1]
+                    answer_button3.text = answerList[2]
+                    answer_button4.text = answerList[3]
 
-                questionCounter++
+                    questionCounter++
 
-                text_view_question_count.text = ("Question: " + questionCounter
-                        + "/" + questionCountTotal)
+                    text_view_question_count.text = ("Question: " + questionCounter
+                            + "/" + questionCountTotal)
 
-                timer(millisInFuture, countDownInterval).start()
+                    timer(millisInFuture, countDownInterval).start()
 
-            } else {
-                finishQuiz()
+                } else {
+                    finishQuiz()
+                }
+            }else {
+
             }
         }
     }
@@ -101,6 +107,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     fun finishQuiz() {
         finish()
+        Client.reconnectToMaster()
     }
 
 
@@ -124,7 +131,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
             override fun onFinish() {
                 sendScore()
-
             }
         }
     }

@@ -37,8 +37,6 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_detail)
-
-
         updateUi()
 
         btn_join.setOnClickListener {
@@ -100,7 +98,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
             if(!nickname.isNullOrBlank()) {
                 nicknameEntered = true
                 Client.withHandlers(mapOf(
-                        MsgPlayerCount ::class to { conn, msg -> }
+                        MsgPlayerCount ::class to { _, msg -> }
                 ))
                 Client.send(MsgJoin(gameId, nickname))
                 showAttemptQuizStart()

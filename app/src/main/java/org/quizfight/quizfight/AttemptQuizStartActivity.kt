@@ -55,6 +55,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     fun sendMsgStartGame() {
         Client.send(MsgStartGame())
+        btn_start.isEnabled = false
     }
 
     fun sendMsgLeaveGame() {
@@ -69,7 +70,6 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         tv_question_count.setText(""+ questionCountTotal)
         tv_game_name.setText(gameName)
         tv_created_by.setText(createdBy)
-
 
 
         if(startGameEnable){
@@ -99,7 +99,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     fun showQuizActivity(question: ChoiceQuestion) = launch{
         // Create an Intent to start the AllGamesActivity
 
-        println("test : question ist da")
+        println("connection : question ist da")
         val intent = Intent(context, QuizActivity::class.java)
         intent.putExtra("gameId" , gameId)
         intent.putExtra("questionCountTotal" , questionCountTotal)

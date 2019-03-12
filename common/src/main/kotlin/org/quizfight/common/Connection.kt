@@ -59,7 +59,6 @@ class SocketConnection(
             val handler = handlers[msg::class] ?: throw Exception("No handler found for message type ${msg::class}")
             handler(this@SocketConnection, msg)
         }
-        //throw Exception("HELLO DARKNESS MY OLD FRIEND")
     }
 
     override fun send(msg: Message) {
