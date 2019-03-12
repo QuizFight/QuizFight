@@ -32,7 +32,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         setContentView(R.layout.activity_attempt_quiz_start)
 
         Client.withHandlers(
-                mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity((msg as MsgQuestion).question as ChoiceQuestion)},
+                mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity(msg as MsgQuestion)},
                         MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
 
         gameId = intent.getStringExtra("gameId")
@@ -97,27 +97,33 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     }
 
 
-    fun showQuizActivity(question: ChoiceQuestion) = launch{
+    fun showQuizActivity(msg: MsgQuestion) = launch{
         // Create an Intent to start the AllGamesActivity
 
         println("connection : question ist da")
-        val intent = Intent(context, QuizActivity::class.java)
-        intent.putExtra("gameId" , gameId)
-        intent.putExtra("questionCountTotal" , questionCountTotal)
 
-        //put 1st question
-        intent.putExtra("questionText" , question.text)
-        intent.putExtra("correctChoice" , question.correctChoice)
-        var answers = ArrayList<String>()
-        answers.add(question.choices[0])
-        answers.add(question.choices[1])
-        answers.add(question.choices[2])
+        if(msg.question is ChoiceQuestion) {
 
-        intent.putStringArrayListExtra("answers", answers)
-        intent.putExtra("Category", question.category.name)
+            val question = msg.question as ChoiceQuestion
 
-        startActivity(intent)
-        context.finish()
+            val intent = Intent(context, QuizActivity::class.java)
+            intent.putExtra("gameId", gameId)
+            intent.putExtra("questionCountTotal", questionCountTotal)
+
+            //put 1st question
+            intent.putExtra("questionText", question.text)
+            intent.putExtra("correctChoice", question.correctChoice)
+            var answers = ArrayList<String>()
+            answers.add(question.choices[0])
+            answers.add(question.choices[1])
+            answers.add(question.choices[2])
+
+            intent.putStringArrayListExtra("answers", answers)
+            intent.putExtra("Category", question.category.name)
+
+            startActivity(intent)
+            context.finish()
+        }
     }
 
 

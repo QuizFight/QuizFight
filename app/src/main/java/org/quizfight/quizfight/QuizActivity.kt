@@ -23,7 +23,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     private var questionCounter: Int = 0
     private var questionCountTotal: Int = 0
-
     private lateinit var currentQuestion: ChoiceQuestion
     private var answerSelected : Boolean = false
 
@@ -32,14 +31,12 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     val millisInFuture: Long = 21000 // for 20 seconds plus 1 second imprecision
     val countDownInterval: Long = 1000 // sets the countdown interval to 1 second
 
-    val rowList = listOf<TableRow>(table_row_first, table_row_second, table_row_third,
-            table_row_fourth, table_row_fifth, table_row_sixth, table_row_seventh, table_row_eight)
+    private var rowList = listOf<TableRow>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
-        //sollte auch vom Server gelesen werden
         questionCountTotal = intent.getIntExtra("questionCountTotal", 4)
 
         val questiontext = intent.getStringExtra("questionText")
@@ -57,6 +54,10 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 MsgRanking::class to { _, msg -> showRanking(msg as MsgRanking)},
                 MsgGameInfo::class to { _, msg -> finishQuiz()}
         ))
+
+        rowList = listOf<TableRow>(table_row_first, table_row_second, table_row_third,
+                table_row_fourth, table_row_fifth, table_row_sixth, table_row_seventh, table_row_eight)
+
     }
 
 
