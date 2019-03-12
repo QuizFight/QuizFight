@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="20dp"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -50,20 +50,20 @@
             android:id="@+id/question_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TextView"
             android:layout_margin="50dp"
-            android:textSize="20dp"
-            android:textColor="#ffffff"
+            android:text="TextView"
             android:textAlignment="center"
-            />
+            android:textColor="#ffffff"
+            android:textSize="20dp" />
 
         <RadioGroup
             android:id="@+id/radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
             android:layout_marginTop="90dp"
             android:orientation="vertical"
-            android:layout_marginLeft="40dp">
+            android:onClick="checkAnswer">
 
             <RadioButton
                 android:id="@+id/answer_button1"
@@ -98,11 +98,13 @@
                 android:textColor="#ffffff" />
         </RadioGroup>
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/container_range"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -129,7 +131,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:textColor="@android:color/white"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/score_titel_view"
@@ -162,7 +164,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:background="@drawable/cell_shape"
-                    android:text="McNippel"
+                    android:text="TextView"
                     android:textColor="@android:color/white" />
 
                 <TextView
@@ -172,11 +174,12 @@
 
                     android:background="@drawable/cell_shape"
 
-                    android:text="100"
+                    android:text="TextView"
                     android:textColor="@android:color/white" />
             </TableRow>
 
             <TableRow
+                android:id="@+id/table_row_second"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -188,19 +191,20 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:background="@drawable/cell_shape"
-                    android:text="Arschmatz"
+                    android:text="TextView"
                     android:textColor="@android:color/white" />
 
                 <TextView
-                    android:id="@+id/textView12"
+                    android:id="@+id/score_view2"
                     android:layout_width="120dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/cell_shape"
-                    android:text="700"
+                    android:text="TextView"
                     android:textColor="@android:color/white" />
             </TableRow>
 
             <TableRow
+                android:id="@+id/table_row_third"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -216,7 +220,7 @@
                     android:textColor="@android:color/white" />
 
                 <TextView
-                    android:id="@+id/textView16"
+                    android:id="@+id/score_view3"
                     android:layout_width="120dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/cell_shape"
@@ -226,6 +230,7 @@
             </TableRow>
 
             <TableRow
+                android:id="@+id/table_row_fourth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -241,7 +246,7 @@
                     android:textColor="@android:color/white" />
 
                 <TextView
-                    android:id="@+id/textView26"
+                    android:id="@+id/score_view4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/cell_shape"
@@ -250,6 +255,7 @@
             </TableRow>
 
             <TableRow
+                android:id="@+id/table_row_fifth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -265,7 +271,7 @@
                     android:textColor="@android:color/white" />
 
                 <TextView
-                    android:id="@+id/textView18"
+                    android:id="@+id/score_view5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/cell_shape"
@@ -274,6 +280,7 @@
             </TableRow>
 
             <TableRow
+                android:id="@+id/table_row_sixth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -289,7 +296,7 @@
                     android:textColor="@android:color/white" />
 
                 <TextView
-                    android:id="@+id/textView20"
+                    android:id="@+id/score_view6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/cell_shape"
@@ -298,6 +305,7 @@
             </TableRow>
 
             <TableRow
+                android:id="@+id/table_row_seventh"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -313,7 +321,7 @@
                     android:textColor="@android:color/white" />
 
                 <TextView
-                    android:id="@+id/textView22"
+                    android:id="@+id/score_view7"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/cell_shape"
@@ -322,6 +330,7 @@
             </TableRow>
 
             <TableRow
+                android:id="@+id/table_row_eight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -337,7 +346,7 @@
                     android:textColor="@android:color/white" />
 
                 <TextView
-                    android:id="@+id/textView24"
+                    android:id="@+id/score_view8"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/cell_shape"

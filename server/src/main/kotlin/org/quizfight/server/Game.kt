@@ -81,6 +81,8 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
      *
      */
     fun broadcast(msg: Message){
+        serverLog("$msg wird an folgende IP's gesendet")
+        //serverLog(players.values.forEach{ getIpAndPortFromConnection(it.connection as SocketConnection) })
         players.values.forEach{ it.connection.send(msg) }
     }
 
@@ -137,17 +139,21 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
 
     fun proceed() {
         questionIncome++
-        
+
+
         if(questionIncome < players.size)
             return
 
         questionIncome = 0
-        questions.removeAt(0)
 
         if(questions.size == 0){
             broadcast(MsgRanking(createRanking()))
         }else{
-            broadcast(getNextQuestion())
+            questions.removeAt(0)
+
+            broadcast(MsgQuestion(ChoiceQuestion("Wer hat an der Uhr gedreht?",
+                    Category.AROUND_THE_WORLD,
+                    listOf<String>("Relaxo", "Florian", "Mario", "Aude"), "Relaxo")))//broadcast(getNextQuestion())
         }
     }
 }

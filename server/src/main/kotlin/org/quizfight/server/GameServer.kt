@@ -144,7 +144,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
         val gameData = GameData(id, gameName, maxPlayers, listOf<String>(gameCreator), questionCount)
 
-        serverLog("Game erstellt. Die ID ist: ${id}")
+        serverLog("Game erstellt: ${msg.game}")
         serverLog("Der Game-Creator ist ${gameCreator} und dieser wurde dem Game hinzugefügt")
         conn.send(MsgGameInfo(gameData))
     }

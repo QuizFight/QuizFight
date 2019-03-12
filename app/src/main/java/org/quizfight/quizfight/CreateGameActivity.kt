@@ -12,13 +12,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.quizfight.common.MASTER_PORT
-import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
-import java.net.Socket
 
 class CreateGameActivity : CoroutineScope, AppCompatActivity() {
-
-    private lateinit var connMaster : SocketConnection
 
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
@@ -102,7 +98,7 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
                 while (!Client.connected);
 
                 Client.withHandlers(mapOf(
-                        MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game) }
+                        MsgGameInfo ::class to { _, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game) }
                 ))
                 Client.send(MsgCreateGame(gameRequest, nickname))
                 btn_create_game.isEnabled = false
@@ -133,7 +129,6 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
         context.finish()
 
     }
-
 
 
 }
