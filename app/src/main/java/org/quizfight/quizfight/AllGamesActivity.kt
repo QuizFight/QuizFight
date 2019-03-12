@@ -65,12 +65,14 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
 
     }
 
-    fun sendRequestOpenGame(){
-        launch(Dispatchers.IO) {
-            var conn = SocketConnection(Socket(masterServerIp, 34567),
-                    mapOf(MsgGameList ::class to { conn, msg -> showGames((msg as MsgGameList).games)}  ))
-            conn.send(MsgRequestOpenGames())
-        }
+    fun sendRequestOpenGame() = launch {
+        Client.setMasterServer(masterServerIp, 34567)
+        while (!Client.connected);
+
+        Client.withHandlers(mapOf(
+                MsgGameList ::class to { conn, msg -> showGames((msg as MsgGameList).games)}
+        ))
+        Client.send(MsgRequestOpenGames())
 
     }
 

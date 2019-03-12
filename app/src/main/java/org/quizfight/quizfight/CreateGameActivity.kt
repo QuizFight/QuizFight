@@ -39,6 +39,7 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
             validateForm()
         }
 
+
     }
 
 
@@ -94,34 +95,19 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
             val gameRequest = GameRequest(gameName, maxPlayer, questionCount)
 
             //create Game in Backend
-            sendMsgCreateGameToServer(gameRequest, nickname )
+            launch {
+                Client.setMasterServer(masterServerIp, 34567)
+
+                while (!Client.connected);
+
+                Client.withHandlers(mapOf(
+                        MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game) }
+                ))
+                Client.send(MsgCreateGame(gameRequest, nickname))
+                btn_create_game.isEnabled = false
+            }
 
         }
-    }
-
-
-    fun sendMsgCreateGameToServer(gameRequest: GameRequest, nickname: String){
-        launch(Dispatchers.IO) {
-            connMaster = SocketConnection(Socket(masterServerIp, 34567),
-                    mapOf(MsgTransferToGameServer::class to { conn, msg ->
-                        transferToGameServer(msg as MsgTransferToGameServer, gameRequest, nickname)}))
-            connMaster.send(MsgCreateGame(gameRequest,nickname))
-        }
-        btn_create_game.isEnabled = false
-    }
-
-
-    fun transferToGameServer(msg :MsgTransferToGameServer, gameRequest: GameRequest, nickname: String){
-        connMaster.close()
-        gameServerIp = msg.gameServer.ip
-
-        launch(Dispatchers.IO) {
-            Client.setServer(gameServerIp, 45678,
-                    mapOf(MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game)}
-            ))
-            Client.connection?.send(MsgCreateGame(gameRequest,nickname))
-        }
-        println("test : send CreateGame to " + gameServerIp )
     }
 
 

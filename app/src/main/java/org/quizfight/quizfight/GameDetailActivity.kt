@@ -34,15 +34,11 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     private var context = this
 
-    private var masterServerIp = ""
-    private var gameServerIp = ""
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_detail)
 
-        masterServerIp = intent.getStringExtra("masterServerIP")
 
         updateUi()
 
@@ -83,8 +79,6 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("nickname" , nickname)
         intent.putExtra("createdBy" , "")
         intent.putExtra("startEnable", false)
-        intent.putExtra("masterServerIP", masterServerIp)
-        intent.putExtra("gameServerIP", gameServerIp)
         intent.putExtra("playerCount", playerCount)
 
         startActivity(intent)
@@ -107,31 +101,16 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
             nickname = editText.text.toString()
             if(!nickname.isNullOrBlank()) {
                 nicknameEntered = true
-                sendJoinMessage()
+                Client.withHandlers(mapOf(
+                        MsgPlayerCount ::class to { conn, msg -> }
+                ))
+                Client.send(MsgJoin(gameId, nickname))
+                showAttemptQuizStart()
             } else {
                 displayAlert()
             }
         }
 
         builder.create().show()
-    }
-
-    fun sendJoinMessage() {
-        launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket(masterServerIp, 34567),
-                    mapOf(MsgTransferToGameServer ::class to { conn, msg -> transferToGameServer((msg as MsgTransferToGameServer))}) )
-            conn.send(MsgJoin(gameId, nickname))
-        }
-    }
-
-    fun transferToGameServer(msg : MsgTransferToGameServer){
-        conn.close()
-        gameServerIp = msg.gameServer.ip
-
-        Client.setServer(gameServerIp, 45678,
-                mapOf( MsgPlayerCount ::class to { conn, msg -> }) )
-        Client.connection?.send(MsgJoin(gameId, nickname))
-
-        showAttemptQuizStart()
     }
 }

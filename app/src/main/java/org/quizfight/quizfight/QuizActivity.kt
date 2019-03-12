@@ -20,7 +20,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     // Use launch{} whenever you want to change UI elements.
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
-    private lateinit var conn : SocketConnection
 
     private var questionCounter: Int = 0
     private var questionCountTotal: Int = 0
@@ -50,10 +49,10 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 listOf<String>(correct, answers[0], answers[1], answers[2]),
                 correct)))
 
-        launch(Dispatchers.IO) {
-            Client.connection?.withHandlers( mapOf(MsgQuestion ::class to { conn, msg -> showNextQuestion((msg as MsgQuestion))},
-                            MsgRanking::class to { conn, msg -> showRanking(msg as MsgRanking)}))
-        }
+        Client.withHandlers(mapOf(
+                MsgQuestion ::class to { _, msg -> showNextQuestion((msg as MsgQuestion))},
+                MsgRanking::class to { _, msg -> showRanking(msg as MsgRanking)}
+        ))
     }
 
 
@@ -114,9 +113,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
             answer = selectedButton.text.toString()
         }
 
-        launch(Dispatchers.Default){
-            conn.send(MsgScore(currentQuestion.evaluate(answer.toString())))
-        }
+        Client.send(MsgScore(currentQuestion.evaluate(answer)))
 
         answerSelected = false
     }

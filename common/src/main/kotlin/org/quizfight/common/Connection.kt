@@ -34,6 +34,8 @@ class SocketConnection(
     // Flag to ignore EOF exception when closing socket correctly
     private var shuttingDown = AtomicBoolean(false)
 
+    val ip = socket.inetAddress.hostAddress
+
     // TEMPORARY
     override val id = "1"
 

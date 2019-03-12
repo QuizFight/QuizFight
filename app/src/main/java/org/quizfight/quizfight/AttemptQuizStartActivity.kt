@@ -33,7 +33,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attempt_quiz_start)
 
-        Client.connection?.withHandlers(
+        Client.withHandlers(
                 mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity((msg as MsgQuestion).question as ChoiceQuestion)},
                         MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
 
@@ -57,18 +57,11 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
 
     fun sendMsgStartGame() {
-        launch(Dispatchers.IO) {
-            Client.connection?.send(MsgStartGame())
-        println("test: send MsgStartGame to " + Client.getServerIp())
-        }
-
-
+        Client.send(MsgStartGame())
     }
 
     fun sendMsgLeaveGame() {
-        launch(Dispatchers.IO) {
-            Client.connection?.send(MsgLeave())
-        }
+        Client.send(MsgLeave())
         launch { context.finish() }
     }
 
