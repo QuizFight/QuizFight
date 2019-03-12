@@ -2,9 +2,11 @@
 package org.quizfight.server
 
 import org.quizfight.common.Connection
+import org.quizfight.common.GAME_SERVER_PORT
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import java.net.ServerSocket
+import kotlin.concurrent.thread
 
 /**
  * The master server that manages game servers.
@@ -40,9 +42,9 @@ class MasterServer(private val port : Int) {
         val remoteIp     = remoteIpPort.split(":")[0]
         val remotePort   = remoteIpPort.split(":")[1].toInt()
 
-        gameServers.find { gs -> gs.ip == remoteIp && gs.port == remotePort }!!.games = msgGameList.games
+        gameServers.find { gs -> gs.ip == remoteIp && gs.port == GAME_SERVER_PORT }!!.games = msgGameList.games
 
-        serverLog("GameListe erhalten von: ${remoteIp}:${remotePort}")
+        serverLog("GameListe erhalten von: $remoteIp:$GAME_SERVER_PORT")
         serverLog("Meine aktuelle Liste aller Spiele sieht so aus:\n" + listAllOpenGames() + "\n")
     }
 
