@@ -11,6 +11,8 @@ import org.quizfight.common.messages.*
 import org.quizfight.common.question.Category
 import org.quizfight.common.question.ChoiceQuestion
 import java.util.Locale
+import android.widget.TableRow
+import android.widget.TextView
 
 class QuizActivity : CoroutineScope, AppCompatActivity() {
 
@@ -29,6 +31,9 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     //Countdown Timer
     val millisInFuture: Long = 21000 // for 20 seconds plus 1 second imprecision
     val countDownInterval: Long = 1000 // sets the countdown interval to 1 second
+
+    val rowList = listOf<TableRow>(table_row_first, table_row_second, table_row_third,
+            table_row_fourth, table_row_fifth, table_row_sixth, table_row_seventh, table_row_eight)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +71,9 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     fun showNextQuestion(question: MsgQuestion) {
 
         launch() {
+            rowList.forEach({tr -> hideTableRows(tr)})
+            showHide(question_outer_layout)
+            showHide(score_outer_layout)
 
             if (question.question is ChoiceQuestion) {
                 //reset all selected buttons
@@ -141,7 +149,23 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     }
 
     private fun showRanking(msg : MsgRanking) = launch{
+        showHide(question_outer_layout)
+        showHide(score_outer_layout)
 
+        val rowNicknameScoreViews = listOf<Triple<TableRow, TextView, TextView>>(
+                Triple(table_row_first, nickname_view1, score_view1), Triple(table_row_second, nickname_view2, score_view2),
+                Triple(table_row_third, nickname_view3, score_view3), Triple(table_row_fourth, nickname_view4, score_view4),
+                Triple(table_row_fifth, nickname_view4, score_view4), Triple(table_row_sixth, nickname_view6, score_view6),
+                Triple(table_row_seventh, nickname_view7, score_view7), Triple(table_row_eight, nickname_view8, score_view8)
+        )
+        val iter = msg.totalScore.iterator()
+
+        for((index, value) in iter.withIndex()) {
+            showHide(rowNicknameScoreViews[index].first)
+            rowNicknameScoreViews[index].second.text = value.key
+            rowNicknameScoreViews[index].third.text = value.value.toString()
+
+        }
     }
 
     fun showHide(view: View) {
@@ -150,6 +174,15 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                     View.GONE
                 } else {
                     View.VISIBLE
+                }
+    }
+
+    fun hideTableRows(tableRow: TableRow) {
+        tableRow.visibility =
+                if(tableRow.visibility == View.VISIBLE) {
+                    View.GONE
+                } else {
+                    View.GONE
                 }
     }
 }
