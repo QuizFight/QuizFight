@@ -61,6 +61,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     fun sendMsgLeaveGame() {
         Client.send(MsgLeave())
         launch { context.finish() }
+        Client.reconnectToMaster()
     }
 
 

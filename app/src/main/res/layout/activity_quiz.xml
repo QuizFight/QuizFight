@@ -102,15 +102,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/container_range"
-            android:orientation="vertical"
-            android:visibility="gone">
+            android:orientation="horizontal">
 
-            <ProgressBar
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:id="@+id/range_min"/>
+            <SeekBar
                 android:id="@+id/answer_guess_question"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/range_max"/>
         </LinearLayout>
 
     </LinearLayout>
