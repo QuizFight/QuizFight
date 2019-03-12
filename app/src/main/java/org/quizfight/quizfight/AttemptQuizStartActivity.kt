@@ -50,7 +50,6 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         btn_leave.setOnClickListener {
             sendMsgLeaveGame()
         }
-
     }
 
 

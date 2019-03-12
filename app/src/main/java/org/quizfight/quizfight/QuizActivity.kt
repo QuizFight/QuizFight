@@ -7,11 +7,9 @@ import android.widget.Button
 import kotlinx.android.synthetic.main.activity_quiz.*
 import android.view.View
 import kotlinx.coroutines.*
-import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import org.quizfight.common.question.Category
 import org.quizfight.common.question.ChoiceQuestion
-import java.net.Socket
 import java.util.Locale
 
 class QuizActivity : CoroutineScope, AppCompatActivity() {

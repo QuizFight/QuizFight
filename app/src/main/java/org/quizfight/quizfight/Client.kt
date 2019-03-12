@@ -1,5 +1,6 @@
 package org.quizfight.quizfight
 
+import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +35,15 @@ object Client : CoroutineScope, Connection {
         val extHandlers = handlers + (
                 MsgTransferToGameServer::class to { _, msg -> handleServerTransfer(msg as MsgTransferToGameServer) }
                 )
-        launch(Dispatchers.IO) { connection?.withHandlers(extHandlers) }
+
+        val withLogging = extHandlers.mapValues {
+            { conn: Connection, msg: Message ->
+                Log.d("Connection",  "Received message $msg from ${connection?.ip}")
+                it.value(conn, msg)
+            }
+        }
+        //launch(Dispatchers.IO) { connection?.withHandlers(extHandlers) }
+        launch(Dispatchers.IO) { connection?.withHandlers(withLogging) }
         return this
     }
 
@@ -47,7 +56,7 @@ object Client : CoroutineScope, Connection {
 
         // Resend last message that caused transfer
         if (lastMessage != null)
-            connection!!.send(lastMessage!!)
+            send(lastMessage!!)
     }
 
     fun reconnectToMaster() = launch(Dispatchers.IO) {
