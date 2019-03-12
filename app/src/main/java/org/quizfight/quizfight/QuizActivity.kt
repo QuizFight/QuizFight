@@ -9,6 +9,7 @@ import android.view.View
 import kotlinx.coroutines.*
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
+import org.quizfight.common.question.Category
 import org.quizfight.common.question.ChoiceQuestion
 import java.net.Socket
 import java.util.Locale
@@ -27,8 +28,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     private lateinit var currentQuestion: ChoiceQuestion
     private var answerSelected : Boolean = false
 
-    private var masterServerIP = ""
-    private var gameServer = ""
 
     //Countdown Timer
     val millisInFuture: Long = 21000 // for 20 seconds plus 1 second imprecision
@@ -38,11 +37,18 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
-        masterServerIP = intent.getStringExtra("masterServerIP")
-        gameServer = intent.getStringExtra("gameServerIP")
-
         //sollte auch vom Server gelesen werden
         questionCountTotal = intent.getIntExtra("questionCountTotal", 4)
+
+        val questiontext = intent.getStringExtra("questionText")
+        val correct = intent.getStringExtra("correctChoice")
+        val answers = intent.getStringArrayListExtra("answers")
+        val category = intent.getStringExtra("Category")
+
+        showNextQuestion(MsgQuestion(ChoiceQuestion(questiontext,
+                Category.valueOf(category) ,
+                listOf<String>(correct, answers[0], answers[1], answers[2]),
+                correct)))
 
         launch(Dispatchers.IO) {
             Client.connection?.withHandlers( mapOf(MsgQuestion ::class to { conn, msg -> showNextQuestion((msg as MsgQuestion))},

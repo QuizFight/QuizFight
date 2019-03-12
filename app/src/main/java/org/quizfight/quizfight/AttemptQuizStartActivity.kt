@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import org.quizfight.common.question.ChoiceQuestion
-import java.net.Socket
+import java.util.ArrayList
 
 class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
@@ -29,22 +29,13 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     private val context = this
 
-    var masterServerIp = ""
-    var gameServerIp = ""
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attempt_quiz_start)
 
-
-        masterServerIp = intent.getStringExtra("masterServerIP")
-        gameServerIp = intent.getStringExtra("gameServerIP")
-
-        launch(Dispatchers.IO) {
-            Client.connection?.withHandlers(
-                    mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity((msg as MsgQuestion).question as ChoiceQuestion)},
-                            MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
-        }
+        Client.connection?.withHandlers(
+                mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity((msg as MsgQuestion).question as ChoiceQuestion)},
+                        MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
 
         gameId = intent.getStringExtra("gameId")
         var createdBy = intent.getStringExtra("createdBy")
@@ -68,6 +59,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     fun sendMsgStartGame() {
         launch(Dispatchers.IO) {
             Client.connection?.send(MsgStartGame())
+        println("test: send MsgStartGame to " + Client.getServerIp())
         }
 
 
@@ -117,17 +109,22 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     fun showQuizActivity(question: ChoiceQuestion) = launch{
         // Create an Intent to start the AllGamesActivity
+
+        println("test : question ist da")
         val intent = Intent(context, QuizActivity::class.java)
         intent.putExtra("gameId" , gameId)
         intent.putExtra("questionCountTotal" , questionCountTotal)
-        intent.putExtra("masterServerIP", masterServerIp)
-        intent.putExtra("gameServerIP", gameServerIp)
 
         //put 1. question
         intent.putExtra("questionText" , question.text)
         intent.putExtra("correctChoice" , question.correctChoice)
-      /*  intent.putExtra("masterServerIP", masterServerIp)
-        intent.putExtra("gameServerIP", gameServerIp)*/
+        var answers = ArrayList<String>()
+        answers.add(question.choices[0])
+        answers.add(question.choices[1])
+        answers.add(question.choices[2])
+
+        intent.putStringArrayListExtra("answers", answers)
+        intent.putExtra("Category", question.category.name)
 
         startActivity(intent)
         context.finish()

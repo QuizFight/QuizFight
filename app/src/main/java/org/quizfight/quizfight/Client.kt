@@ -9,9 +9,15 @@ import kotlin.reflect.KClass
 
 object Client {
     public var connection: Connection? = null
+    private var serverIp: String = ""
 
     fun setServer(ip: String, port: Int , handlers: Map<KClass<*>, (Connection, Message) -> Unit>){
        connection = SocketConnection(Socket(ip, port), handlers)
+        serverIp = ip
+    }
+
+    fun getServerIp(): String{
+        return  serverIp
     }
 
 }

@@ -114,7 +114,6 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
     fun transferToGameServer(msg :MsgTransferToGameServer, gameRequest: GameRequest, nickname: String){
         connMaster.close()
         gameServerIp = msg.gameServer.ip
-        println("test gameserver: " + gameServerIp )
 
         launch(Dispatchers.IO) {
             Client.setServer(gameServerIp, 45678,
@@ -122,7 +121,7 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
             ))
             Client.connection?.send(MsgCreateGame(gameRequest,nickname))
         }
-
+        println("test : send CreateGame to " + gameServerIp )
     }
 
 
