@@ -34,6 +34,8 @@ class SocketConnection(
     // Flag to ignore EOF exception when closing socket correctly
     private var shuttingDown = AtomicBoolean(false)
 
+    val ip = socket.inetAddress.hostAddress
+
     // TEMPORARY
     override val id = "1"
 
@@ -72,7 +74,6 @@ class SocketConnection(
         // TODO: This should probably kill the coroutine, too, in case it's already blocking on readObject.
         // Note: This should only kill the coroutine if this method is not executed within the coroutine!
         //       Otherwise, it suicides and the new Connection is never created.
-        handleMessages.set(false)
         this.handlers = handlers
         return this
     }

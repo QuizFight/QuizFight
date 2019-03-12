@@ -11,33 +11,31 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.quizfight.common.SocketConnection
+import org.quizfight.common.MASTER_PORT
 import org.quizfight.common.messages.*
-import java.net.Socket
 
 class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
-    private lateinit var conn : SocketConnection
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
+    private var context = this
+
     var nickname:String = " "
 
+    var masterServerIp = ""
+    private var gameServerIp = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_game)
 
-        launch(Dispatchers.IO) {
-
-            conn = SocketConnection(Socket("10.0.2.2", 34567),
-                    mapOf(MsgGameInfo ::class to { conn, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game)} ))
-        }
-
+        masterServerIp = intent.getStringExtra("masterServerIP")
 
         btn_create_game.setOnClickListener {
             validateForm()
         }
+
 
     }
 
@@ -61,6 +59,10 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
         if(TextUtils.isEmpty(ed_number_question.text)){
             ed_number_question.setError(getString(R.string.required))
+            focusView = ed_number_question
+            cancel = true
+        }else if(ed_number_question.text.toString().toInt() > 20){
+            ed_number_question.setError(getString(R.string.no_question_not_correct))
             focusView = ed_number_question
             cancel = true
         }
@@ -90,22 +92,25 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
             val gameRequest = GameRequest(gameName, maxPlayer, questionCount)
 
             //create Game in Backend
-            sendMsgCreateGameToServer(gameRequest,nickname )
+            launch {
+                Client.setMasterServer(masterServerIp, MASTER_PORT)
+
+                while (!Client.connected);
+
+                Client.withHandlers(mapOf(
+                        MsgGameInfo ::class to { _, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game) }
+                ))
+                Client.send(MsgCreateGame(gameRequest, nickname))
+                btn_create_game.isEnabled = false
+            }
 
         }
     }
 
 
-    fun sendMsgCreateGameToServer(gameRequest: GameRequest, nickname: String){
-        launch(Dispatchers.IO) {
-            conn.send(MsgCreateGame(gameRequest,nickname))
+    fun showAttemptQuizStartActivity(gameInfo: GameData) = launch{
 
-        }
-
-    }
-
-    fun showAttemptQuizStartActivity(gameInfo: GameData){
-        val intent = Intent(this,  AttemptQuizStartActivity::class.java)
+        val intent = Intent(context,  AttemptQuizStartActivity::class.java)
 
         //send game's info to AttemptQuizStartActivity
         intent.putExtra("gameId" , gameInfo.id)
@@ -116,10 +121,14 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("createdBy" , nickname)
         intent.putExtra("startEnable", true)
 
-        //intent.putExtra("Client", client)
+        intent.putExtra("masterServerIP", masterServerIp)
+        intent.putExtra("gameServerIP", gameServerIp)
 
         startActivity(intent)
-        this.finish()
+
+        context.finish()
 
     }
+
+
 }

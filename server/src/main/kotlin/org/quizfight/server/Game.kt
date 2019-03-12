@@ -3,10 +3,13 @@ package org.quizfight.server
 //import java.util.*
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
-import org.quizfight.common.messages.*
+import org.quizfight.common.messages.Message
+import org.quizfight.common.messages.MsgPlayerCount
+import org.quizfight.common.messages.MsgQuestion
+import org.quizfight.common.messages.MsgRanking
+import org.quizfight.common.question.Category
+import org.quizfight.common.question.ChoiceQuestion
 import org.quizfight.common.question.Question
-import java.net.Socket
-import java.util.*
 
 /**
  * Game Class. Manages connections to players, asks Questions and calculates the scores
@@ -45,21 +48,31 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
 
         val player = Player(name, this, connection, ipAndPort)
         addPlayer(player)
-        //conn.send(MsgGameJoined(gameToGameData(games[msgJoinGame.id])))
     }
 
     fun addPlayer(player: Player) {
         if(players.size >= maxPlayer) {
+            serverLog("Player size >= maxPlayer")
             throw Exception(MSG_GAME_FULL)
             return
         }
         players.put(player.id, player)
 
-        broadcast(MsgPlayerCount(++playerCount))
+        playerCount++
+        if(playerCount > 1) {
+            broadcast(MsgPlayerCount(playerCount))
+            serverLog("Der PlayerCount wurde an alle Spieler versendet, aktuell sind ${playerCount} in der Lobby\n")
+        }
 
         if(playerCount == maxPlayer) {
+            serverLog("Maximale Spieleranzahl erreicht. Spiel Startet in 3 Sekunden")
+            Thread.sleep(3000)
             isOpen = false
-            this.broadcast(getNextQuestion())
+            serverLog("Die maximale Spieler-Anzahl ist erreicht. Das Spiel startet\n")
+            this.broadcast(MsgQuestion(ChoiceQuestion("Wer hat an der Uhr gedreht?",
+                    Category.HISTORY,
+                    listOf("Rapha", "Aude", "Julian", "Relaxo"),
+                    "Rapha"))) // getNextQuestion()
         }
     }
 
@@ -68,6 +81,8 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
      *
      */
     fun broadcast(msg: Message){
+        serverLog("$msg wird an folgende IP's gesendet")
+        //serverLog(players.values.forEach{ getIpAndPortFromConnection(it.connection as SocketConnection) })
         players.values.forEach{ it.connection.send(msg) }
     }
 
@@ -110,28 +125,35 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
         return "Game(id=$id, gameName='$gameName', maxPlayer=$maxPlayer, open=$isOpen)"
     }
 
-    fun createRanking(): SortedMap<String, Int> {
-        var ranking = sortedMapOf<String, Int>()
+    fun createRanking(): Map<String, Int> {
+        val ranking = hashMapOf<String, Int>()
 
         for (player in players){
             ranking.put(player.key, player.value.score)
         }
-        return ranking
+
+        val rankingSorted = ranking.toList().sortedBy { (_, value) -> value}.toMap()
+
+        return rankingSorted
     }
 
     fun proceed() {
         questionIncome++
-        
+
+
         if(questionIncome < players.size)
             return
 
         questionIncome = 0
-        questions.removeAt(0)
 
         if(questions.size == 0){
             broadcast(MsgRanking(createRanking()))
         }else{
-            broadcast(getNextQuestion())
+            questions.removeAt(0)
+
+            broadcast(MsgQuestion(ChoiceQuestion("Wer hat an der Uhr gedreht?",
+                    Category.AROUND_THE_WORLD,
+                    listOf<String>("Relaxo", "Florian", "Mario", "Aude"), "Relaxo")))//broadcast(getNextQuestion())
         }
     }
 }

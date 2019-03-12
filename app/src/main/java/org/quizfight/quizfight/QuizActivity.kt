@@ -7,11 +7,12 @@ import android.widget.Button
 import kotlinx.android.synthetic.main.activity_quiz.*
 import android.view.View
 import kotlinx.coroutines.*
-import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
+import org.quizfight.common.question.Category
 import org.quizfight.common.question.ChoiceQuestion
-import java.net.Socket
 import java.util.Locale
+import android.widget.TableRow
+import android.widget.TextView
 
 class QuizActivity : CoroutineScope, AppCompatActivity() {
 
@@ -19,7 +20,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     // Use launch{} whenever you want to change UI elements.
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
-    private lateinit var conn : SocketConnection
 
     private var questionCounter: Int = 0
     private var questionCountTotal: Int = 0
@@ -27,9 +27,13 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     private lateinit var currentQuestion: ChoiceQuestion
     private var answerSelected : Boolean = false
 
+
     //Countdown Timer
     val millisInFuture: Long = 21000 // for 20 seconds plus 1 second imprecision
     val countDownInterval: Long = 1000 // sets the countdown interval to 1 second
+
+    val rowList = listOf<TableRow>(table_row_first, table_row_second, table_row_third,
+            table_row_fourth, table_row_fifth, table_row_sixth, table_row_seventh, table_row_eight)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,15 +42,23 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         //sollte auch vom Server gelesen werden
         questionCountTotal = intent.getIntExtra("questionCountTotal", 4)
 
-        launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket("10.0.2.2", 34567),
-                    mapOf(MsgQuestion ::class to { conn, msg -> showNextQuestion((msg as MsgQuestion))} ,
-                            MsgRanking::class to { conn, msg -> showRanking(msg as MsgRanking)} ))
+        val questiontext = intent.getStringExtra("questionText")
+        val correct = intent.getStringExtra("correctChoice")
+        val answers = intent.getStringArrayListExtra("answers")
+        val category = intent.getStringExtra("Category")
 
-        }
+        showNextQuestion(MsgQuestion(ChoiceQuestion(questiontext,
+                Category.valueOf(category) ,
+                listOf<String>(correct, answers[0], answers[1], answers[2]),
+                correct)))
 
-
+        Client.withHandlers(mapOf(
+                MsgQuestion ::class to { _, msg -> showNextQuestion((msg as MsgQuestion))},
+                MsgRanking::class to { _, msg -> showRanking(msg as MsgRanking)},
+                MsgGameInfo::class to { _, msg -> finishQuiz()}
+        ))
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -57,32 +69,40 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     // use = launch {} whenever the function could possibly be called from a non main thread.
     // for example all message handlers call from non main threads!
     fun showNextQuestion(question: MsgQuestion) {
+
         launch() {
+            rowList.forEach({tr -> hideTableRows(tr)})
+            showHide(question_outer_layout)
+            showHide(score_outer_layout)
 
-            //reset all selected buttons
-            radio_group.clearCheck()
+            if (question.question is ChoiceQuestion) {
+                //reset all selected buttons
+                radio_group.clearCheck()
 
-            if (questionCounter < questionCountTotal) {
-                currentQuestion = question.question as ChoiceQuestion
-                var answerList: MutableList<String> = mutableListOf(currentQuestion.correctChoice)
-                answerList.addAll(currentQuestion.choices)
-                answerList.shuffle()
+                if (questionCounter < questionCountTotal) {
+                    currentQuestion = question.question as ChoiceQuestion
+                    var answerList: MutableList<String> = mutableListOf(currentQuestion.correctChoice)
+                    answerList.addAll(currentQuestion.choices)
+                    answerList.shuffle()
 
-                question_text_view.text = currentQuestion.text
-                answer_button1.text = answerList[0]
-                answer_button2.text = answerList[1]
-                answer_button3.text = answerList[2]
-                answer_button4.text = answerList[3]
+                    question_text_view.text = currentQuestion.text
+                    answer_button1.text = answerList[0]
+                    answer_button2.text = answerList[1]
+                    answer_button3.text = answerList[2]
+                    answer_button4.text = answerList[3]
 
-                questionCounter++
+                    questionCounter++
 
-                text_view_question_count.text = ("Question: " + questionCounter
-                        + "/" + questionCountTotal)
+                    text_view_question_count.text = ("Question: " + questionCounter
+                            + "/" + questionCountTotal)
 
-                timer(millisInFuture, countDownInterval).start()
+                    timer(millisInFuture, countDownInterval).start()
 
-            } else {
-                finishQuiz()
+                } else {
+                    finishQuiz()
+                }
+            }else {
+
             }
         }
     }
@@ -95,6 +115,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     fun finishQuiz() {
         finish()
+        Client.reconnectToMaster()
     }
 
 
@@ -105,9 +126,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
             answer = selectedButton.text.toString()
         }
 
-        launch(Dispatchers.Default){
-            conn.send(MsgScore(currentQuestion.evaluate(answer.toString())))
-        }
+        Client.send(MsgScore(currentQuestion.evaluate(answer)))
 
         answerSelected = false
     }
@@ -120,7 +139,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
             override fun onFinish() {
                 sendScore()
-
             }
         }
     }
@@ -131,7 +149,23 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     }
 
     private fun showRanking(msg : MsgRanking) = launch{
+        showHide(question_outer_layout)
+        showHide(score_outer_layout)
 
+        val rowNicknameScoreViews = listOf<Triple<TableRow, TextView, TextView>>(
+                Triple(table_row_first, nickname_view1, score_view1), Triple(table_row_second, nickname_view2, score_view2),
+                Triple(table_row_third, nickname_view3, score_view3), Triple(table_row_fourth, nickname_view4, score_view4),
+                Triple(table_row_fifth, nickname_view4, score_view4), Triple(table_row_sixth, nickname_view6, score_view6),
+                Triple(table_row_seventh, nickname_view7, score_view7), Triple(table_row_eight, nickname_view8, score_view8)
+        )
+        val iter = msg.totalScore.iterator()
+
+        for((index, value) in iter.withIndex()) {
+            showHide(rowNicknameScoreViews[index].first)
+            rowNicknameScoreViews[index].second.text = value.key
+            rowNicknameScoreViews[index].third.text = value.value.toString()
+
+        }
     }
 
     fun showHide(view: View) {
@@ -140,6 +174,15 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                     View.GONE
                 } else {
                     View.VISIBLE
+                }
+    }
+
+    fun hideTableRows(tableRow: TableRow) {
+        tableRow.visibility =
+                if(tableRow.visibility == View.VISIBLE) {
+                    View.GONE
+                } else {
+                    View.GONE
                 }
     }
 }

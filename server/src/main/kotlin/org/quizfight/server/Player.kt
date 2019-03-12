@@ -3,7 +3,6 @@ package org.quizfight.server
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.MsgLeave
-import org.quizfight.common.messages.MsgRanking
 import org.quizfight.common.messages.MsgScore
 import org.quizfight.common.messages.MsgStartGame
 
@@ -18,7 +17,8 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
     val connection = oldConnection.withHandlers(mapOf(
             //TODO: Vote, Timeout, etc
             MsgStartGame::class to { conn, msg -> startGame(conn, msg as MsgStartGame) },
-            MsgScore::class to { conn, msg -> receiveAnswer(conn, msg as MsgScore) }
+            MsgScore::class to { conn, msg -> receiveAnswer(conn, msg as MsgScore) },
+            MsgLeave::class to {conn, msg -> leaveGame(conn, msg as MsgLeave)}
     ))
 
 
@@ -26,6 +26,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
      * Forces the game to send the first question
      */
     private fun startGame(conn: Connection, msgStartGame: MsgStartGame) {
+        serverLog("Ein Spieler hat das Spiel gestartet. Die erste Question wird gesendet\n")
         game.questionIncome = 0
         game.broadcast(game.getNextQuestion())
     }
@@ -48,6 +49,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
      * Calculates score, removes game's first question and forces the game to send the next question
      */
     private fun receiveAnswer(conn: Connection, msgSendAnswer: MsgScore) {
+        serverLog("Antwort erhalten von ${getIpAndPortFromConnection(conn as SocketConnection)} \n")
         addToScore(msgSendAnswer.score)
         game.proceed()
     }

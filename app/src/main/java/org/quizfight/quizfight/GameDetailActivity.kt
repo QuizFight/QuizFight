@@ -12,9 +12,9 @@ import android.view.View
 import android.widget.EditText
 import kotlinx.android.synthetic.main.layout_alert_enter_nickname.*
 import kotlinx.coroutines.launch
+import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
-import org.quizfight.common.messages.MsgGameInfo
-import org.quizfight.common.messages.MsgJoin
+import org.quizfight.common.messages.*
 import java.net.Socket
 
 class GameDetailActivity : CoroutineScope, AppCompatActivity() {
@@ -24,12 +24,15 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     private lateinit var nickname: String
     private var gameName = ""
     private var maxPlayers = 0
+    private var playerCount = 0
 
     private var nicknameEntered: Boolean = false
 
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
-    private lateinit var conn : SocketConnection
+
+    private var context = this
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,13 +49,13 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     }
 
-
     fun updateUi(){
 
         questionCountTotal = intent.getIntExtra("questionCountTotal",0 )
         gameId = intent.getStringExtra("gameId" )
         gameName = intent.getStringExtra("gameName")
         maxPlayers = intent.getIntExtra("maxPlayers", 0 )
+        playerCount= intent.getIntExtra("playerCount",0)
 
         text_view_actual_no_players.text = ""+ maxPlayers
         text_view_actual_no_questions.text = ""+ questionCountTotal
@@ -60,10 +63,9 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     }
 
 
-    fun showAttemptQuizStart(){
+    fun showAttemptQuizStart() = launch{
 
-
-        val intent = Intent(this, AttemptQuizStartActivity::class.java)
+        val intent = Intent(context, AttemptQuizStartActivity::class.java)
 
         //send game's info to AttemptQuizStartActivity
         intent.putExtra("gameId" , gameId)
@@ -73,9 +75,10 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("nickname" , nickname)
         intent.putExtra("createdBy" , "")
         intent.putExtra("startEnable", false)
+        intent.putExtra("playerCount", playerCount)
 
         startActivity(intent)
-        this.finish()
+        context.finish()
     }
 
 
@@ -94,7 +97,10 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
             nickname = editText.text.toString()
             if(!nickname.isNullOrBlank()) {
                 nicknameEntered = true
-                sendJoinMessage()
+                Client.withHandlers(mapOf(
+                        MsgPlayerCount ::class to { _, msg -> }
+                ))
+                Client.send(MsgJoin(gameId, nickname))
                 showAttemptQuizStart()
             } else {
                 displayAlert()
@@ -102,13 +108,5 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         }
 
         builder.create().show()
-    }
-
-    fun sendJoinMessage() {
-        launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket("10.0.2.2", 34567), mapOf() )
-            conn.send(MsgJoin(gameId, nickname))
-
-        }
     }
 }

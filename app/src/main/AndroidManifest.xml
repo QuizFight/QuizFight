@@ -20,9 +20,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".AllGamesActivity" />
-        <activity android:name=".GameDetailActivity" />
-        <activity android:name=".CreateGameActivity" />
-        <activity android:name=".AttemptQuizStartActivity"></activity>
+        <activity android:name=".GameDetailActivity">
+        </activity>
+        <activity android:name="org.quizfight.quizfight.CreateGameActivity" >
+        </activity>
+        <activity android:name="org.quizfight.quizfight.AttemptQuizStartActivity"></activity>
     </application>
 
 </manifest>

@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.quizfight.common.MASTER_PORT
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import java.net.Socket
@@ -28,9 +29,13 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
     private val context = this
     private lateinit var allOpenGames : List<GameData>
 
+    var masterServerIp = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_all_games)
+
+        masterServerIp = intent.getStringExtra("masterServerIP")
 
         sendRequestOpenGame()
 
@@ -46,23 +51,29 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
             intent.putExtra("gameId", selectedGame.id)
             intent.putExtra("questionCountTotal", selectedGame.questionCount)
             intent.putExtra("maxPlayers", selectedGame.maxPlayers)
+            intent.putExtra("playerCount", selectedGame.players.size)
+
+            intent.putExtra("masterServerIP", masterServerIp)
 
             startActivity(intent)
         }
 
         btn_sync.setOnClickListener {
             sendRequestOpenGame()
+            btn_sync.isEnabled = false
         }
 
 
     }
 
-    fun sendRequestOpenGame(){
-        launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket("10.0.2.2", 34567),
-                    mapOf(MsgGameList ::class to { conn, msg -> showGames((msg as MsgGameList).games)}  ))
-            conn.send(MsgRequestOpenGames())
-        }
+    fun sendRequestOpenGame() = launch {
+        Client.setMasterServer(masterServerIp, MASTER_PORT)
+        while (!Client.connected);
+
+        Client.withHandlers(mapOf(
+                MsgGameList ::class to { conn, msg -> showGames((msg as MsgGameList).games)}
+        ))
+        Client.send(MsgRequestOpenGames())
 
     }
 

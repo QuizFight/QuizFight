@@ -4,6 +4,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.quizfight.common.Connection
+import org.quizfight.common.GAME_SERVER_PORT
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import org.quizfight.questionStore.QuestionStore
@@ -23,11 +24,11 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     val socket = ServerSocket(ownPort)
     var games= mutableListOf<Game>()
 
-    val UPDATE_INTERVALL = 8000L
+    val UPDATE_INTERVALL = 4000L
 
     init {
         connectWithMaster()
-        addHardcodedGameForTesting()  // TEMPORARY
+        //addHardcodedGameForTesting()  // TEMPORARY
         sendUpdate()
         start()
     }
@@ -44,7 +45,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         GlobalScope.launch {
             while(true) {
                 masterConn.send(MsgGameList(gameListToGameDataList()))
-                println("Sent this GameList to Master: " + games + "\n")
+                serverLog("Sende diese GameList zum Master: " + games + "\n")
                 delay(UPDATE_INTERVALL)
             }
         }
@@ -103,25 +104,21 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
             val incoming = socket.accept()
             GlobalScope.launch {
                 SocketConnection(incoming, mapOf(
-                        //TODO: implement all handlers for Masterserver communication
                         MsgGameList::class to { conn, msg -> getOpenGames(conn, msg as MsgGameList) },
                         MsgJoin::class to { conn, msg -> joinGame(conn, msg as MsgJoin) },
                         MsgCreateGame::class to { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame) }
                 ))
-                println("Client connected")
             }
         }
     }
 
     private fun connectWithMaster() {
         try {
-            masterConn.send(MsgRegisterGameServer())
+            masterConn.send(MsgRegisterGameServer(GAME_SERVER_PORT))
+            serverLog("Mit Master verbunden\n")
         }catch(socEx: SocketException){
             println("Failed while connecting to Master")
-            return
         }
-
-        println("Connected to Master")
     }
 
     /**
@@ -145,9 +142,10 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
         addNewGame(game)
 
-        val gameData = GameData(id, gameName, maxPlayers, listOf<String>(), questionCount)
+        val gameData = GameData(id, gameName, maxPlayers, listOf<String>(gameCreator), questionCount)
 
-        println("Game erstellt. Die ID ist: ${id}")
+        serverLog("Game erstellt: ${msg.game}")
+        serverLog("Der Game-Creator ist ${gameCreator} und dieser wurde dem Game hinzugefügt")
         conn.send(MsgGameInfo(gameData))
     }
 
@@ -175,18 +173,16 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
      * Adds the Player to a Game
      */
     private fun joinGame(conn: Connection, msgJoinGame: MsgJoin) {
+        serverLog("Join Game Anfrage von ${msgJoinGame.nickname}")
+
         val game = games.find { game -> game.id == msgJoinGame.gameId }
         if (game == null){
+            serverLog("Game ist null!")
             return
         }
         game!!.addPlayer(msgJoinGame.nickname, conn)
 
-        val gameData = gameToGameData(game!!)
-
         serverLog("Spieler ${msgJoinGame.nickname} möchte dem Spiel ${game.gameName} joinen")
-        serverLog("Ihm werden diese GameDaten gesendet: ${gameData}\n")
-
-        conn.send(MsgGameInfo(gameData))
     }
 
 
