@@ -10,7 +10,6 @@ import org.quizfight.common.messages.MsgRanking
 import org.quizfight.common.question.Category
 import org.quizfight.common.question.ChoiceQuestion
 import org.quizfight.common.question.Question
-import java.util.*
 
 /**
  * Game Class. Manages connections to players, asks Questions and calculates the scores
@@ -124,13 +123,16 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
         return "Game(id=$id, gameName='$gameName', maxPlayer=$maxPlayer, open=$isOpen)"
     }
 
-    fun createRanking(): SortedMap<String, Int> {
-        var ranking = sortedMapOf<String, Int>()
+    fun createRanking(): Map<String, Int> {
+        val ranking = hashMapOf<String, Int>()
 
         for (player in players){
             ranking.put(player.key, player.value.score)
         }
-        return ranking
+
+        val rankingSorted = ranking.toList().sortedBy { (_, value) -> value}.toMap()
+
+        return rankingSorted
     }
 
     fun proceed() {

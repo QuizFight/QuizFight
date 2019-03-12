@@ -2,7 +2,6 @@ package org.quizfight.common.messages
 
 import org.quizfight.common.question.Question
 import java.io.Serializable
-import java.util.*
 
 interface Message : Serializable
 
@@ -32,7 +31,7 @@ data class MsgCreateGame(val game : GameRequest, val nickname : String) : Messag
 class MsgStartGame : Message
 data class MsgQuestion(val question : Question<*>) : Message
 data class MsgScore(val score : Int) : Message
-data class MsgRanking(val totalScore : SortedMap<String, Int>) : Message
+data class MsgRanking(val totalScore : Map<String, Int>) : Message
 data class MsgConnectionLost(val name : String) : Message
 data class MsgVote(val waitForPlayer : Boolean, val name : String): Message
 data class MsgWait(val name : String): Message
