@@ -7,6 +7,8 @@ import org.quizfight.common.messages.Message
 import org.quizfight.common.messages.MsgPlayerCount
 import org.quizfight.common.messages.MsgQuestion
 import org.quizfight.common.messages.MsgRanking
+import org.quizfight.common.question.Category
+import org.quizfight.common.question.ChoiceQuestion
 import org.quizfight.common.question.Question
 import java.util.*
 
@@ -64,8 +66,14 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
         }
 
         if(playerCount == maxPlayer) {
+            serverLog("Maximale Spieleranzahl erreicht. Spiel Startet in 3 Sekunden")
+            Thread.sleep(3000)
             isOpen = false
-            this.broadcast(getNextQuestion())
+            serverLog("Die maximale Spieler-Anzahl ist erreicht. Das Spiel startet\n")
+            this.broadcast(MsgQuestion(ChoiceQuestion("Wer hat an der Uhr gedreht?",
+                    Category.HISTORY,
+                    listOf("Rapha", "Aude", "Julian", "Relaxo"),
+                    "Rapha"))) // getNextQuestion()
         }
     }
 
