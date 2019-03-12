@@ -17,7 +17,8 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
     val connection = oldConnection.withHandlers(mapOf(
             //TODO: Vote, Timeout, etc
             MsgStartGame::class to { conn, msg -> startGame(conn, msg as MsgStartGame) },
-            MsgScore::class to { conn, msg -> receiveAnswer(conn, msg as MsgScore) }
+            MsgScore::class to { conn, msg -> receiveAnswer(conn, msg as MsgScore) },
+            MsgLeave::class to {conn, msg -> leaveGame(conn, msg as MsgLeave)}
     ))
 
 
@@ -48,6 +49,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
      * Calculates score, removes game's first question and forces the game to send the next question
      */
     private fun receiveAnswer(conn: Connection, msgSendAnswer: MsgScore) {
+        serverLog("Antwort erhalten von ${getIpAndPortFromConnection(conn as SocketConnection)} \n")
         addToScore(msgSendAnswer.score)
         game.proceed()
     }
