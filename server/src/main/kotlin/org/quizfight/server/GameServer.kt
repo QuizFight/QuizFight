@@ -4,6 +4,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.quizfight.common.Connection
+import org.quizfight.common.GAME_SERVER_PORT
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import org.quizfight.questionStore.QuestionStore
@@ -113,7 +114,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
     private fun connectWithMaster() {
         try {
-            masterConn.send(MsgRegisterGameServer())
+            masterConn.send(MsgRegisterGameServer(GAME_SERVER_PORT))
             serverLog("Mit Master verbunden\n")
         }catch(socEx: SocketException){
             println("Failed while connecting to Master")
