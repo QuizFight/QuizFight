@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.quizfight.common.MASTER_PORT
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import java.net.Socket
@@ -96,7 +97,7 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
             //create Game in Backend
             launch {
-                Client.setMasterServer(masterServerIp, 34567)
+                Client.setMasterServer(masterServerIp, MASTER_PORT)
 
                 while (!Client.connected);
 
