@@ -9,7 +9,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import org.quizfight.common.question.ChoiceQuestion
 import java.util.ArrayList
@@ -23,7 +22,6 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     private var startGameEnable : Boolean = false
 
-    private lateinit var conn : SocketConnection
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
@@ -108,7 +106,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         intent.putExtra("gameId" , gameId)
         intent.putExtra("questionCountTotal" , questionCountTotal)
 
-        //put 1. question
+        //put 1st question
         intent.putExtra("questionText" , question.text)
         intent.putExtra("correctChoice" , question.correctChoice)
         var answers = ArrayList<String>()
