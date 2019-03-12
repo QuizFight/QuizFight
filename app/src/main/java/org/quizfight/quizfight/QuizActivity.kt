@@ -120,7 +120,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     }
 
 
-    fun sendScore() = launch{
+    fun sendScore() {
         var answer: String = " "
         if(answerSelected) {
             val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
@@ -149,24 +149,27 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         text_view_countdown.text = String.format(Locale.getDefault(), "%02d", seconds)
     }
 
-    private fun showRanking(msg : MsgRanking) = launch{
-        showHide(question_outer_layout)
-        showHide(score_outer_layout)
+    private fun showRanking(msg : MsgRanking) {
+        launch{
+            showHide(question_outer_layout)
+            showHide(score_outer_layout)
 
-        val rowNicknameScoreViews = listOf<Triple<TableRow, TextView, TextView>>(
-                Triple(table_row_first, nickname_view1, score_view1), Triple(table_row_second, nickname_view2, score_view2),
-                Triple(table_row_third, nickname_view3, score_view3), Triple(table_row_fourth, nickname_view4, score_view4),
-                Triple(table_row_fifth, nickname_view4, score_view4), Triple(table_row_sixth, nickname_view6, score_view6),
-                Triple(table_row_seventh, nickname_view7, score_view7), Triple(table_row_eight, nickname_view8, score_view8)
-        )
-        val iter = msg.totalScore.iterator()
+            val rowNicknameScoreViews = listOf<Triple<TableRow, TextView, TextView>>(
+                    Triple(table_row_first, nickname_view1, score_view1), Triple(table_row_second, nickname_view2, score_view2),
+                    Triple(table_row_third, nickname_view3, score_view3), Triple(table_row_fourth, nickname_view4, score_view4),
+                    Triple(table_row_fifth, nickname_view4, score_view4), Triple(table_row_sixth, nickname_view6, score_view6),
+                    Triple(table_row_seventh, nickname_view7, score_view7), Triple(table_row_eight, nickname_view8, score_view8)
+            )
+            val iter = msg.totalScore.iterator()
 
-        for((index, value) in iter.withIndex()) {
-            showHide(rowNicknameScoreViews[index].first)
-            rowNicknameScoreViews[index].second.text = value.key
-            rowNicknameScoreViews[index].third.text = value.value.toString()
+            for((index, value) in iter.withIndex()) {
+                showHide(rowNicknameScoreViews[index].first)
+                rowNicknameScoreViews[index].second.text = value.key
+                rowNicknameScoreViews[index].third.text = value.value.toString()
 
+            }
         }
+        Thread.sleep(5000)
     }
 
     fun showHide(view: View) {
