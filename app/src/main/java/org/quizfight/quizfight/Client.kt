@@ -5,7 +5,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.quizfight.common.Connection
-import org.quizfight.common.GAME_SERVER_PORT
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import java.net.Socket
@@ -43,7 +42,7 @@ object Client : CoroutineScope, Connection {
         connection?.close()
         val oldHandlers = connection?.handlers ?: emptyMap()
         val serverData = msg.gameServer
-        val socket = Socket(serverData.ip, GAME_SERVER_PORT)
+        val socket = Socket(serverData.ip, serverData.port)
         connection = SocketConnection(socket, oldHandlers)
 
         // Resend last message that caused transfer
