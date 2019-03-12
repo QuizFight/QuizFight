@@ -16,7 +16,7 @@ enum class Category {
 interface Question<T> : Serializable {
     val text: String
     val category: Category
-    fun evaluate(answer: T): Int
+    fun evaluate(answer: T, usedTime: Int, totalTime: Int): Int
 }
 
 class ChoiceQuestion (
@@ -26,7 +26,14 @@ class ChoiceQuestion (
         val correctChoice: String
 ) : Question<String> {
     //TODO: Impelement
-    override fun evaluate(answer: String) = if (answer == correctChoice ) 100 else 0
+    override fun evaluate(answer: String, usedTime: Int, totalTime: Int):Int {
+        var score:Int = 0
+        if(answer == correctChoice) {
+            return ((totalTime - usedTime) / totalTime * 500) + 500    //Max Score = 1000, min Score = 500
+        } else {
+            return 0
+        }
+    }//= if (answer == correctChoice ) 100 else 0
 }
 
 class GuessQuestion(
@@ -36,9 +43,12 @@ class GuessQuestion(
         val highest: Int,
         val correctValue: Int
 ) : Question<Int> {
-    override fun evaluate(answer: Int): Int {
-        //TODO: Impelement
-        return 9001
+    override fun evaluate(answer: Int, usedTime: Int, totalTime: Int): Int {
+        if( answer <= correctValue) {
+            return (answer - lowest) / (correctValue - lowest) * 1000
+        } else {
+            return (highest - answer) / (highest - correctValue) * 1000
+        }
     }
 }
 
