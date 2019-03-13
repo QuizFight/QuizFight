@@ -11,21 +11,21 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.quizfight.common.messages.*
 import org.quizfight.common.question.ChoiceQuestion
+import org.quizfight.common.question.GuessQuestion
 import java.util.ArrayList
 
 class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
-
-    private var gameId : String = ""
-    private var maxPlayers: Int = 0
-    private var nickname : String = ""
-    private var questionCountTotal = 0
-
-    private var startGameEnable : Boolean = false
 
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
     private val context = this
+
+    private var maxPlayers: Int = 0
+    private var nickname : String = ""
+    private var questionCountTotal = 0
+    private var startGameEnable : Boolean = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +35,6 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
                 mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity(msg as MsgQuestion)},
                         MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
 
-        gameId = intent.getStringExtra("gameId")
         var createdBy = intent.getStringExtra("createdBy")
         nickname = intent.getStringExtra("nickname")
         var gameName = intent.getStringExtra("gameName")
@@ -98,20 +97,20 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
 
     fun showQuizActivity(msg: MsgQuestion) = launch{
-        // Create an Intent to start the AllGamesActivity
 
-        println("connection : question ist da")
+        val intent = Intent(context, QuizActivity::class.java)
+        intent.putExtra("questionCountTotal", questionCountTotal)
+        intent.putExtra("questionText", msg.question.text)
+        intent.putExtra("Category", msg.question.category.name)
 
+        //put 1st question
+
+        //handle ChoiceQuestion
         if(msg.question is ChoiceQuestion) {
 
             val question = msg.question as ChoiceQuestion
 
-            val intent = Intent(context, QuizActivity::class.java)
-            intent.putExtra("gameId", gameId)
-            intent.putExtra("questionCountTotal", questionCountTotal)
-
-            //put 1st question
-            intent.putExtra("questionText", question.text)
+            intent.putExtra("isChoiceQuestion", true)
             intent.putExtra("correctChoice", question.correctChoice)
             var answers = ArrayList<String>()
             answers.add(question.choices[0])
@@ -119,11 +118,21 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
             answers.add(question.choices[2])
 
             intent.putStringArrayListExtra("answers", answers)
-            intent.putExtra("Category", question.category.name)
-
-            startActivity(intent)
-            context.finish()
         }
+
+        //handle GuessQuestion
+        else{
+
+            val question = msg.question as GuessQuestion
+
+            intent.putExtra("isChoiceQuestion", false)
+            intent.putExtra("correctChoice",question.correctValue)
+            intent.putExtra("highest", question.highest)
+            intent.putExtra("lowest", question.lowest)
+        }
+
+        startActivity(intent)
+        context.finish()
     }
 
 

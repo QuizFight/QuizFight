@@ -20,11 +20,8 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
     override val coroutineContext = Dispatchers.Main + job
 
     private var context = this
-
-    var nickname:String = " "
-
-    var masterServerIp = ""
-    private var gameServerIp = ""
+    private var nickname:String = " "
+    private var masterServerIp = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,9 +117,6 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("nickname" , nickname)
         intent.putExtra("createdBy" , nickname)
         intent.putExtra("startEnable", true)
-
-        intent.putExtra("masterServerIP", masterServerIp)
-        intent.putExtra("gameServerIP", gameServerIp)
 
         startActivity(intent)
 
