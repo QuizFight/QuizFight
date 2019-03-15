@@ -100,13 +100,15 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     fun sendScore() = launch{
         var answer: String = " "
+        var timeLeft: Int = 0
         if(answerSelected) {
             val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
             answer = selectedButton.text.toString()
+            timeLeft = text_view_countdown.text.toString().toInt()
         }
 
         launch(Dispatchers.Default){
-            conn.send(MsgScore(currentQuestion.evaluate(answer.toString())))
+            conn.send(MsgScore(currentQuestion.evaluate(answer.toString(), timeLeft, 21)))
         }
 
         answerSelected = false
