@@ -3,6 +3,7 @@ package org.quizfight.quizfight
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.support.v7.app.AlertDialog
 import android.widget.Button
 import kotlinx.android.synthetic.main.activity_quiz.*
 import android.view.View
@@ -195,6 +196,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 }
     }
 
+
     fun showChoiceQuestion(question: ChoiceQuestion){
 
         range.visibility = View.GONE
@@ -219,6 +221,23 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
         range.visibility = View.VISIBLE
         radio_group.visibility = View.GONE
+    }
 
+    fun displayDisconnectedPoll(msg: MsgConnectionLost) {
+        val builder = AlertDialog.Builder(this)
+        val view = layoutInflater.inflate(R.layout.layout_disconnect_poll, null)
+        builder.setView(view)
+
+        builder.setPositiveButton("wait") { _, _ ->
+            Client.send(MsgVote(waitForPlayer = true, name = msg.name))
+
+        }
+
+        builder.setNegativeButton("don't wait") { _, _ ->
+            Client.send(MsgVote(waitForPlayer = false, name = msg.name))
+
+        }
+
+        builder.create().show()
     }
 }
