@@ -14,6 +14,7 @@ import org.quizfight.common.question.ChoiceQuestion
 import java.util.Locale
 import android.widget.TableRow
 import android.widget.TextView
+import org.quizfight.common.question.GuessQuestion
 
 class QuizActivity : CoroutineScope, AppCompatActivity() {
 
@@ -24,8 +25,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     private var questionCounter: Int = 0
     private var questionCountTotal: Int = 0
-
-    private lateinit var currentQuestion: ChoiceQuestion
+    private lateinit var currentQuestion: MsgQuestion
     private var answerSelected : Boolean = false
 
 
@@ -33,31 +33,45 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     val millisInFuture: Long = 21000 // for 20 seconds plus 1 second imprecision
     val countDownInterval: Long = 1000 // sets the countdown interval to 1 second
 
-    val rowList = listOf<TableRow>(table_row_first, table_row_second, table_row_third,
-            table_row_fourth, table_row_fifth, table_row_sixth, table_row_seventh, table_row_eight)
+    private var rowList = listOf<TableRow>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
-        //sollte auch vom Server gelesen werden
+
+        //Display 1st question
         questionCountTotal = intent.getIntExtra("questionCountTotal", 4)
 
         val questiontext = intent.getStringExtra("questionText")
-        val correct = intent.getStringExtra("correctChoice")
-        val answers = intent.getStringArrayListExtra("answers")
         val category = intent.getStringExtra("Category")
+        val isChoicheQuestion = intent.getBooleanExtra("isChoiceQuestion",false)
 
-        showNextQuestion(MsgQuestion(ChoiceQuestion(questiontext,
-                Category.valueOf(category) ,
-                listOf<String>(correct, answers[0], answers[1], answers[2]),
-                correct)))
+        if(isChoicheQuestion){
+            val answers = intent.getStringArrayListExtra("answers")
+            val correct = intent.getStringExtra("correctChoice")
+            showNextQuestion(MsgQuestion(ChoiceQuestion(questiontext,
+                    Category.valueOf(category) ,
+                    listOf<String>(correct, answers[0], answers[1], answers[2]),
+                    correct)))
+        }else{
+            val highest = intent.getIntExtra("highest",100)
+            val lowest = intent.getIntExtra("lowest",0)
+            val correct = intent.getIntExtra("correctchoice",10)
+            showNextQuestion(MsgQuestion(GuessQuestion(questiontext,
+                    Category.valueOf(category), lowest, highest, correct)))
+        }
+
 
         Client.withHandlers(mapOf(
                 MsgQuestion ::class to { _, msg -> showNextQuestion((msg as MsgQuestion))},
                 MsgRanking::class to { _, msg -> showRanking(msg as MsgRanking)},
-                MsgGameInfo::class to { _, msg -> finishQuiz()}
-        ))
+                MsgGameOver::class to { _, msg -> finishQuiz()}
+                ))
+
+        rowList = listOf<TableRow>(table_row_first, table_row_second, table_row_third,
+                table_row_fourth, table_row_fifth, table_row_sixth, table_row_seventh, table_row_eight)
+
     }
 
 
@@ -69,42 +83,28 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     //  = launch {} tells the function to run in the main thread if not stated otherwise
     // use = launch {} whenever the function could possibly be called from a non main thread.
     // for example all message handlers call from non main threads!
-    fun showNextQuestion(question: MsgQuestion) {
+    fun showNextQuestion(question: MsgQuestion) = launch() {
+        rowList.forEach({tr -> hideTableRows(tr)})
+        showHide(question_outer_layout)
+        showHide(score_outer_layout)
 
-        launch() {
-            rowList.forEach({tr -> hideTableRows(tr)})
-            showHide(question_outer_layout)
-            showHide(score_outer_layout)
+        currentQuestion = question
 
+        if (questionCounter < questionCountTotal) {
             if (question.question is ChoiceQuestion) {
-                //reset all selected buttons
-                radio_group.clearCheck()
-
-                if (questionCounter < questionCountTotal) {
-                    currentQuestion = question.question as ChoiceQuestion
-                    var answerList: MutableList<String> = mutableListOf(currentQuestion.correctChoice)
-                    answerList.addAll(currentQuestion.choices)
-                    answerList.shuffle()
-
-                    question_text_view.text = currentQuestion.text
-                    answer_button1.text = answerList[0]
-                    answer_button2.text = answerList[1]
-                    answer_button3.text = answerList[2]
-                    answer_button4.text = answerList[3]
-
-                    questionCounter++
-
-                    text_view_question_count.text = ("Question: " + questionCounter
-                            + "/" + questionCountTotal)
-
-                    timer(millisInFuture, countDownInterval).start()
-
-                } else {
-                    finishQuiz()
-                }
-            }else {
-
+                showChoiceQuestion(question.question as ChoiceQuestion)
+            } else {
+                showGuessQuestion(question.question as GuessQuestion)
             }
+
+            questionCounter++
+
+            text_view_question_count.text = ("Question: " + questionCounter
+                    + "/" + questionCountTotal)
+
+            timer(millisInFuture, countDownInterval).start()
+        }else {
+            finishQuiz()
         }
     }
 
@@ -120,16 +120,22 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     }
 
 
-    fun sendScore() = launch{
-        var answer: String = " "
-        if(answerSelected) {
-            val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
-            answer = selectedButton.text.toString()
+    fun sendScore() {
+        if(currentQuestion.question is ChoiceQuestion){
+            var answer: String = " "
+            if(answerSelected) {
+                val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
+                answer = selectedButton.text.toString()
+            }
+
+            Client.send(MsgScore((currentQuestion.question as ChoiceQuestion).evaluate(answer)))
+
+            answerSelected = false
+
+        }else{
+            Client.send(MsgScore((currentQuestion.question as GuessQuestion).evaluate(10)))
         }
 
-        Client.send(MsgScore(currentQuestion.evaluate(answer)))
-
-        answerSelected = false
     }
 
     private fun timer(millisInFuture: Long, countDownInterval: Long): CountDownTimer  {
@@ -149,24 +155,27 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         text_view_countdown.text = String.format(Locale.getDefault(), "%02d", seconds)
     }
 
-    private fun showRanking(msg : MsgRanking) = launch{
-        showHide(question_outer_layout)
-        showHide(score_outer_layout)
+    private fun showRanking(msg : MsgRanking) {
+        launch{
+            showHide(question_outer_layout)
+            showHide(score_outer_layout)
 
-        val rowNicknameScoreViews = listOf<Triple<TableRow, TextView, TextView>>(
-                Triple(table_row_first, nickname_view1, score_view1), Triple(table_row_second, nickname_view2, score_view2),
-                Triple(table_row_third, nickname_view3, score_view3), Triple(table_row_fourth, nickname_view4, score_view4),
-                Triple(table_row_fifth, nickname_view4, score_view4), Triple(table_row_sixth, nickname_view6, score_view6),
-                Triple(table_row_seventh, nickname_view7, score_view7), Triple(table_row_eight, nickname_view8, score_view8)
-        )
-        val iter = msg.totalScore.iterator()
+            val rowNicknameScoreViews = listOf<Triple<TableRow, TextView, TextView>>(
+                    Triple(table_row_first, nickname_view1, score_view1), Triple(table_row_second, nickname_view2, score_view2),
+                    Triple(table_row_third, nickname_view3, score_view3), Triple(table_row_fourth, nickname_view4, score_view4),
+                    Triple(table_row_fifth, nickname_view4, score_view4), Triple(table_row_sixth, nickname_view6, score_view6),
+                    Triple(table_row_seventh, nickname_view7, score_view7), Triple(table_row_eight, nickname_view8, score_view8)
+            )
+            val iter = msg.totalScore.iterator()
 
-        for((index, value) in iter.withIndex()) {
-            showHide(rowNicknameScoreViews[index].first)
-            rowNicknameScoreViews[index].second.text = value.key
-            rowNicknameScoreViews[index].third.text = value.value.toString()
+            for((index, value) in iter.withIndex()) {
+                showHide(rowNicknameScoreViews[index].first)
+                rowNicknameScoreViews[index].second.text = value.key
+                rowNicknameScoreViews[index].third.text = value.value.toString()
 
+            }
         }
+        Thread.sleep(5000)
     }
 
     fun showHide(view: View) {
@@ -185,6 +194,33 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 } else {
                     View.GONE
                 }
+    }
+
+
+    fun showChoiceQuestion(question: ChoiceQuestion){
+
+        range.visibility = View.GONE
+        radio_group.visibility = View.VISIBLE
+
+        //reset all selected buttons
+        radio_group.clearCheck()
+
+        var answerList: MutableList<String> = mutableListOf(question.correctChoice)
+        answerList.addAll(question.choices)
+        answerList.shuffle()
+
+        question_text_view.text = question.text
+        answer_button1.text = answerList[0]
+        answer_button2.text = answerList[1]
+        answer_button3.text = answerList[2]
+        answer_button4.text = answerList[3]
+
+    }
+
+    fun showGuessQuestion(question: GuessQuestion){
+
+        range.visibility = View.VISIBLE
+        radio_group.visibility = View.GONE
     }
 
     fun displayDisconnectedPoll(msg: MsgConnectionLost) {

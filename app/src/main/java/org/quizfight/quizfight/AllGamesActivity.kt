@@ -11,9 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.quizfight.common.MASTER_PORT
-import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
-import java.net.Socket
 
 /**
  * This activity allows the user to join a game
@@ -24,7 +22,6 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
 
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
-    private lateinit var conn : SocketConnection
 
     private val context = this
     private lateinit var allOpenGames : List<GameData>

@@ -20,7 +20,7 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
     private val MSG_GAME_FULL = "The Game is already full!"
 
 
-    var questionIncome: Int = 0
+    var answersIncome: Int = 0
     var players: MutableMap<String, Player> = mutableMapOf<String, Player>()
 
     var playerCount = 0
@@ -138,17 +138,17 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
     }
 
     fun proceed() {
-        questionIncome++
+        answersIncome++
 
-
-        if(questionIncome < players.size)
+        if(answersIncome < players.size)
             return
 
-        questionIncome = 0
+        answersIncome = 0
 
-        if(questions.size == 0){
-            broadcast(MsgRanking(createRanking()))
-        }else{
+        broadcast(MsgRanking(createRanking()))
+
+        if(questions.size > 0){
+
             questions.removeAt(0)
 
             broadcast(MsgQuestion(ChoiceQuestion("Wer hat an der Uhr gedreht?",

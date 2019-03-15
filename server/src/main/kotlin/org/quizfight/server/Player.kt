@@ -27,7 +27,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
      */
     private fun startGame(conn: Connection, msgStartGame: MsgStartGame) {
         serverLog("Ein Spieler hat das Spiel gestartet. Die erste Question wird gesendet\n")
-        game.questionIncome = 0
+        game.answersIncome = 0
         game.broadcast(game.getNextQuestion())
     }
 

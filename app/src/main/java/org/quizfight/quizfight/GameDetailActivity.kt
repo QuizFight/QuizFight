@@ -10,14 +10,15 @@ import kotlinx.coroutines.Job
 import android.support.v7.app.AlertDialog
 import android.view.View
 import android.widget.EditText
-import kotlinx.android.synthetic.main.layout_alert_enter_nickname.*
 import kotlinx.coroutines.launch
-import org.quizfight.common.Connection
-import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
-import java.net.Socket
 
 class GameDetailActivity : CoroutineScope, AppCompatActivity() {
+
+    private var job = Job()
+    override val coroutineContext = Dispatchers.Main + job
+
+    private var context = this
 
     private var questionCountTotal : Int = 5
     private var gameId : String = ""
@@ -27,11 +28,6 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     private var playerCount = 0
 
     private var nicknameEntered: Boolean = false
-
-    private var job = Job()
-    override val coroutineContext = Dispatchers.Main + job
-
-    private var context = this
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
