@@ -50,7 +50,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
                 //Display 1st question
         questionCountTotal = intent.getIntExtra("questionCountTotal", 4)
-        progress_question.max = questionCountTotal
+
+        progress_question.max = millisInFuture.toInt()
 
         val questiontext = intent.getStringExtra("questionText")
         val category = intent.getStringExtra("Category")
@@ -110,9 +111,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
             questionCounter++
 
-          /*  text_view_question_count.text = ("Question: " + questionCounter
-                    + "/" + questionCountTotal)*/
-            progress_question.setProgress(questionCounter)
+            text_view_question_count.text = ("Question: " + questionCounter
+                    + "/" + questionCountTotal)
 
             timer.cancel()
             timer = timer(millisInFuture, countDownInterval)
@@ -124,15 +124,22 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
 
     fun checkAnswer(view: View) = launch {
-        val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
-        choiceQuestionAnswer = selectedButton.text.toString()
+        val selectedButton: Button = view as Button
+        choiceQuestionAnswer = view.text.toString()
         sendScore()
         if (choiceQuestionAnswer == (currentQuestion.question as ChoiceQuestion).correctChoice) {
-            selectedButton.setTextColor(Color.GREEN)
+            selectedButton.setBackgroundColor(Color.GREEN)
         } else {
-            selectedButton.setTextColor(Color.RED)
+            selectedButton.setBackgroundColor(Color.RED)
         }
-        radio_group.isEnabled = false
+
+        //disable Buttons
+        btn_answer1.isEnabled = false
+        btn_answer2.isEnabled = false
+        btn_answer3.isEnabled = false
+        btn_answer3.isEnabled = false
+
+        Thread.sleep(2000)
     }
 
 
@@ -163,7 +170,9 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     private fun timer(millisInFuture: Long, countDownInterval: Long): CountDownTimer  {
         return object: CountDownTimer(millisInFuture, countDownInterval) {
             override fun onTick(millisUntilFinished: Long) {
-                updateCountdownText(millisUntilFinished)
+                //updateCountdownText(millisUntilFinished)
+                progress_question.progress = millisInFuture.toInt() - millisUntilFinished.toInt()
+
             }
 
             override fun onFinish() {
@@ -226,32 +235,36 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     fun showChoiceQuestion(question: ChoiceQuestion){
 
         guess_container.visibility = View.GONE
-        radio_group.visibility = View.VISIBLE
+        answer_container.visibility = View.VISIBLE
 
-        //reset all selected buttons
-        radio_group.clearCheck()
+        //reset all buttons
+        btn_answer1.setBackgroundColor(Color.WHITE)
+        btn_answer2.setBackgroundColor(Color.WHITE)
+        btn_answer3.setBackgroundColor(Color.WHITE)
+        btn_answer4.setBackgroundColor(Color.WHITE)
 
-        answer_button1.setTextColor(Color.WHITE)
-        answer_button2.setTextColor(Color.WHITE)
-        answer_button3.setTextColor(Color.WHITE)
-        answer_button4.setTextColor(Color.WHITE)
+        btn_answer1.isEnabled = true
+        btn_answer2.isEnabled = true
+        btn_answer3.isEnabled = true
+        btn_answer4.isEnabled = true
 
         var answerList: MutableList<String> = mutableListOf(question.correctChoice)
         answerList.addAll(question.choices)
         answerList.shuffle()
 
         question_text_view.text = question.text
-        answer_button1.text = answerList[0]
-        answer_button2.text = answerList[1]
-        answer_button3.text = answerList[2]
-        answer_button4.text = answerList[3]
+        btn_answer1.text = answerList[0]
+        btn_answer2.text = answerList[1]
+        btn_answer3.text = answerList[2]
+        btn_answer4.text = answerList[4]
+
 
     }
 
     fun showGuessQuestion(question: GuessQuestion){
 
         guess_container.visibility = View.VISIBLE
-        radio_group.visibility = View.GONE
+        answer_container.visibility = View.GONE
 
         question_text_view.text = question.text
         tv_lowest.text = "" + question.lowest
@@ -259,6 +272,21 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
         seekbar.min = question.lowest
         seekbar.max = question.highest
+        seekbar.progress = question.highest/2
+
+        tv_answer.setTextColor(Color.WHITE)
+        btn_ok.visibility = View.GONE
+        btn_ok.isEnabled = true
+
+        btn_ok.setOnClickListener {
+            sendScore()
+            btn_ok.isEnabled = false
+            if(guessQuestionAnswer == question.correctValue){
+                tv_answer.setTextColor(Color.GREEN)
+            }else{
+                tv_answer.setTextColor(Color.RED)
+            }
+        }
 
         seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
 
@@ -270,6 +298,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
+                btn_ok.visibility = View.VISIBLE
+
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {

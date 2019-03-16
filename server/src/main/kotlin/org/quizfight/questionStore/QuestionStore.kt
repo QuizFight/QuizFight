@@ -1,6 +1,5 @@
 package org.quizfight.questionStore
 
-import org.quizfight.common.question.GuessQuestion
 import org.quizfight.common.question.Question
 import org.quizfight.parser.XmlParser
 
