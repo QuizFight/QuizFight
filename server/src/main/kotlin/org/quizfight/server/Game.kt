@@ -22,10 +22,53 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int,
     var answersIncome: Int = 0
     var players: MutableMap<String, Player> = mutableMapOf<String, Player>()
 
+
+    var votes = mutableMapOf<Boolean, Int>((false to 0), (true to 0))
+    var timerForWaiting = 30  // seconds
+    var playerIsBack = false
+
     var playerCount = 0
 
     var isOpen: Boolean = true
     var TERMINATED = false
+
+
+    fun takeVote(vote: Boolean){
+        var count = votes.get(vote)!!
+        votes.put(vote, count + 1)
+
+        if(votes.get(false)!! + votes.get(true)!! == playerCount - 1){
+            evaluateVoting()
+        }
+    }
+
+    private fun evaluateVoting() {
+        serverLog("Voting wird jetzt ausgewertet\n")
+        if(votes.get(true)!! >= votes.get(false)!!){
+            waitForPlayer()
+        }
+
+        broadcast(getNextQuestion())
+    }
+
+    private fun waitForPlayer() {
+        while(timerForWaiting > 0){
+            serverLog("Game $gameName wartet noch $timerForWaiting auf den Spieler")
+
+            Thread.sleep(1000)
+            timerForWaiting--
+
+            if(playerIsBack){
+                resetVotingLogic()
+                break
+            }
+        }
+    }
+
+    private fun resetVotingLogic(){
+        votes = mutableMapOf<Boolean, Int>((false to 0), (true to 0))
+        playerIsBack = false
+    }
 
     /**
      * Sets the max number of players. Must be between 2 and 8
