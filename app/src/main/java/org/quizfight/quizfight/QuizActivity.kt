@@ -1,5 +1,6 @@
 package org.quizfight.quizfight
 
+import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -12,12 +13,11 @@ import kotlinx.coroutines.*
 import org.quizfight.common.messages.*
 import org.quizfight.common.question.Category
 import org.quizfight.common.question.ChoiceQuestion
-import java.util.Locale
 import android.widget.TableRow
 import android.widget.TextView
 import org.quizfight.common.question.GuessQuestion
 import android.view.animation.AnimationUtils
-
+import java.util.*
 
 
 class QuizActivity : CoroutineScope, AppCompatActivity() {
@@ -30,16 +30,15 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     private var questionCounter: Int = 0
     private var questionCountTotal: Int = 0
     private lateinit var currentQuestion: MsgQuestion
-    private var answerSelected : Boolean = false
     private var choiceQuestionAnswer = ""
     private var guessQuestionAnswer : Int = 0
     private var nickname :String = ""
     private var finalScore : Int = 0
 
-val context = this
     //Countdown Timer
-    val millisInFuture: Long = 21000 // for 20 seconds plus 1 second imprecision
+    var millisInFuture: Long = 21000 // for 20 seconds plus 1 second imprecision
     val countDownInterval: Long = 1000 // sets the countdown interval to 1 second
+    lateinit var timer : CountDownTimer
 
     private var rowList = listOf<TableRow>()
 
@@ -51,6 +50,7 @@ val context = this
 
                 //Display 1st question
         questionCountTotal = intent.getIntExtra("questionCountTotal", 4)
+        progress_question.max = questionCountTotal
 
         val questiontext = intent.getStringExtra("questionText")
         val category = intent.getStringExtra("Category")
@@ -82,6 +82,7 @@ val context = this
         rowList = listOf<TableRow>(table_row_first, table_row_second, table_row_third,
                 table_row_fourth, table_row_fifth, table_row_sixth, table_row_seventh, table_row_eight)
 
+        timer = timer(millisInFuture, countDownInterval)
     }
 
 
@@ -109,18 +110,29 @@ val context = this
 
             questionCounter++
 
-            text_view_question_count.text = ("Question: " + questionCounter
-                    + "/" + questionCountTotal)
+          /*  text_view_question_count.text = ("Question: " + questionCounter
+                    + "/" + questionCountTotal)*/
+            progress_question.setProgress(questionCounter)
 
-            timer(millisInFuture, countDownInterval).start()
+            timer.cancel()
+            timer = timer(millisInFuture, countDownInterval)
+            timer.start()
         }else {
             finishQuiz()
         }
     }
 
-    //ob user geantwortet hat oder nicht
-    fun checkAnswer(view: View) {
-        answerSelected = true
+
+    fun checkAnswer(view: View) = launch {
+        val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
+        choiceQuestionAnswer = selectedButton.text.toString()
+        sendScore()
+        if (choiceQuestionAnswer == (currentQuestion.question as ChoiceQuestion).correctChoice) {
+            selectedButton.setTextColor(Color.GREEN)
+        } else {
+            selectedButton.setTextColor(Color.RED)
+        }
+        radio_group.isEnabled = false
     }
 
 
@@ -140,15 +152,7 @@ val context = this
 
     fun sendScore() {
         if(currentQuestion.question is ChoiceQuestion){
-
-            if(answerSelected) {
-                val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
-                choiceQuestionAnswer = selectedButton.text.toString()
-            }
-
             Client.send(MsgScore((currentQuestion.question as ChoiceQuestion).evaluate(choiceQuestionAnswer)))
-
-            answerSelected = false
 
         }else{
             Client.send(MsgScore((currentQuestion.question as GuessQuestion).evaluate(guessQuestionAnswer)))
@@ -165,6 +169,7 @@ val context = this
             override fun onFinish() {
                 sendScore()
             }
+
         }
     }
 
@@ -225,6 +230,11 @@ val context = this
 
         //reset all selected buttons
         radio_group.clearCheck()
+
+        answer_button1.setTextColor(Color.WHITE)
+        answer_button2.setTextColor(Color.WHITE)
+        answer_button3.setTextColor(Color.WHITE)
+        answer_button4.setTextColor(Color.WHITE)
 
         var answerList: MutableList<String> = mutableListOf(question.correctChoice)
         answerList.addAll(question.choices)

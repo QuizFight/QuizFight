@@ -26,7 +26,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Question 1/5"
-                android:textColor="#ffffff" />
+                android:textColor="#ffffff"
+                android:visibility="gone"/>
+
+            <ProgressBar
+                style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Horizontal"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:progressTint="@color/colorPrimary"
+                android:id="@+id/progress_question"/>
 
             <View
                 android:id="@+id/view3"
@@ -72,7 +80,8 @@
                 android:layout_height="wrap_content"
                 android:buttonTint="@color/colorPrimary"
                 android:text="RadioButton"
-                android:textColor="#ffffff" />
+                android:textColor="#ffffff"
+                android:onClick="checkAnswer"/>
 
             <RadioButton
                 android:id="@+id/answer_button2"
@@ -80,7 +89,8 @@
                 android:layout_height="wrap_content"
                 android:buttonTint="@color/colorPrimary"
                 android:text="RadioButton"
-                android:textColor="#ffffff" />
+                android:textColor="#ffffff"
+                android:onClick="checkAnswer"/>
 
             <RadioButton
                 android:id="@+id/answer_button3"
@@ -88,7 +98,8 @@
                 android:layout_height="wrap_content"
                 android:buttonTint="@color/colorPrimary"
                 android:text="RadioButton"
-                android:textColor="#ffffff" />
+                android:textColor="#ffffff"
+                android:onClick="checkAnswer"/>
 
             <RadioButton
                 android:id="@+id/answer_button4"
@@ -96,7 +107,8 @@
                 android:layout_height="wrap_content"
                 android:buttonTint="@color/colorPrimary"
                 android:text="RadioButton"
-                android:textColor="#ffffff" />
+                android:textColor="#ffffff"
+                android:onClick="checkAnswer"/>
         </RadioGroup>
 
         <LinearLayout
