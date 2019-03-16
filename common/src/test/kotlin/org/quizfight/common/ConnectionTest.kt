@@ -1,6 +1,8 @@
 package org.quizfight.common
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
@@ -11,6 +13,7 @@ import java.net.ServerSocket
 import java.net.Socket
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 data class StringMessage(val string: String) : Message
 
@@ -43,5 +46,37 @@ class ConnectionTest {
         Assertions.assertTimeoutPreemptively(Duration.ofSeconds(5)) {
             while (!valueReceived.get() || !job.isCompleted);
         }
+    }
+
+    @Test
+    @DisplayName("Test changing handlers")
+    fun withWHandlersTest() {
+        val trigger = AtomicBoolean(false)
+        val job = GlobalScope.launch(Dispatchers.IO) {
+            val server = ServerSocket(34567)
+            val client = SocketConnection(server.accept(), emptyMap())
+
+            while (!trigger.get());
+            client.send(StringMessage(""))
+            client.send(StringMessage(""))
+            client.close()
+        }
+
+        val oldHandlersRaised = AtomicInteger(0)
+        val newHandlersRaised = AtomicInteger(0)
+
+        SocketConnection(Socket("127.0.0.1", 34567), mapOf(
+            StringMessage::class to { conn, _ ->
+                oldHandlersRaised.incrementAndGet()
+                conn.withHandlers(mapOf(
+                    StringMessage::class to { _, _ -> newHandlersRaised.incrementAndGet(); conn.close() }
+                ))
+            }
+        ))
+
+        trigger.set(true)
+        while(!job.isCompleted);
+        Assertions.assertEquals(1, oldHandlersRaised.get(), "Old handlers did not get removed")
+        Assertions.assertEquals(1, newHandlersRaised.get(), "New handlers were not raised")
     }
 }
