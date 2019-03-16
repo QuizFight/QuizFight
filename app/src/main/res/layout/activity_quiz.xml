@@ -99,16 +99,58 @@
                 android:textColor="#ffffff" />
         </RadioGroup>
 
-        <org.florescu.android.rangeseekbar.RangeSeekBar
-            android:id="@+id/range"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="visible"
-            rsb:absoluteMaxValue="150"
-            rsb:absoluteMinValue="20"
-            rsb:singleThumb="false"
-            rsb:barHeight="10dp"
-            rsb:textAboveThumbsColor="@color/colorPrimary" />
+            android:orientation="vertical"
+            android:id="@+id/guess_container"
+            android:layout_marginTop="100dp"
+            android:layout_gravity="center">
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progressTint="@color/colorPrimary"
+                android:progressBackgroundTint="#9da0a5"
+                android:thumbTint="@color/colorPrimary"
+                android:id="@+id/seekbar"/>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="#fff"
+                    android:id="@+id/tv_lowest"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="1000"
+                    android:layout_marginLeft="200dp"
+                    android:textColor="#fff"
+                    android:id="@+id/tv_highest"
+                    android:textSize="16sp"
+                    android:textAlignment="textEnd"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_answer"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:text="answer"
+                android:textColor="#fff"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -130,11 +172,22 @@
             android:textColor="@color/colorPrimary"
             android:textSize="30dp" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimary"
+            android:layout_gravity="center"
+            android:layout_marginBottom="20dp"
+            android:textSize="17sp"
+            android:visibility="gone"
+            android:id="@+id/tv_your_score"/>
+
         <TableLayout
             android:id="@+id/score_table_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/background">
+            android:background="@color/background"
+            android:layout_marginRight="10dp">
 
             <TableRow
                 android:id="@+id/table_row_first"

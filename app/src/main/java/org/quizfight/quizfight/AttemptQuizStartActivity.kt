@@ -99,6 +99,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     fun showQuizActivity(msg: MsgQuestion) = launch{
 
         val intent = Intent(context, QuizActivity::class.java)
+        intent.putExtra("nickname", nickname)
         intent.putExtra("questionCountTotal", questionCountTotal)
         intent.putExtra("questionText", msg.question.text)
         intent.putExtra("Category", msg.question.category.name)

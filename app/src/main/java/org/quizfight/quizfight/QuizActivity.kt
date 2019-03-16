@@ -7,6 +7,7 @@ import android.support.v7.app.AlertDialog
 import android.widget.Button
 import kotlinx.android.synthetic.main.activity_quiz.*
 import android.view.View
+import android.widget.SeekBar
 import kotlinx.coroutines.*
 import org.quizfight.common.messages.*
 import org.quizfight.common.question.Category
@@ -15,6 +16,9 @@ import java.util.Locale
 import android.widget.TableRow
 import android.widget.TextView
 import org.quizfight.common.question.GuessQuestion
+import android.view.animation.AnimationUtils
+
+
 
 class QuizActivity : CoroutineScope, AppCompatActivity() {
 
@@ -27,8 +31,12 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     private var questionCountTotal: Int = 0
     private lateinit var currentQuestion: MsgQuestion
     private var answerSelected : Boolean = false
+    private var choiceQuestionAnswer = ""
+    private var guessQuestionAnswer : Int = 0
+    private var nickname :String = ""
+    private var finalScore : Int = 0
 
-
+val context = this
     //Countdown Timer
     val millisInFuture: Long = 21000 // for 20 seconds plus 1 second imprecision
     val countDownInterval: Long = 1000 // sets the countdown interval to 1 second
@@ -39,8 +47,9 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
+        nickname = intent.getStringExtra("nickname")
 
-        //Display 1st question
+                //Display 1st question
         questionCountTotal = intent.getIntExtra("questionCountTotal", 4)
 
         val questiontext = intent.getStringExtra("questionText")
@@ -66,7 +75,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         Client.withHandlers(mapOf(
                 MsgQuestion ::class to { _, msg -> showNextQuestion((msg as MsgQuestion))},
                 MsgRanking::class to { _, msg -> showRanking(msg as MsgRanking)},
-                MsgGameOver::class to { _, msg -> finishQuiz()}
+                MsgGameOver::class to { _, msg -> finishQuiz()},
+                MsgConnectionLost::class to { _, msg -> displayDisconnectedPoll(msg as MsgConnectionLost)}
                 ))
 
         rowList = listOf<TableRow>(table_row_first, table_row_second, table_row_third,
@@ -115,25 +125,33 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
 
     fun finishQuiz() {
-        finish()
+        score_titel_view.text = "GAME OVER"
+        tv_your_score.visibility = View.VISIBLE
+        tv_your_score.text = "Your score: $finalScore"
+        val a = AnimationUtils.loadAnimation(this, R.anim.anim_game_over)
+        a.reset()
+
+        score_titel_view.clearAnimation()
+        score_titel_view.startAnimation(a)
+
         Client.reconnectToMaster()
     }
 
 
     fun sendScore() {
         if(currentQuestion.question is ChoiceQuestion){
-            var answer: String = " "
+
             if(answerSelected) {
                 val selectedButton: Button = findViewById(radio_group.checkedRadioButtonId)
-                answer = selectedButton.text.toString()
+                choiceQuestionAnswer = selectedButton.text.toString()
             }
 
-            Client.send(MsgScore((currentQuestion.question as ChoiceQuestion).evaluate(answer)))
+            Client.send(MsgScore((currentQuestion.question as ChoiceQuestion).evaluate(choiceQuestionAnswer)))
 
             answerSelected = false
 
         }else{
-            Client.send(MsgScore((currentQuestion.question as GuessQuestion).evaluate(10)))
+            Client.send(MsgScore((currentQuestion.question as GuessQuestion).evaluate(guessQuestionAnswer)))
         }
 
     }
@@ -173,6 +191,9 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 rowNicknameScoreViews[index].second.text = value.key
                 rowNicknameScoreViews[index].third.text = value.value.toString()
 
+                if(value.key.equals(nickname)){
+                    finalScore = value.value
+                }
             }
         }
         Thread.sleep(5000)
@@ -199,7 +220,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     fun showChoiceQuestion(question: ChoiceQuestion){
 
-        range.visibility = View.GONE
+        guess_container.visibility = View.GONE
         radio_group.visibility = View.VISIBLE
 
         //reset all selected buttons
@@ -219,8 +240,32 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     fun showGuessQuestion(question: GuessQuestion){
 
-        range.visibility = View.VISIBLE
+        guess_container.visibility = View.VISIBLE
         radio_group.visibility = View.GONE
+
+        question_text_view.text = question.text
+        tv_lowest.text = "" + question.lowest
+        tv_highest.text = "" + question.highest
+
+        seekbar.min = question.lowest
+        seekbar.max = question.highest
+
+        seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+
+            override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
+                // Display the current progress of SeekBar
+                tv_answer.text = "Your answer : $i"
+                guessQuestionAnswer = i
+
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+            }
+        })
+
     }
 
     fun displayDisconnectedPoll(msg: MsgConnectionLost) {

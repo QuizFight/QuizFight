@@ -12,6 +12,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.quizfight.common.MASTER_PORT
 import org.quizfight.common.messages.*
+import android.support.v4.widget.SwipeRefreshLayout
+
+
 
 /**
  * This activity allows the user to join a game
@@ -33,6 +36,7 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
         setContentView(R.layout.activity_all_games)
 
         masterServerIp = intent.getStringExtra("masterServerIP")
+        Client.setMasterServer(masterServerIp, MASTER_PORT)
 
         sendRequestOpenGame()
 
@@ -57,16 +61,25 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
 
         btn_sync.setOnClickListener {
             sendRequestOpenGame()
-            btn_sync.isEnabled = false
+            btn_sync.visibility = View.INVISIBLE
         }
+
+
+        //add refresh swipe
+
+        swiperefresh.setOnRefreshListener(object : SwipeRefreshLayout.OnRefreshListener {
+            override fun onRefresh() {
+                //Here you can update your data from internet or from local SQLite data
+                sendRequestOpenGame()
+                swiperefresh.setRefreshing(false)
+            }
+        })
 
 
     }
 
-    fun sendRequestOpenGame() = launch {
-        Client.setMasterServer(masterServerIp, MASTER_PORT)
+    fun sendRequestOpenGame() {
         while (!Client.connected);
-
         Client.withHandlers(mapOf(
                 MsgGameList ::class to { conn, msg -> showGames((msg as MsgGameList).games)}
         ))
@@ -97,7 +110,7 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
                 android.R.layout.simple_list_item_1,
                 gameNameList
         )
-        all_games_container.adapter = adapter;
+        all_games_container.adapter = adapter
     }
 
 
