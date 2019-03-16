@@ -32,8 +32,6 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
         btn_create_game.setOnClickListener {
             validateForm()
         }
-
-
     }
 
 
@@ -58,7 +56,8 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
             ed_number_question.setError(getString(R.string.required))
             focusView = ed_number_question
             cancel = true
-        }else if(ed_number_question.text.toString().toInt() > 20){
+        }else if(ed_number_question.text.toString().toInt() > 20 ||
+                ed_number_question.text.toString().toInt() < 1){
             ed_number_question.setError(getString(R.string.no_question_not_correct))
             focusView = ed_number_question
             cancel = true
@@ -67,6 +66,11 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
         if(TextUtils.isEmpty(ed_number_player.text)){
             ed_number_player.setError(getString(R.string.required))
             focusView = ed_number_player
+            cancel = true
+        }else if(ed_number_player.text.toString().toInt() > 8 ||
+                ed_number_player.text.toString().toInt() < 2){
+            ed_number_player.setError(getString(R.string.no_player_not_correct))
+            focusView = ed_number_question
             cancel = true
         }
 
@@ -123,6 +127,7 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
         context.finish()
 
     }
+
 
 
 }
