@@ -129,7 +129,7 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
         val ranking = hashMapOf<String, Int>()
 
         for (player in players){
-            ranking.put(player.key, player.value.score)
+            ranking.put(player.value.name, player.value.score)
         }
 
         val rankingSorted = ranking.toList().sortedBy { (_, value) -> value}.toMap()
@@ -151,9 +151,7 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
 
             questions.removeAt(0)
 
-            broadcast(MsgQuestion(ChoiceQuestion("Wer hat an der Uhr gedreht?",
-                    Category.AROUND_THE_WORLD,
-                    listOf<String>("Relaxo", "Florian", "Mario", "Aude"), "Relaxo")))//broadcast(getNextQuestion())
+            broadcast(getNextQuestion())
         }
     }
 }
