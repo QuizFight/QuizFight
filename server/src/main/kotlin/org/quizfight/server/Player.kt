@@ -24,7 +24,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
     ))
 
     private fun receiveVoteOrNot(conn: Connection, msgVote: MsgVote) {
-        game.takeVote(msgVote.waitForPlayer)
+        game.voting.takeVote(msgVote.waitForPlayer)
     }
 
 
