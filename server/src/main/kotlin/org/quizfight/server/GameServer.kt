@@ -23,7 +23,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     val socket = ServerSocket(ownPort)
     var games= mutableListOf<Game>()
 
-    val UPDATE_INTERVALL = 8000L
+    val UPDATE_INTERVALL = 2000L
 
     init {
         connectWithMaster()
@@ -32,11 +32,12 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         start()
     }
 
-    private fun addHardcodedGameForTesting(){
-        games.add(Game("1", "TestGame 1",8,
+    fun addHardcodedGameForTesting(){
+       games.add(Game("1", "TestGame 1",8,
                 questionStore.getQuestionsForGame(5).toMutableList()))
         games.add(Game("2", "TestGame 2",5,
                 questionStore.getQuestionsForGame(9).toMutableList()))
+
     }
 
 

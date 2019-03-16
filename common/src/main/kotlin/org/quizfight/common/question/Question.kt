@@ -27,9 +27,10 @@ class ChoiceQuestion (
 ) : Question<String> {
     //TODO: Impelement
     override fun evaluate(answer: String, usedTime: Int, totalTime: Int):Int {
-        var score:Int = 0
+        var score:Double = 0.0
         if(answer == correctChoice) {
-            return ((totalTime - usedTime) / totalTime * 500) + 500    //Max Score = 1000, min Score = 500
+            score= ((totalTime.toDouble() - usedTime.toDouble()) / totalTime.toDouble() * 500) + 500    //Max Score = 1000, min Score = 500
+            return score.toInt()
         } else {
             return 0
         }
@@ -44,10 +45,16 @@ class GuessQuestion(
         val correctValue: Int
 ) : Question<Int> {
     override fun evaluate(answer: Int, usedTime: Int, totalTime: Int): Int {
-        if( answer <= correctValue) {
-            return (answer - lowest) / (correctValue - lowest) * 1000
+        var score:Double = 0.0
+        if(answer == correctValue) {
+            return 1000
+        }
+        if( answer < correctValue) {
+            score = (answer - lowest).toDouble() / (correctValue - lowest).toDouble() * 1000
+            return score.toInt()
         } else {
-            return (highest - answer) / (highest - correctValue) * 1000
+            score = (highest - answer).toDouble() / (highest - correctValue).toDouble() * 1000
+            return score.toInt()
         }
     }
 }
