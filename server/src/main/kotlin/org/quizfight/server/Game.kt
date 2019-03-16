@@ -3,10 +3,7 @@ package org.quizfight.server
 //import java.util.*
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
-import org.quizfight.common.messages.Message
-import org.quizfight.common.messages.MsgPlayerCount
-import org.quizfight.common.messages.MsgQuestion
-import org.quizfight.common.messages.MsgRanking
+import org.quizfight.common.messages.*
 import org.quizfight.common.question.Question
 
 /**
@@ -192,6 +189,7 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int,
         if(questions.size > 0){
             broadcast(getNextQuestion())
         }else{
+            broadcast(MsgGameOver())
             terminateGame()
         }
     }
