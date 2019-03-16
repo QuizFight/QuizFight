@@ -28,22 +28,15 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
     init {
         connectWithMaster()
-        //addHardcodedGameForTesting()  // TEMPORARY
         sendUpdate()
         start()
-    }
-
-    private fun addHardcodedGameForTesting(){
-        games.add(Game("1", "TestGame 1",8,
-                questionStore.getQuestionsForGame(5).toMutableList()))
-        games.add(Game("2", "TestGame 2",5,
-                questionStore.getQuestionsForGame(9).toMutableList()))
     }
 
 
     private fun sendUpdate(){
         GlobalScope.launch {
             while(true) {
+                deleteTerminatedGames()
                 masterConn.send(MsgGameList(gameListToGameDataList()))
                 serverLog("Sende diese GameList zum Master: " + games + "\n")
                 delay(UPDATE_INTERVALL)
@@ -51,6 +44,15 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         }
     }
 
+    private fun deleteTerminatedGames() {
+        try{
+            games.forEach { if (it.TERMINATED) { games.remove(it) }}
+        }catch(ex: ConcurrentModificationException){
+            //TODO tritt auf, funktioniert aber.
+        }
+
+
+    }
 
 
     /**
@@ -81,19 +83,12 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         var gameDataList = mutableListOf<GameData>()
 
         for(game in games){
-            gameDataList.add(gameToGameData(game))
+            if(game.isOpen && game.players.size > 0 && game.players.size < 8)
+                gameDataList.add(gameToGameData(game))
         }
 
         return gameDataList
     }
-
-    /**
-     * converts gameData into a game
-     */
-   /* private fun gameDataToGame(gd: GameData): Game {
-        // TODO: Game braucht Question list
-        return Game(gd.id,gd.name, gd.maxPlayers)
-    }*/
 
 
     /**
@@ -137,7 +132,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
         val gameQuestions = questionStore.getQuestionsForGame(questionCount).toMutableList()
 
-        val game = Game(id, gameName, maxPlayers, gameQuestions)
+        val game = Game(id, gameName, maxPlayers, gameQuestions, id)
         game.addPlayer(gameCreator, conn)
 
         addNewGame(game)
@@ -145,7 +140,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         val gameData = GameData(id, gameName, maxPlayers, listOf<String>(gameCreator), questionCount)
 
         serverLog("Game erstellt: ${msg.game}")
-        serverLog("Der Game-Creator ist ${gameCreator} und dieser wurde dem Game hinzugefügt")
+        serverLog("Der Game-Creator ist ${gameCreator} und dieser wurde dem Game hinzugefügt\n")
         conn.send(MsgGameInfo(gameData))
     }
 
@@ -183,6 +178,16 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         game!!.addPlayer(msgJoinGame.nickname, conn)
 
         serverLog("Spieler ${msgJoinGame.nickname} möchte dem Spiel ${game.gameName} joinen")
+    }
+
+    fun removeGame(id: String) {
+        for(game in games){
+            if(game.id == id){
+                games.remove(game)
+                serverLog("Spiel ${game.gameName} entfernt\n")
+                return
+            }
+        }
     }
 
 
