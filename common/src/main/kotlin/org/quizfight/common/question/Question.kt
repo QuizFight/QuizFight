@@ -1,16 +1,18 @@
 package org.quizfight.common.question
 
-import org.quizfight.common.messages.Message
-import java.io.Serializable;
+import java.io.Serializable
 
 enum class Category {
-    //TODO: Impelement
-    GAMING,
+    ANIMALS,
     AROUND_THE_WORLD,
+    CHEMISTRY,
+    COMPUTER_SCIENCE,
+    FUN,
+    GAMING,
     HISTORY,
-    CATEGORY1,
-    CATEGORY2,
-    CATEGORY3
+    MOVIES,
+    RELIGION,
+    SPORTS
 }
 
 interface Question<T> : Serializable {

@@ -1,5 +1,27 @@
 <questions type="GUESS_QUESTION">
-    <CATEGORY1>
+    <ANIMALS>
+        <question>
+            <text>Wie viele Monate dauert eine Schwangerschaft bei Blauwalen?</text>
+            <correct>12</correct>
+            <begin>10</begin>
+            <end>48</end>
+        </question>
+    </ANIMALS>
+    <AROUND_THE_WORLD>
+        <question>
+            <text>Wie viele Bundesländer gibt es in Deuschland?</text>
+            <correct>16</correct>
+            <begin>10</begin>
+            <end>20</end>
+        </question>
+    </AROUND_THE_WORLD>
+    <FUN>
+        <question>
+            <text>Ein Bauer hat 16 Schafe. Fast alle sterben, außer 9. Wie viele Schafe bleiben uebrig?</text>
+            <correct>9</correct>
+            <begin>0</begin>
+            <end>16</end>
+        </question>
         <question>
             <text>Wie viele Liter Bier werden in Deutschland pro Kopf jaehrlich getrunken?</text>
             <correct>100</correct>
@@ -7,32 +29,40 @@
             <end>200</end>
         </question>
         <question>
-            <text>Wie viele Einkerbungen hat ein Golfball?</text>
-            <correct>336</correct>
-            <begin>80</begin>
-            <end>400</end>
-        </question>
-    </CATEGORY1>
-    <CATEGORY2>
-        <question>
-            <text>Wie lange dauerte der 30 jaehrige Krieg?</text>
-            <correct>30</correct>
-            <begin>28</begin>
-            <end>31</end>
-        </question>
-        <question>
             <text>Einige Monate haben 30, einige 31 Tage. Wie viele haben 28 Tage?</text>
             <correct>12</correct>
             <begin>1</begin>
             <end>12</end>
         </question>
-    </CATEGORY2>
-    <CATEGORY3>
         <question>
-            <text>Ein Bauer hat 16 Schafe. Fast alle sterben, außer 9. Wie viele Schafe bleiben uebrig?</text>
-            <correct>9</correct>
+            <text>Wie viele Tiere nahm Moses mit auf die Arche?</text>
+            <correct>0</correct>
             <begin>0</begin>
-            <end>16</end>
+            <end>500</end>
         </question>
-    </CATEGORY3>
+    </FUN>
+    <GAMING>
+        <question>
+            <text>Wie viele tragbare oder stationäre Konsolen hat Nintendo Stand 2018 in Europa veröffentlicht?</text>
+            <correct>27</correct>
+            <begin>10</begin>
+            <end>40</end>
+        </question>
+    </GAMING>
+    <HISTORY>
+        <question>
+            <text>Wie lange dauerte der 30 jährige Krieg?</text>
+            <correct>30</correct>
+            <begin>28</begin>
+            <end>31</end>
+        </question>
+    </HISTORY>
+    <SPORTS>
+        <question>
+            <text>Wie viele Tore hat Gerd Müller in der deutschen Fussball-Nationalmannschaft geschossen?</text>
+            <correct>68</correct>
+            <begin>10</begin>
+            <end>100</end>
+        </question>
+    </SPORTS>
 </questions>
