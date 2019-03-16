@@ -7,15 +7,14 @@ import org.quizfight.common.messages.Message
 import org.quizfight.common.messages.MsgPlayerCount
 import org.quizfight.common.messages.MsgQuestion
 import org.quizfight.common.messages.MsgRanking
-import org.quizfight.common.question.Category
-import org.quizfight.common.question.ChoiceQuestion
 import org.quizfight.common.question.Question
 
 /**
  * Game Class. Manages connections to players, asks Questions and calculates the scores
  * @author Thomas Spanier
  */
-class Game(val id: String, val gameName:String, val maxPlayer: Int, var questions: MutableList<Question<*>>) {
+class Game(val id: String, val gameName:String, val maxPlayer: Int,
+           var questions: MutableList<Question<*>>, val idOfGameCreator: String) {
     private val MSG_PLAYER_COUNT = "MaxPlayerCount must be between 2 and 8!"
     private val MSG_GAME_FULL = "The Game is already full!"
 
@@ -26,6 +25,7 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
     var playerCount = 0
 
     var isOpen: Boolean = true
+    var TERMINATED = false
 
     /**
      * Sets the max number of players. Must be between 2 and 8
@@ -65,14 +65,11 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
         }
 
         if(playerCount == maxPlayer) {
-            serverLog("Maximale Spieleranzahl erreicht. Spiel Startet in 3 Sekunden")
-            Thread.sleep(3000)
             isOpen = false
-            serverLog("Die maximale Spieler-Anzahl ist erreicht. Das Spiel startet\n")
-            this.broadcast(MsgQuestion(ChoiceQuestion("Wer hat an der Uhr gedreht?",
-                    Category.HISTORY,
-                    listOf("Rapha", "Aude", "Julian", "Relaxo"),
-                    "Rapha"))) // getNextQuestion()
+            serverLog("Maximale Spieleranzahl erreicht. Spiel Startet in 3 Sekunden")
+            var question =
+            Thread.sleep(3000)
+            broadcast(getNextQuestion())
         }
     }
 
@@ -81,13 +78,16 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
      *
      */
     fun broadcast(msg: Message){
-        serverLog("$msg wird an folgende IP's gesendet")
-        //serverLog(players.values.forEach{ getIpAndPortFromConnection(it.connection as SocketConnection) })
         players.values.forEach{ it.connection.send(msg) }
     }
 
 
-    fun removePlayer(id: String){
+    fun removePlayer(id: String, conn: Connection){
+        if(id == idOfGameCreator) {
+            terminateGame()
+            return
+        }
+        conn.close()
         players.remove(id)
         broadcast(MsgPlayerCount(--playerCount))
     }
@@ -115,10 +115,9 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
      * Ends all connections between the Server and the mobile devices and clears the players list
      */
     fun terminateGame(){
-        players.values.forEach{
-            it.connection.close()
-        }
-        players.clear()
+        players.values.forEach{ it.connection.close() }
+        players = mutableMapOf<String, Player>()
+        TERMINATED = true
     }
 
     override fun toString(): String {
@@ -148,10 +147,9 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
         broadcast(MsgRanking(createRanking()))
 
         if(questions.size > 0){
-
-            questions.removeAt(0)
-
             broadcast(getNextQuestion())
+        }else{
+            terminateGame()
         }
     }
 }

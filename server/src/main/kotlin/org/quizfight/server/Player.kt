@@ -39,7 +39,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
 
         for(player in game.players){
             if(player.key == ipAndPort){
-                game.removePlayer(id)
+                game.removePlayer(id, conn)
                 return
             }
         }

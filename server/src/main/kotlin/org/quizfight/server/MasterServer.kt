@@ -6,7 +6,6 @@ import org.quizfight.common.GAME_SERVER_PORT
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import java.net.ServerSocket
-import kotlin.concurrent.thread
 
 /**
  * The master server that manages game servers.
@@ -40,7 +39,6 @@ class MasterServer(private val port : Int) {
     private fun receiveGameServerUpdate(conn: Connection, msgGameList: MsgGameList) {
         val remoteIpPort = getIpAndPortFromConnection(conn as SocketConnection)
         val remoteIp     = remoteIpPort.split(":")[0]
-        val remotePort   = remoteIpPort.split(":")[1].toInt()
 
         gameServers.find { gs -> gs.ip == remoteIp && gs.port == GAME_SERVER_PORT }!!.games = msgGameList.games
 
