@@ -3,11 +3,9 @@ package org.quizfight.server
 //import java.util.*
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
-import org.quizfight.common.messages.Message
-import org.quizfight.common.messages.MsgPlayerCount
-import org.quizfight.common.messages.MsgQuestion
-import org.quizfight.common.messages.MsgRanking
+import org.quizfight.common.messages.*
 import org.quizfight.common.question.Question
+import java.io.IOException
 
 /**
  * Game Class. Manages connections to players, asks Questions and calculates the scores
@@ -15,29 +13,21 @@ import org.quizfight.common.question.Question
  */
 class Game(val id: String, val gameName:String, val maxPlayer: Int,
            var questions: MutableList<Question<*>>, val idOfGameCreator: String) {
-    private val MSG_PLAYER_COUNT = "MaxPlayerCount must be between 2 and 8!"
+
     private val MSG_GAME_FULL = "The Game is already full!"
 
 
     var answersIncome: Int = 0
     var players: MutableMap<String, Player> = mutableMapOf<String, Player>()
 
+
+    var voting = Voting(this)
+
     var playerCount = 0
 
     var isOpen: Boolean = true
     var TERMINATED = false
 
-    /**
-     * Sets the max number of players. Must be between 2 and 8
-     * TODO: Reimplement
-     */
-    private fun setMaxPlayer(maxPlayer: Int):Int{
-        if (maxPlayer>8 || maxPlayer < 2) {
-            throw java.lang.IllegalArgumentException(MSG_PLAYER_COUNT)
-        } else {
-            return maxPlayer
-        }
-    }
 
     /**
      * Adds a player to the game
@@ -75,7 +65,6 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int,
 
     /**
      * Send a Message to all Players in this game
-     *
      */
     fun broadcast(msg: Message){
         players.values.forEach{ it.connection.send(msg) }
@@ -144,12 +133,44 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int,
 
         answersIncome = 0
 
-        broadcast(MsgRanking(createRanking()))
-
         if(questions.size > 0){
+            broadcast(MsgRanking(createRanking()))
             broadcast(getNextQuestion())
         }else{
+            broadcast(MsgGameOver())
+            broadcast(MsgRanking(createRanking()))
             terminateGame()
         }
+    }
+
+    private fun checkConnections() {
+        players.forEach {
+            try {
+                it.value.connection.send(MsgCheckConnection())
+            }catch(ex: IOException){
+                serverLog("Client ${it.value.name} hat die Verbindung verloren. Voting wird gesendet\n")
+                sendVoting(it.value.id)
+                return
+            }
+        }
+    }
+
+    /**
+     * Sends a voting message to all clients still connected
+     * @param id is the missed client
+     */
+    private fun sendVoting(id: String) {
+        var nickname = ""
+
+        players.forEach{
+            if(id == it.value.id) {
+                players.remove(id)
+                nickname = it.value.name
+            }
+        }
+
+        serverLog("Sende Voting zu allen verbliebenen Clients")
+        broadcast(MsgConnectionLost(nickname))
+
     }
 }

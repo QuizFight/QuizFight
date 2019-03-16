@@ -5,6 +5,7 @@ import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.MsgLeave
 import org.quizfight.common.messages.MsgScore
 import org.quizfight.common.messages.MsgStartGame
+import org.quizfight.common.messages.MsgVote
 
 /**
  * Player Class. Manages the Connection between a mobile device and the Server.
@@ -18,8 +19,13 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
             //TODO: Vote, Timeout, etc
             MsgStartGame::class to { conn, msg -> startGame(conn, msg as MsgStartGame) },
             MsgScore::class to { conn, msg -> receiveAnswer(conn, msg as MsgScore) },
-            MsgLeave::class to {conn, msg -> leaveGame(conn, msg as MsgLeave)}
+            MsgLeave::class to {conn, msg -> leaveGame(conn, msg as MsgLeave)},
+            MsgVote::class to { conn, msg -> receiveVoteOrNot(conn, msg as MsgVote)}
     ))
+
+    private fun receiveVoteOrNot(conn: Connection, msgVote: MsgVote) {
+        game.voting.takeVote(msgVote.waitForPlayer)
+    }
 
 
     /**
