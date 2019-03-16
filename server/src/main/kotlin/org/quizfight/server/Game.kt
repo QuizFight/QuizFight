@@ -151,9 +151,7 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
 
             questions.removeAt(0)
 
-            broadcast(MsgQuestion(ChoiceQuestion("Wer hat an der Uhr gedreht?",
-                    Category.AROUND_THE_WORLD,
-                    listOf<String>("Relaxo", "Florian", "Mario", "Aude"), "Relaxo")))//broadcast(getNextQuestion())
+            broadcast(getNextQuestion())
         }
     }
 }
