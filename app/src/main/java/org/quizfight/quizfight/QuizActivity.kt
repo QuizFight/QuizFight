@@ -158,14 +158,14 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
 
     fun sendScore() {
+        var timeLeft = 21 - progress_question.progress
         timer.cancel()
 
         if(currentQuestion.question is ChoiceQuestion){
-            Client.send(MsgScore((currentQuestion.question as ChoiceQuestion).evaluate(choiceQuestionAnswer)))
+            Client.send(MsgScore((currentQuestion.question as ChoiceQuestion).evaluate(choiceQuestionAnswer, timeLeft, 21)))
         } else {
-            Client.send(MsgScore((currentQuestion.question as GuessQuestion).evaluate(guessQuestionAnswer)))
+            Client.send(MsgScore((currentQuestion.question as GuessQuestion).evaluate(guessQuestionAnswer, timeLeft, 21)))
         }
-
     }
 
     private fun timer(millisInFuture: Long, countDownInterval: Long): CountDownTimer  {
