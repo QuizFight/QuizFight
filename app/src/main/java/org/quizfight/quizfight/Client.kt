@@ -25,6 +25,8 @@ object Client : CoroutineScope, Connection {
         get() = connection?.ip
 
     override fun send(msg: Message) {
+        while (!connected);
+
         lastMessage = msg
         launch(Dispatchers.IO) {connection?.send(msg) }
         Log.d("Connection", "Sent message $msg to ${connection?.ip}")
@@ -59,9 +61,18 @@ object Client : CoroutineScope, Connection {
     }
 
     fun reconnectToMaster() = launch(Dispatchers.IO) {
+        Log.d("Connection", "(Re)Connecting to master server $masterServerIP...")
+
+        val handlers = connection?.handlers
         connection?.close()
+
         val socket = Socket(masterServerIP!!, masterServerPort!!)
         connection = SocketConnection(socket, emptyMap())
+        if (handlers != null) {
+            connection!!.withHandlers(handlers)
+        }
+
+        Log.d("Connection", "Connected to $masterServerIP")
     }
 
     fun setMasterServer(ip: String, port: Int) {

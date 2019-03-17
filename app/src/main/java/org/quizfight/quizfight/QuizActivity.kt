@@ -158,10 +158,11 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
 
     fun sendScore() {
+        timer.cancel()
+
         if(currentQuestion.question is ChoiceQuestion){
             Client.send(MsgScore((currentQuestion.question as ChoiceQuestion).evaluate(choiceQuestionAnswer)))
-
-        }else{
+        } else {
             Client.send(MsgScore((currentQuestion.question as GuessQuestion).evaluate(guessQuestionAnswer)))
         }
 
