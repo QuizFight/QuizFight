@@ -1,5 +1,6 @@
 package org.quizfight.quizfight
 
+import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -26,6 +27,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     private var questionCountTotal = 0
     private var startGameEnable : Boolean = false
 
+    private var gameId = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +44,8 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         questionCountTotal = intent.getIntExtra("questionCountTotal",0)
         startGameEnable = intent.getBooleanExtra("startEnable", false)
         val playerCount = intent.getIntExtra("playerCount", 0)
+
+        gameId = intent.getStringExtra("gameId")
 
         updateUI(nickname, createdBy, gameName, questionCountTotal)
         updateProgressBar(playerCount + 1)
@@ -99,6 +103,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     fun showQuizActivity(msg: MsgQuestion) = launch{
 
         val intent = Intent(context, QuizActivity::class.java)
+        intent.putExtra("gameId" , gameId)
         intent.putExtra("nickname", nickname)
         intent.putExtra("questionCountTotal", questionCountTotal)
         intent.putExtra("questionText", msg.question.text)
@@ -117,6 +122,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
             answers.add(question.choices[0])
             answers.add(question.choices[1])
             answers.add(question.choices[2])
+            answers.add(question.choices[3])
 
             intent.putStringArrayListExtra("answers", answers)
         }
@@ -133,6 +139,8 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         }
 
         startActivity(intent)
+        saveGameServersInfo()
+
         context.finish()
     }
 
@@ -141,4 +149,21 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         super.onDestroy()
         job.cancel()
     }
+
+    override fun onBackPressed() {
+        sendMsgLeaveGame()
+    }
+
+
+    fun saveGameServersInfo(){
+        val preferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
+        val editor = preferences.edit()
+        editor.putString("gameServerIp", Client.gameServerIp)
+        editor.putInt("gameServerPort", Client.gameServerPort)
+        editor.putString("gameId", gameId)
+        editor.putString("nickname", nickname)
+        editor.commit()
+
+    }
+
 }

@@ -32,7 +32,6 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         start()
     }
 
-
     private fun sendUpdate(){
         GlobalScope.launch {
             while(true) {

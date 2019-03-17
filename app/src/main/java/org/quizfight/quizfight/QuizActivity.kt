@@ -18,6 +18,8 @@ import android.widget.TextView
 import org.quizfight.common.question.GuessQuestion
 import android.view.animation.AnimationUtils
 import java.util.*
+import android.content.Context
+
 
 
 class QuizActivity : CoroutineScope, AppCompatActivity() {
@@ -27,6 +29,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
+    private var gameId = ""
+
     private var questionCounter: Int = 0
     private var questionCountTotal: Int = 0
     private lateinit var currentQuestion: MsgQuestion
@@ -34,6 +38,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     private var guessQuestionAnswer : Int = 0
     private var nickname :String = ""
     private var finalScore : Int = 0
+    private var hasVoted = false
+    private var isGameOver = false
 
     //Countdown Timer
     var millisInFuture: Long = 21000 // for 20 seconds plus 1 second imprecision
@@ -42,11 +48,13 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     private var rowList = listOf<TableRow>()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
         nickname = intent.getStringExtra("nickname")
+        gameId = intent.getStringExtra("gameId")
 
                 //Display 1st question
         questionCountTotal = intent.getIntExtra("questionCountTotal", 4)
@@ -62,7 +70,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
             val correct = intent.getStringExtra("correctChoice")
             showNextQuestion(MsgQuestion(ChoiceQuestion(questiontext,
                     Category.valueOf(category) ,
-                    listOf<String>(correct, answers[0], answers[1], answers[2]),
+                    listOf<String>(answers[3], answers[0], answers[1], answers[2]),
                     correct)))
         }else{
             val highest = intent.getIntExtra("highest",100)
@@ -77,7 +85,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 MsgQuestion ::class to { _, msg -> showNextQuestion((msg as MsgQuestion))},
                 MsgRanking::class to { _, msg -> showRanking(msg as MsgRanking)},
                 MsgGameOver::class to { _, msg -> finishQuiz()},
-                MsgConnectionLost::class to { _, msg -> displayDisconnectedPoll(msg as MsgConnectionLost)}
+                MsgConnectionLost::class to { _, msg -> displayDisconnectedPoll(msg as MsgConnectionLost)},
+                MsgCheckConnection::class to {_,_ -> }
                 ))
 
         rowList = listOf<TableRow>(table_row_first, table_row_second, table_row_third,
@@ -89,7 +98,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        job.cancel() // Kills the coroutine when the activity gets destroyed
+        job.cancel()
     }
 
     //  = launch {} tells the function to run in the main thread if not stated otherwise
@@ -139,11 +148,12 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         btn_answer3.isEnabled = false
         btn_answer3.isEnabled = false
 
-        Thread.sleep(2000)
     }
 
 
     fun finishQuiz() {
+
+        isGameOver = true
         score_titel_view.text = "GAME OVER"
         tv_your_score.visibility = View.VISIBLE
         tv_your_score.text = "Your score: $finalScore"
@@ -153,18 +163,19 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         score_titel_view.clearAnimation()
         score_titel_view.startAnimation(a)
 
-        Client.reconnectToMaster()
+        Client.close()
     }
 
 
     fun sendScore() {
+        var timeLeft = 21 - progress_question.progress
+        timer.cancel()
+
         if(currentQuestion.question is ChoiceQuestion){
-            Client.send(MsgScore((currentQuestion.question as ChoiceQuestion).evaluate(choiceQuestionAnswer)))
-
-        }else{
-            Client.send(MsgScore((currentQuestion.question as GuessQuestion).evaluate(guessQuestionAnswer)))
+            Client.send(MsgScore((currentQuestion.question as ChoiceQuestion).evaluate(choiceQuestionAnswer, timeLeft, 21)))
+        } else {
+            Client.send(MsgScore((currentQuestion.question as GuessQuestion).evaluate(guessQuestionAnswer, timeLeft, 21)))
         }
-
     }
 
     private fun timer(millisInFuture: Long, countDownInterval: Long): CountDownTimer  {
@@ -256,7 +267,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         btn_answer1.text = answerList[0]
         btn_answer2.text = answerList[1]
         btn_answer3.text = answerList[2]
-        btn_answer4.text = answerList[4]
+        btn_answer4.text = answerList[3]
 
 
     }
@@ -272,7 +283,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
         seekbar.min = question.lowest
         seekbar.max = question.highest
-        seekbar.progress = question.highest/2
+        seekbar.progress = (question.highest + question.lowest)/2
 
         tv_answer.setTextColor(Color.WHITE)
         btn_ok.visibility = View.GONE
@@ -325,4 +336,12 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
         builder.create().show()
     }
+
+    override fun onBackPressed() {
+
+        if(isGameOver){
+            super.onBackPressed()
+        }
+    }
+
 }

@@ -17,6 +17,8 @@ object Client : CoroutineScope, Connection {
     private var lastMessage: Message? = null
     private var masterServerIP: String? = null
     private var masterServerPort: Int? = null
+    var gameServerIp: String = ""
+    var gameServerPort : Int = 0
 
     val connected: Boolean
         get() = connection != null
@@ -25,9 +27,11 @@ object Client : CoroutineScope, Connection {
         get() = connection?.ip
 
     override fun send(msg: Message) {
+        while (!connected);
+
         lastMessage = msg
         launch(Dispatchers.IO) {connection?.send(msg) }
-        Log.d("Connection", "Sent message $msg to ${connection?.ip}")
+        Log.d("Connection", "Sent message $msg to ${connection?.ip}:${connection?.socket?.port}")
     }
 
     override fun withHandlers(handlers: Map<KClass<*>, (Connection, Message) -> Unit>): Connection {
@@ -41,7 +45,7 @@ object Client : CoroutineScope, Connection {
                 it.value(conn, msg)
             }
         }
-        //launch(Dispatchers.IO) { connection?.withHandlers(extHandlers) }
+
         launch(Dispatchers.IO) { connection?.withHandlers(withLogging) }
         return this
     }
@@ -56,12 +60,30 @@ object Client : CoroutineScope, Connection {
         // Resend last message that caused transfer
         if (lastMessage != null)
             send(lastMessage!!)
+        gameServerIp = serverData.ip
+        gameServerPort = serverData.port
     }
 
     fun reconnectToMaster() = launch(Dispatchers.IO) {
+        Log.d("Connection", "(Re)Connecting to master server $masterServerIP...")
+
+        val handlers = connection?.handlers
         connection?.close()
+
         val socket = Socket(masterServerIP!!, masterServerPort!!)
-        connection = SocketConnection(socket, emptyMap())
+        connection = SocketConnection(socket, handlers ?: emptyMap())
+
+        Log.d("Connection", "Connected to $masterServerIP")
+    }
+
+    fun reconnectToGameServer(ip: String, port: Int) = launch(Dispatchers.IO) {
+        Log.d("Connection", "Reconnecting to GameServer $ip and port $port" )
+
+        val handlers = connection?.handlers
+        connection?.close()
+
+        val socket = Socket(ip, port)
+        connection = SocketConnection(socket, handlers ?: emptyMap())
     }
 
     fun setMasterServer(ip: String, port: Int) {
@@ -77,4 +99,6 @@ object Client : CoroutineScope, Connection {
         set(value) { connection!!.handlers = value }
     override val id: String
         get() = connection!!.id
+
+
 }

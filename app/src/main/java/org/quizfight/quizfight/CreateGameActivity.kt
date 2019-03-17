@@ -21,13 +21,10 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
     private var context = this
     private var nickname:String = " "
-    private var masterServerIp = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_game)
-
-        masterServerIp = intent.getStringExtra("masterServerIP")
 
         btn_create_game.setOnClickListener {
             validateForm()
@@ -94,10 +91,6 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
             //create Game in Backend
             launch {
-                Client.setMasterServer(masterServerIp, MASTER_PORT)
-
-                while (!Client.connected);
-
                 Client.withHandlers(mapOf(
                         MsgGameInfo ::class to { _, msg -> showAttemptQuizStartActivity((msg as MsgGameInfo).game) }
                 ))
