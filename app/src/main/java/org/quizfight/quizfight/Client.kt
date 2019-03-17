@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
+import java.lang.Exception
 import java.net.Socket
 import kotlin.reflect.KClass
 
@@ -67,7 +68,12 @@ object Client : CoroutineScope, Connection {
     fun reconnectToMaster() = launch(Dispatchers.IO) {
 
         val handlers = connection?.handlers
-        connection?.close()
+        try {
+            connection?.close()
+        }catch (e : Exception){
+            e.printStackTrace()
+        }
+
 
         Log.d("Connection", "Connection with gameserver closed ")
         Log.d("Connection", "(Re)Connecting to master server $masterServerIP...")
