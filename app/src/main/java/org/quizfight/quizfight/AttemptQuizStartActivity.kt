@@ -121,6 +121,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
             answers.add(question.choices[0])
             answers.add(question.choices[1])
             answers.add(question.choices[2])
+            answers.add(question.choices[3])
 
             intent.putStringArrayListExtra("answers", answers)
         }

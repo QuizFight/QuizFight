@@ -69,7 +69,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
             val correct = intent.getStringExtra("correctChoice")
             showNextQuestion(MsgQuestion(ChoiceQuestion(questiontext,
                     Category.valueOf(category) ,
-                    listOf<String>(correct, answers[0], answers[1], answers[2]),
+                    listOf<String>(answers[3], answers[0], answers[1], answers[2]),
                     correct)))
         }else{
             val highest = intent.getIntExtra("highest",100)
@@ -99,8 +99,9 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
 
     override fun onDestroy() {
+        saveGameId()
         super.onDestroy()
-        job.cancel() // Kills the coroutine when the activity gets destroyed
+        job.cancel()
     }
 
     //  = launch {} tells the function to run in the main thread if not stated otherwise
@@ -150,7 +151,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         btn_answer3.isEnabled = false
         btn_answer3.isEnabled = false
 
-        Thread.sleep(2000)
     }
 
 
@@ -269,7 +269,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         btn_answer1.text = answerList[0]
         btn_answer2.text = answerList[1]
         btn_answer3.text = answerList[2]
-        btn_answer4.text = answerList[4]
+        btn_answer4.text = answerList[3]
 
 
     }
@@ -355,4 +355,5 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         editor.commit()
 
     }
+
 }

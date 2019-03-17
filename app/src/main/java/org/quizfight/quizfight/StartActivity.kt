@@ -6,8 +6,13 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import kotlinx.android.synthetic.main.activity_start.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.quizfight.common.MASTER_PORT
 import org.quizfight.common.messages.MsgQuestion
+import org.quizfight.common.messages.MsgRejoin
 import org.quizfight.common.question.ChoiceQuestion
 import org.quizfight.common.question.GuessQuestion
 import java.util.ArrayList
@@ -18,23 +23,34 @@ import java.util.ArrayList
  * It proposes two button to create a game or to join a game
  * @author Aude Nana
  */
-class StartActivity : AppCompatActivity() {
+class StartActivity : CoroutineScope, AppCompatActivity() {
 
-    private var masterServerIp = "192.168.0.30"
+    private var job = Job()
+    override val coroutineContext = Dispatchers.Main + job
+
+    private var masterServerIp = "192.168.0.32"
     private var gameId = ""
     private var nickname = ""
     private var context = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_start)
 
-      /*  if(readGamesInfo()){
-            Client.send(MsgRejoin(nickname, gameId)
-            val intent = Intent(this, QuizActivity::class.java)
+        //Build Client
+        launch {
+            Client.setMasterServer(masterServerIp, MASTER_PORT)
+            while (!Client.connected);
+        }
 
-        }*/
+        //if user was already in a game
+        //send RejojnMsg
+        if(readGamesInfo()){
+            Client.withHandlers(mapOf(
+                    MsgQuestion ::class to { conn, msg -> showQuizActivity(msg as MsgQuestion)}
+            ))
+            Client.send(MsgRejoin(nickname, gameId))
+        }
     }
 
     /**
@@ -43,8 +59,9 @@ class StartActivity : AppCompatActivity() {
      */
     fun showAllGamesActivity(view: View) {
         val intent = Intent(this, AllGamesActivity::class.java)
-        if(!ed_masterServerIp.text.toString().isEmpty())
+        if(!ed_masterServerIp.text.toString().isEmpty()) {
             masterServerIp = ed_masterServerIp.text.toString()
+        }
         intent.putExtra("masterServerIP", masterServerIp)
         startActivity(intent)
 
@@ -71,12 +88,13 @@ class StartActivity : AppCompatActivity() {
         return false
     }
 
-   /* fun showQuizActivity(msg: MsgQuestion) = launch{
+
+    fun showQuizActivity(msg: MsgQuestion) = launch{
 
         val intent = Intent(context, QuizActivity::class.java)
         intent.putExtra("gameId" , gameId)
         intent.putExtra("nickname", nickname)
-        intent.putExtra("questionCountTotal", questionCountTotal)
+        intent.putExtra("questionCountTotal", 2)   //to modify
         intent.putExtra("questionText", msg.question.text)
         intent.putExtra("Category", msg.question.category.name)
 
@@ -110,7 +128,12 @@ class StartActivity : AppCompatActivity() {
 
         startActivity(intent)
         context.finish()
-    }*/
+    }
 
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
+    }
 
 }
