@@ -48,6 +48,7 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
             intent.putExtra("questionCountTotal", selectedGame.questionCount)
             intent.putExtra("maxPlayers", selectedGame.maxPlayers)
             intent.putExtra("playerCount", selectedGame.players.size)
+            intent.putExtra("creator", selectedGame.gameCreator)
 
             startActivity(intent)
         }
