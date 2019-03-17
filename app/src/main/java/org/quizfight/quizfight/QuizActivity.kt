@@ -17,6 +17,7 @@ import android.widget.TableRow
 import android.widget.TextView
 import org.quizfight.common.question.GuessQuestion
 import android.view.animation.AnimationUtils
+import org.quizfight.quizfight.R.id.radio_group
 import java.util.*
 
 
@@ -158,11 +159,12 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
 
     fun sendScore() {
+        var timeLeft: Int = text_view_countdown.text.toString().toInt()
         if(currentQuestion.question is ChoiceQuestion){
-            Client.send(MsgScore((currentQuestion.question as ChoiceQuestion).evaluate(choiceQuestionAnswer)))
+            Client.send(MsgScore((currentQuestion.question as ChoiceQuestion).evaluate(choiceQuestionAnswer,timeLeft, 21)))
 
         }else{
-            Client.send(MsgScore((currentQuestion.question as GuessQuestion).evaluate(guessQuestionAnswer)))
+            Client.send(MsgScore((currentQuestion.question as GuessQuestion).evaluate(guessQuestionAnswer,timeLeft, 21)))
         }
 
     }
