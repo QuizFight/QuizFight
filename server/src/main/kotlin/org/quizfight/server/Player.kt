@@ -2,10 +2,7 @@ package org.quizfight.server
 
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
-import org.quizfight.common.messages.MsgLeave
-import org.quizfight.common.messages.MsgScore
-import org.quizfight.common.messages.MsgStartGame
-import org.quizfight.common.messages.MsgVote
+import org.quizfight.common.messages.*
 
 /**
  * Player Class. Manages the Connection between a mobile device and the Server.
@@ -40,6 +37,8 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
      * Player leaves game
      */
     private fun leaveGame(conn: Connection, msgLeave: MsgLeave) {
+        serverLog("Spieler verlässt das Game")
+
         val ipAndPort = getIpAndPortFromConnection(conn as SocketConnection)
 
         for(player in game.players){
