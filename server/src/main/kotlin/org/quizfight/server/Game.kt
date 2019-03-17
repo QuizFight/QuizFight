@@ -176,6 +176,7 @@ class Game(val id: String, val gameName:String,
             broadcast(MsgRanking(createRanking()))
             terminateGame()
         }
+        receiveTimeIsOver = false
     }
 
     private fun startVoteIfPlayerLeft(missedPlayer: Player) {
