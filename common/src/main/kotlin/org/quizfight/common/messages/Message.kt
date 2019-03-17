@@ -9,7 +9,8 @@ data class GameData(val id: String,
                     val name:String,
                     val maxPlayers: Int,
                     val players: List<String>,
-                    val questionCount: Int) : Serializable
+                    val questionCount: Int,
+                    val gameCreator: String) : Serializable
 
 data class GameRequest(val name : String,
                        val maxPlayers : Int,

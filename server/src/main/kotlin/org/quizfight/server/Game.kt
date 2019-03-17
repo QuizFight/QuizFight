@@ -1,6 +1,9 @@
 package org.quizfight.server
 
 //import java.util.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
@@ -11,13 +14,14 @@ import java.io.IOException
  * Game Class. Manages connections to players, asks Questions and calculates the scores
  * @author Thomas Spanier
  */
-class Game(val id: String, val gameName:String, val maxPlayer: Int,
-           var questions: MutableList<Question<*>>, val idOfGameCreator: String) {
+class Game(val id: String, val gameName:String,
+           val maxPlayer: Int,
+           var questions: MutableList<Question<*>>,
+           val idOfGameCreator: String,
+           val gameCreatorName: String) {
 
     private val MSG_GAME_FULL = "The Game is already full!"
 
-
-    var answersIncome: Int = 0
     var players: MutableMap<String, Player> = mutableMapOf<String, Player>()
 
 
@@ -27,6 +31,11 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int,
 
     var isOpen: Boolean = true
     var TERMINATED = false
+
+    var playersAnswered = mutableListOf<String>()
+    var receiveAnswersTimer = 25
+    var playerLost = false
+    var receiveTimeIsOver = false
 
 
     /**
@@ -58,7 +67,28 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int,
             isOpen = false
             serverLog("Maximale Spieleranzahl erreicht. Spiel Startet in 3 Sekunden")
             Thread.sleep(3000)
-            broadcast(getNextQuestion())
+            startGame()
+        }
+    }
+
+    fun startGame(){
+        broadcast(getNextQuestion())
+        startTimerForReceiveAnswers()
+    }
+
+    fun startTimerForReceiveAnswers() {
+        GlobalScope.launch {
+            var time =  0
+
+            while(time < receiveAnswersTimer){
+                delay(1000)
+                time++
+            }
+            receiveTimeIsOver = true
+
+            if(playersAnswered.size < players.size){
+                playerLost = true
+            }
         }
     }
 
@@ -125,16 +155,22 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int,
     }
 
     fun proceed() {
-        answersIncome++
+        while(!receiveTimeIsOver && playersAnswered.size < players.size){
+            Thread.sleep(1000)
+        }
 
-        if(answersIncome < players.size)
+        if(playerLost && playersAnswered.size < players.size){
+            var missedPlayer = checkWhichPlayerLeft()
+            startVoteIfPlayerLeft(missedPlayer)
+        }
+
+        if(playersAnswered.size < players.size)
             return
-
-        answersIncome = 0
 
         if(questions.size > 0){
             broadcast(MsgRanking(createRanking()))
             broadcast(getNextQuestion())
+            startTimerForReceiveAnswers()
         }else{
             broadcast(MsgGameOver())
             broadcast(MsgRanking(createRanking()))
@@ -142,17 +178,33 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int,
         }
     }
 
-    private fun checkConnections() {
-        players.forEach {
-            try {
-                it.value.connection.send(MsgCheckConnection())
-            }catch(ex: IOException){
-                serverLog("Client ${it.value.name} hat die Verbindung verloren. Voting wird gesendet\n")
-                sendVoting(it.value.id)
-                return
-            }
+    private fun startVoteIfPlayerLeft(missedPlayer: Player) {
+        broadcast(MsgConnectionLost(missedPlayer.name))
+
+        voting.startVoting()
+
+        while(voting.isOpen){
+            Thread.sleep(2000)
+        }
+
+        var waitOrNot = voting.evaluateVoting()
+        continueGameOrWaitForRejoin(waitOrNot, missedPlayer.id)
+    }
+
+    private fun continueGameOrWaitForRejoin(waitOrNot: Boolean, id: String) {
+        if(waitOrNot) {
+            serverLog("Game $gameName wartet $voting.votingWaitingTime Sekunden auf den Spieler")
+            Thread.sleep(voting.votingWaitingTime)
+        }else{
+            players.remove(id)
         }
     }
+
+    private fun checkWhichPlayerLeft() : Player {
+        playerLost = false
+        return players.values.first { !playersAnswered.contains(it.id) }
+    }
+
 
     /**
      * Sends a voting message to all clients still connected
@@ -168,8 +220,7 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int,
             }
         }
 
-        serverLog("Sende Voting zu allen verbliebenen Clients")
+        serverLog("Sende Voting zu allen verbliebenen Clients, da Spieler $nickname das Spiel verlassen hat\n")
         broadcast(MsgConnectionLost(nickname))
-
     }
 }
