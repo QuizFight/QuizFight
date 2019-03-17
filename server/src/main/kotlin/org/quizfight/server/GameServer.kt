@@ -109,20 +109,13 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     }
 
     private fun rejoinGame(conn: Connection, msgRejoin: MsgRejoin) {
-        if(games.size == 0) conn.send(MsgGameOver())
-
-        lateinit var gameToJoin: Game
-
-        for(game in games){
-            if(game.id == msgRejoin.gameServerID){
-                gameToJoin = game
+        games.forEach {
+            if(it.id == msgRejoin.gameServerID){
+                it.addPlayer(msgRejoin.nickname, conn)
+                return
             }
         }
-
-        if(gameToJoin != null){
-            gameToJoin.addPlayer(msgRejoin.nickname, conn)
-        }
-
+        conn.send(MsgGameOver())
     }
 
     private fun connectWithMaster() {
