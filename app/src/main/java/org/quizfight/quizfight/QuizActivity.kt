@@ -18,7 +18,6 @@ import android.widget.TextView
 import org.quizfight.common.question.GuessQuestion
 import android.view.animation.AnimationUtils
 import java.util.*
-import android.content.Context
 
 
 
@@ -70,7 +69,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
             val correct = intent.getStringExtra("correctChoice")
             showNextQuestion(MsgQuestion(ChoiceQuestion(questiontext,
                     Category.valueOf(category) ,
-                    listOf<String>(answers[3], answers[0], answers[1], answers[2]),
+                    listOf<String>(answers[0], answers[1], answers[2],answers[3]),
                     correct)))
         }else{
             val highest = intent.getIntExtra("highest",100)
@@ -163,7 +162,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         score_titel_view.clearAnimation()
         score_titel_view.startAnimation(a)
 
-        Client.close()
+        Client.reconnectToMaster()
     }
 
 
@@ -221,7 +220,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 }
             }
         }
-        Thread.sleep(5000)
+        Thread.sleep(3000)
     }
 
     fun showHide(view: View) {
@@ -259,7 +258,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         btn_answer3.isEnabled = true
         btn_answer4.isEnabled = true
 
-        var answerList: MutableList<String> = mutableListOf(question.correctChoice)
+
+        var answerList: MutableList<String> = mutableListOf()
         answerList.addAll(question.choices)
         answerList.shuffle()
 

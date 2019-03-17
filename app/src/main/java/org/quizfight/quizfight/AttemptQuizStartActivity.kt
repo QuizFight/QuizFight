@@ -5,6 +5,7 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_attempt_quiz_start.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,10 +35,12 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         setContentView(R.layout.activity_attempt_quiz_start)
 
         Client.withHandlers(
-                mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity(msg as MsgQuestion)},
-                        MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
+                mapOf( MsgQuestion ::class to { _, msg -> showQuizActivity(msg as MsgQuestion)},
+                        MsgPlayerCount ::class to { _, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)},
+                        MsgGameOver ::class to { _, _ -> restartApplication()}
+                ))
 
-        var createdBy = intent.getStringExtra("createdBy")
+        var createdBy = intent.getStringExtra("creator")
         nickname = intent.getStringExtra("nickname")
         var gameName = intent.getStringExtra("gameName")
         maxPlayers = intent.getIntExtra("maxPlayers",0)
@@ -55,6 +58,12 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         }
     }
 
+    fun restartApplication() = launch{
+        Toast.makeText(context, "Sorry this game is no more available", Toast.LENGTH_LONG).show()
+       // Client.reconnectToMaster()
+        //context.finish()
+
+    }
 
     fun sendMsgStartGame() {
         Client.send(MsgStartGame())
@@ -75,7 +84,6 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         tv_game_name.setText(gameName)
         tv_created_by.setText(createdBy)
 
-
         if(startGameEnable){
             btn_start.visibility = View.VISIBLE
             btn_start.setOnClickListener {
@@ -90,6 +98,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
         //update text
         tv_maxplayers.text = ""+ players + "/" + maxPlayers
+
 
         //update Bar
         var progress =  players * 100f / maxPlayers

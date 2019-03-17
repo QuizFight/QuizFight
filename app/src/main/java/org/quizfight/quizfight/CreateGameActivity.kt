@@ -114,6 +114,7 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("nickname" , nickname)
         intent.putExtra("createdBy" , nickname)
         intent.putExtra("startEnable", true)
+        intent.putExtra("creator", gameInfo.gameCreator)
 
         startActivity(intent)
 
