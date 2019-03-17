@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_start.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +31,7 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
-    private var masterServerIp = "192.168.0.32"
+    private var masterServerIp = "192.168.0.38"
     private var gameId = ""
     private var nickname = ""
     private var gameServerIp =""
@@ -41,12 +42,24 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
 
+        Client.setMasterServer(masterServerIp, MASTER_PORT)
+
+      /*  val restart = intent.getBooleanExtra("restart", false)
+        if(restart){
+            launch {  Toast.makeText(context, "Sorry this game is no more available", Toast.LENGTH_LONG).show()
+            }
+
+            Client.reconnectToMaster()
+        }else{
+            Client.setMasterServer(masterServerIp, MASTER_PORT)
+        }*/
+
         clearGameInfo()
         //Build Client
 
         //if user was already in a game
         //send RejojnMsg
-        if(readGamesInfo()){
+    /*    if(readGamesInfo()){
             Log.d("Connection", "Found aborted game, reconnecting")
             Log.d("Connection startActivity", "ip  $gameServerIp and port $gameServerPort")
             Client.reconnectToGameServer(gameServerIp, gameServerPort)
@@ -57,7 +70,7 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
             Client.send(MsgRejoin(gameId, nickname))
         } else {
             Client.setMasterServer(masterServerIp, MASTER_PORT)
-        }
+        }*/
     }
 
     /**

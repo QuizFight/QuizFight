@@ -338,7 +338,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-
         if(isGameOver){
             super.onBackPressed()
         }
