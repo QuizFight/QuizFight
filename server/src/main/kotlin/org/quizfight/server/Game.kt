@@ -177,6 +177,7 @@ class Game(val id: String, val gameName:String,
             terminateGame()
         }
         receiveTimeIsOver = false
+        playersAnswered = mutableListOf<String>()
     }
 
     private fun startVoteIfPlayerLeft(missedPlayer: Player) {
