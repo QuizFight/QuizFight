@@ -23,10 +23,13 @@ import android.support.v4.widget.SwipeRefreshLayout
  */
 class AllGamesActivity : CoroutineScope, AppCompatActivity() {
 
+    //coroutine
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
     private val context = this
+
+    //Server's info
     private lateinit var allOpenGames : List<GameData>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,9 +39,8 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
         sendRequestOpenGame()
 
         // Set an item click listener for ListView
+        //and displays the game's info
         all_games_container.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-            // Get the selected item text from ListView
-           // val selected= parent.getItemAtPosition(position) as String
 
             val selectedGame = allOpenGames[position]
 
@@ -58,20 +60,20 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
             btn_sync.visibility = View.INVISIBLE
         }
 
-
         //add refresh swipe
-
         swiperefresh.setOnRefreshListener(object : SwipeRefreshLayout.OnRefreshListener {
             override fun onRefresh() {
-                //Here you can update your data from internet or from local SQLite data
                 sendRequestOpenGame()
-                swiperefresh.setRefreshing(false)
+                swiperefresh.isRefreshing =  false
             }
         })
 
-
     }
 
+
+    /**
+     * send MsgRequestOpenGame to master server
+     */
     fun sendRequestOpenGame() {
         while (!Client.connected);
         Client.withHandlers(mapOf(

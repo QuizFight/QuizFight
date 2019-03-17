@@ -1,5 +1,6 @@
 package org.quizfight.quizfight
 
+import android.content.Context
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -23,19 +24,22 @@ import java.util.*
 
 class QuizActivity : CoroutineScope, AppCompatActivity() {
 
-    // The code in a "launch" block will run on the main thread.
-    // Use launch{} whenever you want to change UI elements.
+    //Coroutine
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
-    private var gameId = ""
+    private val context = this
 
+    //Game's info
+    private var gameId = ""
     private var questionCounter: Int = 0
     private var questionCountTotal: Int = 0
+    private var nickname :String = ""
+
+    //current info
     private lateinit var currentQuestion: MsgQuestion
     private var choiceQuestionAnswer = ""
     private var guessQuestionAnswer : Int = 0
-    private var nickname :String = ""
     private var finalScore : Int = 0
     private var hasVoted = false
     private var isGameOver = false
@@ -45,6 +49,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     val countDownInterval: Long = 1000 // sets the countdown interval to 1 second
     lateinit var timer : CountDownTimer
 
+    //Ranking
     private var rowList = listOf<TableRow>()
 
 
@@ -52,13 +57,15 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
+        //read nickname and gameID from previous activity
         nickname = intent.getStringExtra("nickname")
         gameId = intent.getStringExtra("gameId")
 
-                //Display 1st question
-        questionCountTotal = intent.getIntExtra("questionCountTotal", 4)
+        //update timer bar
+        progress_timer.max = millisInFuture.toInt()
 
-        progress_question.max = millisInFuture.toInt()
+        //Display 1st question
+        questionCountTotal = intent.getIntExtra("questionCountTotal", 4)
 
         val questiontext = intent.getStringExtra("questionText")
         val category = intent.getStringExtra("Category")
@@ -80,48 +87,48 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         }
 
 
+        //Update handlers of client
         Client.withHandlers(mapOf(
                 MsgQuestion ::class to { _, msg -> showNextQuestion((msg as MsgQuestion))},
                 MsgRanking::class to { _, msg -> showRanking(msg as MsgRanking)},
-                MsgGameOver::class to { _, msg -> finishQuiz()},
+                MsgGameOver::class to { _, _ -> finishQuiz()},
                 MsgConnectionLost::class to { _, msg -> displayDisconnectedPoll(msg as MsgConnectionLost)},
                 MsgCheckConnection::class to {_,_ -> }
                 ))
 
+        //initialize UI elements
         rowList = listOf<TableRow>(table_row_first, table_row_second, table_row_third,
                 table_row_fourth, table_row_fifth, table_row_sixth, table_row_seventh, table_row_eight)
-
         timer = timer(millisInFuture, countDownInterval)
     }
 
 
-    override fun onDestroy() {
-        super.onDestroy()
-        job.cancel()
-    }
+    /**
+     * Displays a question
+     */
+    fun showNextQuestion(question: MsgQuestion) = launch {
 
-    //  = launch {} tells the function to run in the main thread if not stated otherwise
-    // use = launch {} whenever the function could possibly be called from a non main thread.
-    // for example all message handlers call from non main threads!
-    fun showNextQuestion(question: MsgQuestion) = launch() {
+        //show question view
         rowList.forEach({tr -> hideTableRows(tr)})
         showHide(question_outer_layout)
         showHide(score_outer_layout)
 
         currentQuestion = question
-
         if (questionCounter < questionCountTotal) {
+
+            //check if question ChoiceQuestion or GuessQuestion is
             if (question.question is ChoiceQuestion) {
                 showChoiceQuestion(question.question as ChoiceQuestion)
             } else {
                 showGuessQuestion(question.question as GuessQuestion)
             }
 
+            //update the question count textView
             questionCounter++
-
             text_view_question_count.text = ("Question: " + questionCounter
                     + "/" + questionCountTotal)
 
+            //if timer runs, cancel and start a new timer
             timer.cancel()
             timer = timer(millisInFuture, countDownInterval)
             timer.start()
@@ -131,44 +138,43 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     }
 
 
+    /**
+     * read answer of choiceQuestion, evaluate and send score to the game server
+     */
     fun checkAnswer(view: View) = launch {
+
+        //read view
         val selectedButton: Button = view as Button
         choiceQuestionAnswer = view.text.toString()
+
         sendScore()
+
         if (choiceQuestionAnswer == (currentQuestion.question as ChoiceQuestion).correctChoice) {
             selectedButton.setBackgroundColor(Color.GREEN)
         } else {
-            selectedButton.setBackgroundColor(Color.RED)
+            selectedButton.setBackgroundColor(Color.parseColor("#f50a0a"))
         }
 
         //disable Buttons
         btn_answer1.isEnabled = false
         btn_answer2.isEnabled = false
         btn_answer3.isEnabled = false
-        btn_answer3.isEnabled = false
+        btn_answer4.isEnabled = false
+
+        //update button style
+        btn_answer1.setTextColor(Color.BLACK)
+        btn_answer2.setTextColor(Color.BLACK)
+        btn_answer3.setTextColor(Color.BLACK)
+        btn_answer4.setTextColor(Color.BLACK)
 
     }
 
 
-    fun finishQuiz() {
-
-        isGameOver = true
-        score_titel_view.text = "GAME OVER"
-        tv_your_score.visibility = View.VISIBLE
-        tv_your_score.text = "Your score: $finalScore"
-        val a = AnimationUtils.loadAnimation(this, R.anim.anim_game_over)
-        a.reset()
-
-        score_titel_view.clearAnimation()
-        score_titel_view.startAnimation(a)
-
-        Client.reconnectToMaster()
-    }
-
-
+    /**
+     * evaluate and send score to gameserver
+     */
     fun sendScore() {
-        var timeLeft = 21 - progress_question.progress
-        timer.cancel()
+        var timeLeft = 21 - progress_timer.progress
 
         if(currentQuestion.question is ChoiceQuestion){
             Client.send(MsgScore((currentQuestion.question as ChoiceQuestion).evaluate(choiceQuestionAnswer, timeLeft, 21)))
@@ -177,18 +183,22 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         }
     }
 
+    /**
+     * Timer defined time to answer
+     * if the player didn't aswer in this time
+     * then
+     */
     private fun timer(millisInFuture: Long, countDownInterval: Long): CountDownTimer  {
         return object: CountDownTimer(millisInFuture, countDownInterval) {
             override fun onTick(millisUntilFinished: Long) {
-                //updateCountdownText(millisUntilFinished)
-                progress_question.progress = millisInFuture.toInt() - millisUntilFinished.toInt()
+                progress_timer.progress = millisInFuture.toInt() - millisUntilFinished.toInt()
 
             }
 
             override fun onFinish() {
+                if(!isGameOver)
                 sendScore()
-            }
-
+             }
         }
     }
 
@@ -197,8 +207,14 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         text_view_countdown.text = String.format(Locale.getDefault(), "%02d", seconds)
     }
 
+
+    /**
+     * display ranking after each question
+     */
     private fun showRanking(msg : MsgRanking) {
         launch{
+
+            //show ranking view
             showHide(question_outer_layout)
             showHide(score_outer_layout)
 
@@ -210,6 +226,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
             )
             val iter = msg.totalScore.iterator()
 
+            //bind scores with the view
             for((index, value) in iter.withIndex()) {
                 showHide(rowNicknameScoreViews[index].first)
                 rowNicknameScoreViews[index].second.text = value.key
@@ -220,8 +237,11 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 }
             }
         }
+
+        //display ranking for 3 seconds
         Thread.sleep(3000)
     }
+
 
     fun showHide(view: View) {
         view.visibility =
@@ -232,6 +252,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 }
     }
 
+
     fun hideTableRows(tableRow: TableRow) {
         tableRow.visibility =
                 if(tableRow.visibility == View.VISIBLE) {
@@ -241,6 +262,9 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 }
     }
 
+    /**
+     * Display a choiceQuestion
+     */
 
     fun showChoiceQuestion(question: ChoiceQuestion){
 
@@ -272,6 +296,10 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     }
 
+
+    /**
+     * display GuessQuestion
+     */
     fun showGuessQuestion(question: GuessQuestion){
 
         guess_container.visibility = View.VISIBLE
@@ -319,28 +347,76 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     }
 
-    fun displayDisconnectedPoll(msg: MsgConnectionLost) {
-        val builder = AlertDialog.Builder(this)
+    /**
+     * display dialog when a player has lost the connection during a game
+     * This enable the user to vote to wait for that player or not
+     * the game continues when the app becomes a new question
+     */
+    fun displayDisconnectedPoll(msg: MsgConnectionLost) = launch{
+        val builder = AlertDialog.Builder(context)
         val view = layoutInflater.inflate(R.layout.layout_disconnect_poll, null)
         builder.setView(view)
 
         builder.setPositiveButton("wait") { _, _ ->
             Client.send(MsgVote(waitForPlayer = true, name = msg.name))
-
         }
 
         builder.setNegativeButton("don't wait") { _, _ ->
             Client.send(MsgVote(waitForPlayer = false, name = msg.name))
-
         }
 
         builder.create().show()
     }
 
+
     override fun onBackPressed() {
         if(isGameOver){
             super.onBackPressed()
         }
+    }
+
+
+    /**
+     * Terminate a Game
+     */
+    fun finishQuiz() {
+        isGameOver = true
+
+        //if timer runs, cancel
+        timer.cancel()
+
+        //update UI with animation
+        score_titel_view.text = "GAME OVER"
+        tv_your_score.visibility = View.VISIBLE
+        tv_your_score.text = "Your score: $finalScore"
+        val a = AnimationUtils.loadAnimation(this, R.anim.anim_game_over)
+        a.reset()
+        score_titel_view.clearAnimation()
+        score_titel_view.startAnimation(a)
+
+        //close socket and reconnect to master
+        Client.reconnectToMaster()
+
+        //delete game's info
+        clearGameInfo()
+
+    }
+
+
+    /**
+     * delete all game's info saved on the device
+     */
+    private fun clearGameInfo() {
+        val preferences = this.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
+        val editor = preferences.edit()
+        editor.clear()
+        editor.commit()
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
     }
 
 }

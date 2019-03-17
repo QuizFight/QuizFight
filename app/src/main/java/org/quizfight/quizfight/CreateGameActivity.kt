@@ -122,6 +122,11 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
 
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
+    }
+
 
 
 }

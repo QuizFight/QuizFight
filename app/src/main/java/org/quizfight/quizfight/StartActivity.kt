@@ -31,7 +31,7 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
-    private var masterServerIp = "192.168.0.38"
+    private var masterServerIp = "192.168.0.32"
     private var gameId = ""
     private var nickname = ""
     private var gameServerIp =""
@@ -42,35 +42,39 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
 
-        Client.setMasterServer(masterServerIp, MASTER_PORT)
+        clearGameInfo()
 
-      /*  val restart = intent.getBooleanExtra("restart", false)
+        //check if app is started after attemptQuiz or not
+        //if so , show toast else 2 possibilities
+        //even the app was stopped during a quiz
+        //then read games info and send ReJoin to gameserver
+        //or the app is started for the first time
+        //then just create a client
+        val restart = intent.getBooleanExtra("restart", false)
         if(restart){
             launch {  Toast.makeText(context, "Sorry this game is no more available", Toast.LENGTH_LONG).show()
             }
 
-            Client.reconnectToMaster()
         }else{
-            Client.setMasterServer(masterServerIp, MASTER_PORT)
-        }*/
 
-        clearGameInfo()
-        //Build Client
+            //Build Client
 
-        //if user was already in a game
-        //send RejojnMsg
-    /*    if(readGamesInfo()){
-            Log.d("Connection", "Found aborted game, reconnecting")
-            Log.d("Connection startActivity", "ip  $gameServerIp and port $gameServerPort")
-            Client.reconnectToGameServer(gameServerIp, gameServerPort)
-            Client.withHandlers(mapOf(
-                    MsgQuestion ::class to { conn, msg -> showQuizActivity(msg as MsgQuestion)},
-                    MsgGameOver::class to { _, _ -> clearGameInfo(); Client.reconnectToMaster() }
-            ))
-            Client.send(MsgRejoin(gameId, nickname))
-        } else {
-            Client.setMasterServer(masterServerIp, MASTER_PORT)
-        }*/
+            //if user was already in a game
+            //send RejojnMsg
+           if(readGamesInfo()){
+                Log.d("Connection", "Found aborted game, reconnecting")
+                Log.d("Connection startActivity", "ip  $gameServerIp and port $gameServerPort")
+                Client.reconnectToGameServer(gameServerIp, gameServerPort)
+                Client.withHandlers(mapOf(
+                        MsgQuestion ::class to { _, msg -> showQuizActivity(msg as MsgQuestion)},
+                        MsgGameOver::class to { _, _ -> clearGameInfo(); Client.reconnectToMaster() }
+                ))
+                Client.send(MsgRejoin(gameId, nickname))
+            } else {
+               Log.d("Connection", "connect to master ")
+                Client.setMasterServer(masterServerIp, MASTER_PORT)
+            }
+        }
     }
 
     /**
@@ -96,6 +100,10 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
 
     }
 
+    /**
+     * Check if the app starts after a connection failure during a game or not
+     * and read game's info
+     */
     fun readGamesInfo() : Boolean{
         val preferences = this.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
 
@@ -117,6 +125,9 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
     }
 
 
+    /**
+     * Show the next question, if the player could rejoin a game
+     */
     fun showQuizActivity(msg: MsgQuestion) = launch{
 
         val intent = Intent(context, QuizActivity::class.java)
