@@ -8,14 +8,19 @@ import org.quizfight.common.messages.*
 import java.net.ServerSocket
 
 /**
- * The master server that manages game servers.
- * First contact point for all clients and game servers.
- * @author Phillip Persch
+ * MasterServer is responsible for:
+ * - Receiving updates from game servers
+ * - Keeps a list of connected game server
+ * - Show all open games to clients which want to join a game
+ * - Forwards clients to game servers if they create a game or join a game
+ * @param port is the port of the master server
  */
 class MasterServer(private val port : Int) {
     private var gameServers = mutableListOf<ServerData>()
-    private var gameDataList = mutableListOf<GameData>()
 
+    /**
+     * Inizializes handlers for listening to requests of clients and game servers
+     */
     init{
         acceptConnections()
     }
@@ -97,12 +102,10 @@ class MasterServer(private val port : Int) {
     }
 
 
-
-    // HANDLERS
-
     /**
      * Handler function for Request all games messages.
      * Wraps a list of all open games into a message object.
+     * @param conn is the client asking for the open games
      */
     private fun sendAllGames(conn : Connection) {
         val games = listAllOpenGames()

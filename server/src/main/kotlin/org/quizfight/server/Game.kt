@@ -78,6 +78,12 @@ class Game(val id: String, val gameName:String,
                 if(receiveTimeIsOver) {
                     break
                 }
+
+                serverLog("Timer bei: $time / $receiveAnswersTimer")
+                serverLog("receiveTimeIsOver: : " + receiveTimeIsOver    + "\n"
+                        + "playersAnswered: "     + playersAnswered.size + "\n"
+                        + "players: "             + players.size)
+
             }
             if(receiveTimeIsOver)
                 return@launch
@@ -154,24 +160,17 @@ class Game(val id: String, val gameName:String,
     }
 
     fun proceed() {
-        var time = 0
-        while(!receiveTimeIsOver ){
-            if(playersAnswered.size == players.size){
-                receiveTimeIsOver = true
-            }
+        waitForTimerOrAnswers()
 
-            serverLog("receiveTimeIsOver: : " + receiveTimeIsOver
-                    + "\nplayersAnswered: " + playersAnswered.size
-                    + "\nplayers: " + players.size)
-            serverLog("Timer bei: $time / $receiveAnswersTimer")
-            Thread.sleep(1000)
-            time++
-        }
-        /*
-        if(playerLost && playersAnswered.size < players.size){
+        if((playerLost && playersAnswered.size < players.size -1) || (!playerLost && playersAnswered.size < players.size))
+            return
+
+        if(playerLost){
             var missedPlayer = checkWhichPlayerLeft()
-            startVoteIfPlayerLeft(missedPlayer)
-        }*/
+            missedPlayer.connection.close()
+            players.remove(missedPlayer.id)
+            //startVoteIfPlayerLeft(missedPlayer)
+        }
 
         if(playersAnswered.size < players.size)
             return
@@ -180,12 +179,25 @@ class Game(val id: String, val gameName:String,
             broadcast(MsgRanking(createRanking()))
             broadcast(getNextQuestion())
             startTimerForReceiveAnswers()
+            playersAnswered = mutableListOf<String>()
         }else{
             broadcast(MsgGameOver())
             broadcast(MsgRanking(createRanking()))
             terminateGame()
         }
-        playersAnswered = mutableListOf<String>()
+
+    }
+
+    private fun waitForTimerOrAnswers() {
+        var time = 0
+        while(!receiveTimeIsOver ){
+            if(playersAnswered.size == players.size){
+                receiveTimeIsOver = true
+            }
+
+            Thread.sleep(1000)
+            time++
+        }
     }
 
     private fun startVoteIfPlayerLeft(missedPlayer: Player) {
