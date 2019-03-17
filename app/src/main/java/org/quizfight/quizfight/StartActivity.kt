@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.activity_start.*
  */
 class StartActivity : AppCompatActivity() {
 
-    var masterServerIp = "192.168.0.32"
+    var masterServerIp = "10.0.2.2"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
