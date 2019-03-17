@@ -75,7 +75,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
             players.add(player.value.name)
         }
 
-        return GameData(g.id, g.gameName, g.maxPlayer, players, g.questions.size)
+        return GameData(g.id, g.gameName, g.maxPlayer, players, g.questions.size, g.gameCreatorName)
     }
 
     private fun gameListToGameDataList(): List<GameData>{
@@ -110,15 +110,14 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     private fun rejoinGame(conn: Connection, msgRejoin: MsgRejoin) {
         serverLog("Spieler ${msgRejoin.nickname} möchte rejoinen")
 
-        games.forEach {
-            if(it.id == msgRejoin.gameServerID){
-                it.addPlayer(msgRejoin.nickname, conn)
-                return
-            }
+        val game = games.find { it.id == msgRejoin.gameServerID }
+
+        if(game != null) {
+            game.addPlayer(msgRejoin.nickname, conn)
+        } else {
+            serverLog("Sein altes Spiel wurde nicht mehr gefunden\n")
+            conn.send(MsgGameOver())
         }
-        
-        serverLog("Sein altes Spiel wurde nicht mehr gefunden\n")
-        conn.send(MsgGameOver())
     }
 
     private fun connectWithMaster() {
@@ -146,12 +145,12 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
         val gameQuestions = questionStore.getQuestionsForGame(questionCount).toMutableList()
 
-        val game = Game(id, gameName, maxPlayers, gameQuestions, id)
+        val game = Game(id, gameName, maxPlayers, gameQuestions, id, gameCreator)
         game.addPlayer(gameCreator, conn)
 
         addNewGame(game)
 
-        val gameData = GameData(id, gameName, maxPlayers, listOf<String>(gameCreator), questionCount)
+        val gameData = GameData(id, gameName, maxPlayers, listOf<String>(gameCreator), questionCount, gameCreator)
 
         serverLog("Game erstellt: ${msg.game}")
         serverLog("Der Game-Creator ist ${gameCreator} und dieser wurde dem Game hinzugefügt\n")

@@ -33,8 +33,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
      */
     private fun startGame(conn: Connection, msgStartGame: MsgStartGame) {
         serverLog("Ein Spieler hat das Spiel gestartet. Die erste Question wird gesendet\n")
-        game.answersIncome = 0
-        game.broadcast(game.getNextQuestion())
+        game.startGame()
     }
 
     /**
@@ -56,6 +55,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
      */
     private fun receiveAnswer(conn: Connection, msgSendAnswer: MsgScore) {
         serverLog("Antwort erhalten von ${getIpAndPortFromConnection(conn as SocketConnection)} \n")
+        game.playersAnswered.add(getIpAndPortFromConnection(conn as SocketConnection))
         addToScore(msgSendAnswer.score)
         game.proceed()
     }
