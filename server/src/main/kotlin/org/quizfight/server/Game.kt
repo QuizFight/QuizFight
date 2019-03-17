@@ -155,6 +155,7 @@ class Game(val id: String, val gameName:String,
     }
 
     fun proceed() {
+        serverLog("Antwort in proceed() erhaten\n")
         while(!receiveTimeIsOver && playersAnswered.size < players.size){
             Thread.sleep(1000)
         }

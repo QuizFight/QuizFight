@@ -190,8 +190,6 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
             return
         }
         game!!.addPlayer(msgJoinGame.nickname, conn)
-
-        serverLog("Spieler ${msgJoinGame.nickname} möchte dem Spiel ${game.gameName} joinen")
     }
 
     fun removeGame(id: String) {
