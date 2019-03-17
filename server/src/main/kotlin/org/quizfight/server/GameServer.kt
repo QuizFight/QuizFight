@@ -37,7 +37,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
             while(true) {
                 deleteTerminatedGames()
                 masterConn.send(MsgGameList(gameListToGameDataList()))
-                //serverLog("Sende diese GameList zum Master: " + games + "\n")
+                serverLog("Sende diese GameList zum Master: " + games + "\n")
                 delay(UPDATE_INTERVALL)
             }
         }

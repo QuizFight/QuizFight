@@ -20,10 +20,7 @@ class Game(val id: String, val gameName:String,
            val idOfGameCreator: String,
            val gameCreatorName: String) {
 
-    private val MSG_GAME_FULL = "The Game is already full!"
-
     var players: MutableMap<String, Player> = mutableMapOf<String, Player>()
-
 
     var voting = Voting(this)
 
@@ -50,11 +47,6 @@ class Game(val id: String, val gameName:String,
     }
 
     fun addPlayer(player: Player) {
-        if(players.size >= maxPlayer) {
-            serverLog("Player size >= maxPlayer")
-            throw Exception(MSG_GAME_FULL)
-            return
-        }
         players.put(player.id, player)
 
         playerCount++
@@ -83,7 +75,13 @@ class Game(val id: String, val gameName:String,
             while(time < receiveAnswersTimer){
                 delay(1000)
                 time++
+                if(receiveTimeIsOver) {
+                    break
+                }
             }
+            if(receiveTimeIsOver)
+                return@launch
+
             receiveTimeIsOver = true
 
             if(playersAnswered.size < players.size){
@@ -104,16 +102,16 @@ class Game(val id: String, val gameName:String,
 
 
     fun removePlayer(id: String, conn: Connection){
+        conn.close()
         players.remove(id)
 
-        if(id == idOfGameCreator) {
+        if (id == idOfGameCreator) {
             serverLog("Es war der Game Creator. Alle bekommen eine MsgGameOver\n")
             broadcast(MsgGameOver())
             terminateGame()
             return
         }
 
-        conn.close()
         broadcast(MsgPlayerCount(--playerCount))
     }
 
@@ -127,20 +125,12 @@ class Game(val id: String, val gameName:String,
         return MsgQuestion(question)
     }
 
-    fun printQuestions(){
-        var i = 1;
-        for(question in questions){
-            println("Frage " + i + ": " + question.text)
-            i++
-        }
-    }
-
 
     /**
      * Ends all connections between the Server and the mobile devices and clears the players list
      */
     fun terminateGame(){
-        serverLog("Schliesse folgende Verbindungen\n")
+        serverLog("Schliesse folgende Verbindungen und beende das Spiel\n")
         players.values.forEach { println(getIpAndPortFromConnection(it.connection as SocketConnection)) }
         players.values.forEach{ it.connection.close() }
         players = mutableMapOf<String, Player>()
@@ -164,10 +154,7 @@ class Game(val id: String, val gameName:String,
     }
 
     fun proceed() {
-        serverLog("Antwort in proceed() erhaten\n")
         var time = 0
-
-
         while(!receiveTimeIsOver ){
             if(playersAnswered.size == players.size){
                 receiveTimeIsOver = true
