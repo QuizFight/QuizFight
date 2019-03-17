@@ -29,14 +29,9 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
     private val context = this
     private lateinit var allOpenGames : List<GameData>
 
-    var masterServerIp = ""
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_all_games)
-
-        masterServerIp = intent.getStringExtra("masterServerIP")
-        Client.setMasterServer(masterServerIp, MASTER_PORT)
 
         sendRequestOpenGame()
 
@@ -53,8 +48,6 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
             intent.putExtra("questionCountTotal", selectedGame.questionCount)
             intent.putExtra("maxPlayers", selectedGame.maxPlayers)
             intent.putExtra("playerCount", selectedGame.players.size)
-
-            intent.putExtra("masterServerIP", masterServerIp)
 
             startActivity(intent)
         }

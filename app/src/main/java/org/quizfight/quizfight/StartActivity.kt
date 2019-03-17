@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import kotlinx.android.synthetic.main.activity_start.*
 import kotlinx.coroutines.CoroutineScope
@@ -11,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.quizfight.common.MASTER_PORT
+import org.quizfight.common.messages.MsgGameOver
 import org.quizfight.common.messages.MsgQuestion
 import org.quizfight.common.messages.MsgRejoin
 import org.quizfight.common.question.ChoiceQuestion
@@ -38,16 +40,15 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
         setContentView(R.layout.activity_start)
 
         //Build Client
-        launch {
-            Client.setMasterServer(masterServerIp, MASTER_PORT)
-            while (!Client.connected);
-        }
+        Client.setMasterServer(masterServerIp, MASTER_PORT)
 
         //if user was already in a game
         //send RejojnMsg
         if(readGamesInfo()){
+            Log.d("Connection", "Found aborted game, reconnecting")
             Client.withHandlers(mapOf(
-                    MsgQuestion ::class to { conn, msg -> showQuizActivity(msg as MsgQuestion)}
+                    MsgQuestion ::class to { conn, msg -> showQuizActivity(msg as MsgQuestion)},
+                    MsgGameOver::class to { _, _ -> clearGameInfo() }
             ))
             Client.send(MsgRejoin(nickname, gameId))
         }
@@ -86,6 +87,13 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
             return true
         }
         return false
+    }
+
+    private fun clearGameInfo() {
+        val preferences = this.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
+        val editor = preferences.edit()
+        editor.clear()
+        editor.commit()
     }
 
 
