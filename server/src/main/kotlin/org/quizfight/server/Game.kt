@@ -51,13 +51,12 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int,
         playerCount++
         if(playerCount > 1) {
             broadcast(MsgPlayerCount(playerCount))
-            serverLog("Der PlayerCount wurde an alle Spieler versendet, aktuell sind ${playerCount} in der Lobby\n")
+            serverLog("Der PlayerCount wurde an alle Spieler versendet, aktuell sind ${playerCount} im Spiel\n")
         }
 
         if(playerCount == maxPlayer) {
             isOpen = false
             serverLog("Maximale Spieleranzahl erreicht. Spiel Startet in 3 Sekunden")
-            var question =
             Thread.sleep(3000)
             broadcast(getNextQuestion())
         }

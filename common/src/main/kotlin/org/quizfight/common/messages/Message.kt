@@ -35,6 +35,7 @@ data class MsgRanking(val totalScore : Map<String, Int>) : Message
 data class MsgConnectionLost(val name : String) : Message
 class MsgCheckConnection() : Message
 data class MsgVote(val waitForPlayer : Boolean, val name : String): Message
+data class MsgRejoin(val gameServerID: String, val nickname: String) : Message
 data class MsgWait(val name : String): Message
 data class MsgConnectionResumed(val name : String) : Message
 class MsgGameOver : Message
