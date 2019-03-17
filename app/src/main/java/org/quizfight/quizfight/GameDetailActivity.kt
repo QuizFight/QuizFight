@@ -26,6 +26,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     private var gameName = ""
     private var maxPlayers = 0
     private var playerCount = 0
+    private var creator =""
 
     private var nicknameEntered: Boolean = false
 
@@ -52,10 +53,12 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         gameName = intent.getStringExtra("gameName")
         maxPlayers = intent.getIntExtra("maxPlayers", 0 )
         playerCount= intent.getIntExtra("playerCount",0)
+        creator = intent.getStringExtra("creator")
 
         text_view_actual_no_players.text = ""+ maxPlayers
         text_view_actual_no_questions.text = ""+ questionCountTotal
         text_view_game_name.text = gameName
+        text_view_creator_name.text = creator
     }
 
 
@@ -69,7 +72,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("questionCountTotal" , questionCountTotal)
         intent.putExtra("gameName" , gameName)
         intent.putExtra("nickname" , nickname)
-        intent.putExtra("createdBy" , "")
+        intent.putExtra("creator" , creator)
         intent.putExtra("startEnable", false)
         intent.putExtra("playerCount", playerCount)
 
