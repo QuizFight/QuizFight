@@ -26,6 +26,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     private var questionCountTotal = 0
     private var startGameEnable : Boolean = false
 
+    private var gameId = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +43,8 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         questionCountTotal = intent.getIntExtra("questionCountTotal",0)
         startGameEnable = intent.getBooleanExtra("startEnable", false)
         val playerCount = intent.getIntExtra("playerCount", 0)
+
+        gameId = intent.getStringExtra("gameId")
 
         updateUI(nickname, createdBy, gameName, questionCountTotal)
         updateProgressBar(playerCount + 1)
@@ -99,6 +102,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     fun showQuizActivity(msg: MsgQuestion) = launch{
 
         val intent = Intent(context, QuizActivity::class.java)
+        intent.putExtra("gameId" , gameId)
         intent.putExtra("nickname", nickname)
         intent.putExtra("questionCountTotal", questionCountTotal)
         intent.putExtra("questionText", msg.question.text)
@@ -140,5 +144,9 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         job.cancel()
+    }
+
+    override fun onBackPressed() {
+        sendMsgLeaveGame()
     }
 }
