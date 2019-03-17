@@ -24,7 +24,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     val socket = ServerSocket(ownPort)
     var games= mutableListOf<Game>()
 
-    val UPDATE_INTERVALL = 4000L
+    val UPDATE_INTERVALL = 2000L
 
     init {
         connectWithMaster()
@@ -37,7 +37,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
             while(true) {
                 deleteTerminatedGames()
                 masterConn.send(MsgGameList(gameListToGameDataList()))
-                serverLog("Sende diese GameList zum Master: " + games + "\n")
+                //serverLog("Sende diese GameList zum Master: " + games + "\n")
                 delay(UPDATE_INTERVALL)
             }
         }

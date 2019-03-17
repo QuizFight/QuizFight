@@ -96,17 +96,24 @@ class Game(val id: String, val gameName:String,
      * Send a Message to all Players in this game
      */
     fun broadcast(msg: Message){
+        serverLog("$msg geht an folgende Connections")
+
+        players.values.forEach { println(getIpAndPortFromConnection(it.connection as SocketConnection)) }
         players.values.forEach{ it.connection.send(msg) }
     }
 
 
     fun removePlayer(id: String, conn: Connection){
+        players.remove(id)
+
         if(id == idOfGameCreator) {
+            serverLog("Es war der Game Creator. Alle bekommen eine MsgGameOver\n")
+            broadcast(MsgGameOver())
             terminateGame()
             return
         }
+
         conn.close()
-        players.remove(id)
         broadcast(MsgPlayerCount(--playerCount))
     }
 
@@ -133,6 +140,8 @@ class Game(val id: String, val gameName:String,
      * Ends all connections between the Server and the mobile devices and clears the players list
      */
     fun terminateGame(){
+        serverLog("Schliesse folgende Verbindungen\n")
+        players.values.forEach { println(getIpAndPortFromConnection(it.connection as SocketConnection)) }
         players.values.forEach{ it.connection.close() }
         players = mutableMapOf<String, Player>()
         TERMINATED = true
@@ -156,14 +165,26 @@ class Game(val id: String, val gameName:String,
 
     fun proceed() {
         serverLog("Antwort in proceed() erhaten\n")
-        while(!receiveTimeIsOver && playersAnswered.size < players.size){
-            Thread.sleep(1000)
-        }
+        var time = 0
 
+
+        while(!receiveTimeIsOver ){
+            if(playersAnswered.size == players.size){
+                receiveTimeIsOver = true
+            }
+
+            serverLog("receiveTimeIsOver: : " + receiveTimeIsOver
+                    + "\nplayersAnswered: " + playersAnswered.size
+                    + "\nplayers: " + players.size)
+            serverLog("Timer bei: $time / $receiveAnswersTimer")
+            Thread.sleep(1000)
+            time++
+        }
+        /*
         if(playerLost && playersAnswered.size < players.size){
             var missedPlayer = checkWhichPlayerLeft()
             startVoteIfPlayerLeft(missedPlayer)
-        }
+        }*/
 
         if(playersAnswered.size < players.size)
             return
@@ -177,7 +198,6 @@ class Game(val id: String, val gameName:String,
             broadcast(MsgRanking(createRanking()))
             terminateGame()
         }
-        receiveTimeIsOver = false
         playersAnswered = mutableListOf<String>()
     }
 
