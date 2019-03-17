@@ -23,7 +23,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     val socket = ServerSocket(ownPort)
     var games= mutableListOf<Game>()
 
-    val UPDATE_INTERVALL = 8000L
+    val UPDATE_INTERVALL = 1000L
 
     init {
         connectWithMaster()
@@ -37,6 +37,8 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
                 questionStore.getQuestionsForGame(5).toMutableList()))
         games.add(Game("2", "TestGame 2",5,
                 questionStore.getQuestionsForGame(9).toMutableList()))
+
+        println("Liste der Spiele: $games")
     }
 
 
@@ -106,11 +108,17 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
                         //TODO: implement all handlers for Masterserver communication
                         MsgGameList::class to { conn, msg -> getOpenGames(conn, msg as MsgGameList) },
                         MsgJoin::class to { conn, msg -> joinGame(conn, msg as MsgJoin) },
-                        MsgCreateGame::class to { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame) }
+                        MsgCreateGame::class to { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame) },
+                        MsgRequestOpenGames::class to { conn, msg -> test(conn, msg as MsgRequestOpenGames) }
                 ))
                 println("Client connected")
             }
         }
+    }
+
+    private fun test(conn: Connection, msgRequestOpenGames: MsgRequestOpenGames){
+
+        conn.send(MsgGameList(gameListToGameDataList()))
     }
 
     private fun connectWithMaster() {
@@ -149,6 +157,8 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
         println("Game erstellt. Die ID ist: ${id}")
         conn.send(MsgGameInfo(gameData))
+        println("Sende Spiel an MS")
+        sendUpdate()
     }
 
     /**
