@@ -1,5 +1,6 @@
 package org.quizfight.quizfight
 
+import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -138,6 +139,8 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         }
 
         startActivity(intent)
+        saveGameServersInfo()
+
         context.finish()
     }
 
@@ -150,4 +153,17 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     override fun onBackPressed() {
         sendMsgLeaveGame()
     }
+
+
+    fun saveGameServersInfo(){
+        val preferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
+        val editor = preferences.edit()
+        editor.putString("gameServerIp", Client.gameServerIp)
+        editor.putInt("gameServerPort", Client.gameServerPort)
+        editor.putString("gameId", gameId)
+        editor.putString("nickname", nickname)
+        editor.commit()
+
+    }
+
 }

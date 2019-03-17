@@ -48,6 +48,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     private var rowList = listOf<TableRow>()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
@@ -92,14 +93,10 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 table_row_fourth, table_row_fifth, table_row_sixth, table_row_seventh, table_row_eight)
 
         timer = timer(millisInFuture, countDownInterval)
-
-        //save gameId
-        saveGameId()
     }
 
 
     override fun onDestroy() {
-        saveGameId()
         super.onDestroy()
         job.cancel()
     }
@@ -345,16 +342,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         if(isGameOver){
             super.onBackPressed()
         }
-    }
-
-    fun saveGameId(){
-
-        val preferences = this.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
-        val editor = preferences.edit()
-        editor.putString("gameId", gameId)
-        editor.putString("nickname", nickname)
-        editor.commit()
-
     }
 
 }

@@ -33,24 +33,30 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
     private var masterServerIp = "192.168.0.32"
     private var gameId = ""
     private var nickname = ""
+    private var gameServerIp =""
+    private var gameServerPort = 0
     private var context = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
 
+        //clearGameInfo()
         //Build Client
-        Client.setMasterServer(masterServerIp, MASTER_PORT)
 
         //if user was already in a game
         //send RejojnMsg
         if(readGamesInfo()){
             Log.d("Connection", "Found aborted game, reconnecting")
+            Log.d("Connection startActivity", "ip  $gameServerIp and port $gameServerPort")
+            Client.reconnectToGameServer(gameServerIp, gameServerPort)
             Client.withHandlers(mapOf(
                     MsgQuestion ::class to { conn, msg -> showQuizActivity(msg as MsgQuestion)},
-                    MsgGameOver::class to { _, _ -> clearGameInfo() }
+                    MsgGameOver::class to { _, _ -> clearGameInfo(); Client.reconnectToMaster() }
             ))
-            Client.send(MsgRejoin(nickname, gameId))
+            Client.send(MsgRejoin(gameId, nickname))
+        } else {
+            Client.setMasterServer(masterServerIp, MASTER_PORT)
         }
     }
 
@@ -63,7 +69,6 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
         if(!ed_masterServerIp.text.toString().isEmpty()) {
             masterServerIp = ed_masterServerIp.text.toString()
         }
-        intent.putExtra("masterServerIP", masterServerIp)
         startActivity(intent)
 
     }
@@ -74,15 +79,17 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
      */
     fun showCreateGameActivity(view: View) {
         val intent = Intent(this, CreateGameActivity::class.java)
-        intent.putExtra("masterServerIP", masterServerIp)
         startActivity(intent)
 
     }
 
     fun readGamesInfo() : Boolean{
         val preferences = this.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
+
         gameId = preferences.getString("gameId", "")
         nickname = preferences.getString("nickname", "")
+        gameServerIp = preferences.getString("gameServerIp", "")
+        gameServerPort = preferences.getInt("gameServerPort", 1)
         if(!gameId.isEmpty()){
             return true
         }
