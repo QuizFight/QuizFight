@@ -3,9 +3,9 @@ package org.quizfight.server
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.MsgLeave
-import org.quizfight.common.messages.MsgRanking
 import org.quizfight.common.messages.MsgScore
 import org.quizfight.common.messages.MsgStartGame
+import org.quizfight.common.messages.MsgVote
 
 /**
  * Player Class. Manages the Connection between a mobile device and the Server.
@@ -18,15 +18,22 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
     val connection = oldConnection.withHandlers(mapOf(
             //TODO: Vote, Timeout, etc
             MsgStartGame::class to { conn, msg -> startGame(conn, msg as MsgStartGame) },
-            MsgScore::class to { conn, msg -> receiveAnswer(conn, msg as MsgScore) }
+            MsgScore::class to { conn, msg -> receiveAnswer(conn, msg as MsgScore) },
+            MsgLeave::class to {conn, msg -> leaveGame(conn, msg as MsgLeave)},
+            MsgVote::class to { conn, msg -> receiveVoteOrNot(conn, msg as MsgVote)}
     ))
+
+    private fun receiveVoteOrNot(conn: Connection, msgVote: MsgVote) {
+        game.voting.takeVote(msgVote.waitForPlayer)
+    }
 
 
     /**
      * Forces the game to send the first question
      */
     private fun startGame(conn: Connection, msgStartGame: MsgStartGame) {
-        game.questionIncome = 0
+        serverLog("Ein Spieler hat das Spiel gestartet. Die erste Question wird gesendet\n")
+        game.answersIncome = 0
         game.broadcast(game.getNextQuestion())
     }
 
@@ -38,7 +45,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
 
         for(player in game.players){
             if(player.key == ipAndPort){
-                game.removePlayer(id)
+                game.removePlayer(id, conn)
                 return
             }
         }
@@ -48,6 +55,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
      * Calculates score, removes game's first question and forces the game to send the next question
      */
     private fun receiveAnswer(conn: Connection, msgSendAnswer: MsgScore) {
+        serverLog("Antwort erhalten von ${getIpAndPortFromConnection(conn as SocketConnection)} \n")
         addToScore(msgSendAnswer.score)
         game.proceed()
     }

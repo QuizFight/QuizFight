@@ -1,4 +1,68 @@
 <questions type="CHOICE_QUESTION">
+    <AROUND_THE_WORLD>
+        <question>
+            <text>In welchem Land steht der schiefe Turm von Pisa?</text>
+            <correct>Italien</correct>
+            <bad>Turmland</bad>
+            <bad>Portugal</bad>
+            <bad>Bulgarien</bad>
+        </question>
+        <question>
+            <text>Wie heißt die Hauptstadt von Kamerun?</text>
+            <correct>Jaunde</correct>
+            <bad>Dakar</bad>
+            <bad>Abidjan</bad>
+            <bad>Lagos</bad>
+        </question>
+        <question>
+            <text>Wie lautet die Hauptstadt von Weißrussland?</text>
+            <correct>Minsk</correct>
+            <bad>Nimsk</bad>
+            <bad>Tallinn</bad>
+            <bad>Riga</bad>
+        </question>
+        <question>
+            <text>An welchem Punkt der Erde schaut man in jeder Richtung nur nach Süden?</text>
+            <correct>Nordpol</correct>
+            <bad>Südpol</bad>
+            <bad>Equator</bad>
+            <bad>Spitze des Mount Everests</bad>
+        </question>
+    </AROUND_THE_WORLD>
+    <CHEMISTRY>
+        <question>
+            <text>Was ist keine Legierung?</text>
+            <correct>Nickel</correct>
+            <bad>Bronze</bad>
+            <bad>Elektrum</bad>
+            <bad>Messing</bad>
+        </question>
+    </CHEMISTRY>
+    <COMPUTER_SCIENCE>
+        <question>
+            <text>Was ist keine Programmiersprache?</text>
+            <correct>Koltin</correct>
+            <bad>Java</bad>
+            <bad>Python</bad>
+            <bad>C</bad>
+        </question>
+    </COMPUTER_SCIENCE>
+    <FUN>
+        <question>
+            <text>Ein Hahn sitzt auf einem Dach und schaut nach Norden. Wenn er ein Ei legt, in welche Himmelsrichtung rollt es? </text>
+            <correct>Welches Ei?</correct>
+            <bad>Norden</bad>
+            <bad>Westen</bad>
+            <bad>Süden</bad>
+        </question>
+        <question>
+            <text>In einem Rennen überholt der dritte Fahrer den Zweiten. Auf welcher Postion ist der Überholer?</text>
+            <correct>2</correct>
+            <bad>3</bad>
+            <bad>1</bad>
+            <bad>4</bad>
+        </question>
+    </FUN>
     <GAMING>
         <question>
             <text>Welcher dieser Herren ist Teil des Videospielunternehmens Nintendo?</text>
@@ -14,30 +78,48 @@
             <bad>1991</bad>
             <bad>1993</bad>
         </question>
+        <question>
+            <text>Wie viele verschiedene Pokémon gibt es (Stand 7. Generation)?</text>
+            <correct>802</correct>
+            <bad>753</bad>
+            <bad>856</bad>
+            <bad>917</bad>
+        </question>
     </GAMING>
-    <AROUND_THE_WORLD>
-        <question>
-            <text>In welchem Land steht der schiefe Turm von Pisa?</text>
-            <correct>Italien</correct>
-            <bad>Turmland</bad>
-            <bad>Portugal</bad>
-            <bad>Bulgarien</bad>
-        </question>
-        <question>
-            <text>Wie lautet die Hauptstadt von Weissrussland?</text>
-            <correct>Minsk</correct>
-            <bad>Nimsk</bad>
-            <bad>Tallinn</bad>
-            <bad>Riga</bad>
-        </question>
-    </AROUND_THE_WORLD>
     <HISTORY>
         <question>
-            <text>Wann wurde offiziell der EURO eingefuehrt?</text>
+            <text>Wann wurde offiziell der EURO eingeführt?</text>
             <correct>1. Januar 2002</correct>
             <bad>12. Januar 2002</bad>
             <bad>1. Januar 2001</bad>
             <bad>12. Januar 2001</bad>
         </question>
     </HISTORY>
+    <MOVIES>
+        <question>
+            <text>Wie viele Oscars hat der Herr der Ringe - Die Rückkehr des Königs gewonnen?</text>
+            <correct>11</correct>
+            <bad>10</bad>
+            <bad>15</bad>
+            <bad>8</bad>
+        </question>
+    </MOVIES>
+    <RELIGION>
+        <question>
+            <text>Was ist kein indischer Gott?</text>
+            <correct>Ramen</correct>
+            <bad>Brahma</bad>
+            <bad>Shiva</bad>
+            <bad>Krishna</bad>
+        </question>
+    </RELIGION>
+    <SPORTS>
+        <question>
+            <text>Was trug Fußballer Walter Frosch stets unter den Stutzen?</text>
+            <correct>Zigaretten</correct>
+            <bad>Rosa Strümpfe</bad>
+            <bad>Bild seiner Mama</bad>
+            <bad>Tattoo des Abstiegsgespensts</bad>
+        </question>
+    </SPORTS>
 </questions>

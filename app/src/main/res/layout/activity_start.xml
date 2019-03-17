@@ -7,11 +7,21 @@
     android:orientation="vertical"
     android:background="@color/background">
 
+    <EditText
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/ed_masterServerIp"
+        android:layout_gravity="center"
+        android:layout_marginTop="80dp"
+        android:hint="@string/ed_master"
+        android:textColorHint="#fff"/>
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_marginTop="80dp">
 
         <Button
             android:id="@+id/btn_create_game"

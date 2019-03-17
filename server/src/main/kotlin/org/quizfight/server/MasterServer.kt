@@ -2,6 +2,7 @@
 package org.quizfight.server
 
 import org.quizfight.common.Connection
+import org.quizfight.common.GAME_SERVER_PORT
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import java.net.ServerSocket
@@ -38,11 +39,10 @@ class MasterServer(private val port : Int) {
     private fun receiveGameServerUpdate(conn: Connection, msgGameList: MsgGameList) {
         val remoteIpPort = getIpAndPortFromConnection(conn as SocketConnection)
         val remoteIp     = remoteIpPort.split(":")[0]
-        val remotePort   = remoteIpPort.split(":")[1].toInt()
 
-        gameServers.find { gs -> gs.ip == remoteIp && gs.port == remotePort }!!.games = msgGameList.games
+        gameServers.find { gs -> gs.ip == remoteIp && gs.port == GAME_SERVER_PORT }!!.games = msgGameList.games
 
-        serverLog("GameListe erhalten von: ${remoteIp}:${remotePort}")
+        serverLog("GameListe erhalten von: $remoteIp:$GAME_SERVER_PORT")
         serverLog("Meine aktuelle Liste aller Spiele sieht so aus:\n" + listAllOpenGames() + "\n")
     }
 
@@ -79,7 +79,7 @@ class MasterServer(private val port : Int) {
      */
     private fun getLeastUsedGameServer() : ServerData {
         gameServers.sortBy { it.games.size }
-        return gameServers.first()
+        return gameServers[0]
     }
 
     /**
@@ -120,6 +120,7 @@ class MasterServer(private val port : Int) {
         //TODO: What if == null?
         if (gameServer != null) {
             conn.send(MsgTransferToGameServer(gameServer))
+            conn.close()
         }
 
         serverLog("Spieler ${msgJoinGame.nickname} möchte dem Spiel ${msgJoinGame.gameId} joinen")
@@ -130,9 +131,12 @@ class MasterServer(private val port : Int) {
      * Handler function for Create Game requests.
      * Sends the server with the lowest amount of games.
      */
-    private fun sendLeastUsedGameServer(conn : Connection, msgJoinGame: MsgCreateGame) {
+    private fun sendLeastUsedGameServer(conn : Connection, msgCreateGame: MsgCreateGame) {
+        serverLog("Client möchte Spiel erstellen: ${msgCreateGame.game.name}")
         val gameServer = getLeastUsedGameServer()
+        serverLog("Er erhält diesen Server dafür: ${gameServer} \n")
         conn.send(MsgTransferToGameServer(gameServer))
+        conn.close()
     }
 
 
@@ -144,7 +148,7 @@ class MasterServer(private val port : Int) {
         // TODO ip und port werden wahrscheinlich anders mitgegeben, rücksprache!
         val remoteIpPort = getIpAndPortFromConnection(conn as SocketConnection)
         val remoteIp     = remoteIpPort.split(":")[0]
-        val remotePort   = remoteIpPort.split(":")[1].toInt()
+        val remotePort   = msg.port
 
         val gameServer = ServerData(remoteIp, remotePort, listOf<GameData>())
 

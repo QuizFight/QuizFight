@@ -9,72 +9,58 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.quizfight.common.SocketConnection
-import org.quizfight.common.messages.MsgLeave
-import org.quizfight.common.messages.MsgPlayerCount
-import org.quizfight.common.messages.MsgQuestion
-import org.quizfight.common.messages.MsgStartGame
-import java.net.Socket
+import org.quizfight.common.messages.*
+import org.quizfight.common.question.ChoiceQuestion
+import org.quizfight.common.question.GuessQuestion
+import java.util.ArrayList
 
 class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
-    private var gameId : String = ""
-    private var maxPlayers: Int = 0
-    private var nickname : String = ""
-    private var questionCountTotal = 0
-
-    private var startGameEnable : Boolean = false
-
-    private lateinit var conn : SocketConnection
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
     private val context = this
 
+    private var maxPlayers: Int = 0
+    private var nickname : String = ""
+    private var questionCountTotal = 0
+    private var startGameEnable : Boolean = false
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attempt_quiz_start)
 
-        launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket("10.0.2.2", 34567),
-                    mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity()},
-                            MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
-        }
+        Client.withHandlers(
+                mapOf( MsgQuestion ::class to { conn, msg -> showQuizActivity(msg as MsgQuestion)},
+                        MsgPlayerCount ::class to { conn, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)}))
 
-        gameId = intent.getStringExtra("gameId")
         var createdBy = intent.getStringExtra("createdBy")
         nickname = intent.getStringExtra("nickname")
         var gameName = intent.getStringExtra("gameName")
         maxPlayers = intent.getIntExtra("maxPlayers",0)
         questionCountTotal = intent.getIntExtra("questionCountTotal",0)
         startGameEnable = intent.getBooleanExtra("startEnable", false)
+        val playerCount = intent.getIntExtra("playerCount", 0)
 
         updateUI(nickname, createdBy, gameName, questionCountTotal)
-        updateProgressBar(1)
+        updateProgressBar(playerCount + 1)
 
         btn_leave.setOnClickListener {
             sendMsgLeaveGame()
         }
-
     }
 
 
     fun sendMsgStartGame() {
-        launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket("10.0.2.2", 34567), mapOf())
-            conn.send(MsgStartGame())
-        }
-        launch { context.finish() }
-
+        Client.send(MsgStartGame())
+        btn_start.isEnabled = false
     }
 
     fun sendMsgLeaveGame() {
-        launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket("10.0.2.2", 34567), mapOf())
-            conn.send(MsgLeave())
-        }
+        Client.send(MsgLeave())
         launch { context.finish() }
-
+        Client.reconnectToMaster()
     }
 
 
@@ -86,7 +72,6 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         tv_created_by.setText(createdBy)
 
 
-
         if(startGameEnable){
             btn_start.visibility = View.VISIBLE
             btn_start.setOnClickListener {
@@ -95,7 +80,6 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         } else{
             btn_start.visibility = View.GONE
         }
-
     }
 
     fun updateProgressBar(players: Int)= launch {
@@ -112,11 +96,42 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     }
 
 
-    fun showQuizActivity() = launch{
-        // Create an Intent to start the AllGamesActivity
+    fun showQuizActivity(msg: MsgQuestion) = launch{
+
         val intent = Intent(context, QuizActivity::class.java)
-        intent.putExtra("gameId" , gameId)
-        intent.putExtra("questionCountTotal" , questionCountTotal)
+        intent.putExtra("nickname", nickname)
+        intent.putExtra("questionCountTotal", questionCountTotal)
+        intent.putExtra("questionText", msg.question.text)
+        intent.putExtra("Category", msg.question.category.name)
+
+        //put 1st question
+
+        //handle ChoiceQuestion
+        if(msg.question is ChoiceQuestion) {
+
+            val question = msg.question as ChoiceQuestion
+
+            intent.putExtra("isChoiceQuestion", true)
+            intent.putExtra("correctChoice", question.correctChoice)
+            var answers = ArrayList<String>()
+            answers.add(question.choices[0])
+            answers.add(question.choices[1])
+            answers.add(question.choices[2])
+
+            intent.putStringArrayListExtra("answers", answers)
+        }
+
+        //handle GuessQuestion
+        else{
+
+            val question = msg.question as GuessQuestion
+
+            intent.putExtra("isChoiceQuestion", false)
+            intent.putExtra("correctChoice",question.correctValue)
+            intent.putExtra("highest", question.highest)
+            intent.putExtra("lowest", question.lowest)
+        }
+
         startActivity(intent)
         context.finish()
     }

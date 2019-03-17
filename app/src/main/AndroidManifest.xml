@@ -19,10 +19,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AllGamesActivity" />
-        <activity android:name=".GameDetailActivity" />
-        <activity android:name=".CreateGameActivity" />
-        <activity android:name=".AttemptQuizStartActivity"></activity>
+        <activity
+            android:name=".AllGamesActivity"
+            android:label="@string/title_all_games_activity">
+        </activity>
+        <activity
+            android:name=".GameDetailActivity"
+            android:label="@string/title_game_details_activity">
+        </activity>
+        <activity
+            android:name=".CreateGameActivity"
+            android:label="@string/title_create_game_activity">
+        </activity>
+        <activity
+            android:name=".AttemptQuizStartActivity"
+            android:label="@string/title_attempt_start_activity">
+        </activity>
     </application>
 
 </manifest>

@@ -5,36 +5,29 @@ import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import org.quizfight.common.question.Question
-import java.net.Socket
-import java.util.*
+import java.io.IOException
 
 /**
  * Game Class. Manages connections to players, asks Questions and calculates the scores
  * @author Thomas Spanier
  */
-class Game(val id: String, val gameName:String, val maxPlayer: Int, var questions: MutableList<Question<*>>) {
-    private val MSG_PLAYER_COUNT = "MaxPlayerCount must be between 2 and 8!"
+class Game(val id: String, val gameName:String, val maxPlayer: Int,
+           var questions: MutableList<Question<*>>, val idOfGameCreator: String) {
+
     private val MSG_GAME_FULL = "The Game is already full!"
 
 
-    var questionIncome: Int = 0
+    var answersIncome: Int = 0
     var players: MutableMap<String, Player> = mutableMapOf<String, Player>()
+
+
+    var voting = Voting(this)
 
     var playerCount = 0
 
     var isOpen: Boolean = true
+    var TERMINATED = false
 
-    /**
-     * Sets the max number of players. Must be between 2 and 8
-     * TODO: Reimplement
-     */
-    private fun setMaxPlayer(maxPlayer: Int):Int{
-        if (maxPlayer>8 || maxPlayer < 2) {
-            throw java.lang.IllegalArgumentException(MSG_PLAYER_COUNT)
-        } else {
-            return maxPlayer
-        }
-    }
 
     /**
      * Adds a player to the game
@@ -45,34 +38,44 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
 
         val player = Player(name, this, connection, ipAndPort)
         addPlayer(player)
-        //conn.send(MsgGameJoined(gameToGameData(games[msgJoinGame.id])))
     }
 
     fun addPlayer(player: Player) {
         if(players.size >= maxPlayer) {
+            serverLog("Player size >= maxPlayer")
             throw Exception(MSG_GAME_FULL)
             return
         }
         players.put(player.id, player)
 
-        broadcast(MsgPlayerCount(++playerCount))
+        playerCount++
+        if(playerCount > 1) {
+            broadcast(MsgPlayerCount(playerCount))
+            serverLog("Der PlayerCount wurde an alle Spieler versendet, aktuell sind ${playerCount} im Spiel\n")
+        }
 
         if(playerCount == maxPlayer) {
             isOpen = false
-            this.broadcast(getNextQuestion())
+            serverLog("Maximale Spieleranzahl erreicht. Spiel Startet in 3 Sekunden")
+            Thread.sleep(3000)
+            broadcast(getNextQuestion())
         }
     }
 
     /**
      * Send a Message to all Players in this game
-     *
      */
     fun broadcast(msg: Message){
         players.values.forEach{ it.connection.send(msg) }
     }
 
 
-    fun removePlayer(id: String){
+    fun removePlayer(id: String, conn: Connection){
+        if(id == idOfGameCreator) {
+            terminateGame()
+            return
+        }
+        conn.close()
         players.remove(id)
         broadcast(MsgPlayerCount(--playerCount))
     }
@@ -100,38 +103,73 @@ class Game(val id: String, val gameName:String, val maxPlayer: Int, var question
      * Ends all connections between the Server and the mobile devices and clears the players list
      */
     fun terminateGame(){
-        players.values.forEach{
-            it.connection.close()
-        }
-        players.clear()
+        players.values.forEach{ it.connection.close() }
+        players = mutableMapOf<String, Player>()
+        TERMINATED = true
     }
 
     override fun toString(): String {
         return "Game(id=$id, gameName='$gameName', maxPlayer=$maxPlayer, open=$isOpen)"
     }
 
-    fun createRanking(): SortedMap<String, Int> {
-        var ranking = sortedMapOf<String, Int>()
+    fun createRanking(): Map<String, Int> {
+        val ranking = hashMapOf<String, Int>()
 
         for (player in players){
-            ranking.put(player.key, player.value.score)
+            ranking.put(player.value.name, player.value.score)
         }
-        return ranking
+
+        val rankingSorted = ranking.toList().sortedBy { (_, value) -> value}.toMap()
+
+        return rankingSorted
     }
 
     fun proceed() {
-        questionIncome++
-        
-        if(questionIncome < players.size)
+        answersIncome++
+
+        if(answersIncome < players.size)
             return
 
-        questionIncome = 0
-        questions.removeAt(0)
+        answersIncome = 0
 
-        if(questions.size == 0){
+        if(questions.size > 0){
             broadcast(MsgRanking(createRanking()))
-        }else{
             broadcast(getNextQuestion())
+        }else{
+            broadcast(MsgGameOver())
+            broadcast(MsgRanking(createRanking()))
+            terminateGame()
         }
+    }
+
+    private fun checkConnections() {
+        players.forEach {
+            try {
+                it.value.connection.send(MsgCheckConnection())
+            }catch(ex: IOException){
+                serverLog("Client ${it.value.name} hat die Verbindung verloren. Voting wird gesendet\n")
+                sendVoting(it.value.id)
+                return
+            }
+        }
+    }
+
+    /**
+     * Sends a voting message to all clients still connected
+     * @param id is the missed client
+     */
+    private fun sendVoting(id: String) {
+        var nickname = ""
+
+        players.forEach{
+            if(id == it.value.id) {
+                players.remove(id)
+                nickname = it.value.name
+            }
+        }
+
+        serverLog("Sende Voting zu allen verbliebenen Clients")
+        broadcast(MsgConnectionLost(nickname))
+
     }
 }

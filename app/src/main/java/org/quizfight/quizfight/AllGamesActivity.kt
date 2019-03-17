@@ -10,9 +10,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.quizfight.common.SocketConnection
+import org.quizfight.common.MASTER_PORT
 import org.quizfight.common.messages.*
-import java.net.Socket
+import android.support.v4.widget.SwipeRefreshLayout
+
+
 
 /**
  * This activity allows the user to join a game
@@ -23,14 +25,18 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
 
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
-    private lateinit var conn : SocketConnection
 
     private val context = this
     private lateinit var allOpenGames : List<GameData>
 
+    var masterServerIp = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_all_games)
+
+        masterServerIp = intent.getStringExtra("masterServerIP")
+        Client.setMasterServer(masterServerIp, MASTER_PORT)
 
         sendRequestOpenGame()
 
@@ -46,23 +52,38 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
             intent.putExtra("gameId", selectedGame.id)
             intent.putExtra("questionCountTotal", selectedGame.questionCount)
             intent.putExtra("maxPlayers", selectedGame.maxPlayers)
+            intent.putExtra("playerCount", selectedGame.players.size)
+
+            intent.putExtra("masterServerIP", masterServerIp)
 
             startActivity(intent)
         }
 
         btn_sync.setOnClickListener {
             sendRequestOpenGame()
+            btn_sync.visibility = View.INVISIBLE
         }
+
+
+        //add refresh swipe
+
+        swiperefresh.setOnRefreshListener(object : SwipeRefreshLayout.OnRefreshListener {
+            override fun onRefresh() {
+                //Here you can update your data from internet or from local SQLite data
+                sendRequestOpenGame()
+                swiperefresh.setRefreshing(false)
+            }
+        })
 
 
     }
 
-    fun sendRequestOpenGame(){
-        launch(Dispatchers.IO) {
-            conn = SocketConnection(Socket("10.0.2.2", 34567),
-                    mapOf(MsgGameList ::class to { conn, msg -> showGames((msg as MsgGameList).games)}  ))
-            conn.send(MsgRequestOpenGames())
-        }
+    fun sendRequestOpenGame() {
+        while (!Client.connected);
+        Client.withHandlers(mapOf(
+                MsgGameList ::class to { conn, msg -> showGames((msg as MsgGameList).games)}
+        ))
+        Client.send(MsgRequestOpenGames())
 
     }
 
@@ -89,7 +110,7 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
                 android.R.layout.simple_list_item_1,
                 gameNameList
         )
-        all_games_container.adapter = adapter;
+        all_games_container.adapter = adapter
     }
 
 

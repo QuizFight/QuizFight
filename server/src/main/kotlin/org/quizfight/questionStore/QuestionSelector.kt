@@ -16,7 +16,7 @@ class QuestionSelector {
      * @return is the list of questions. Its size is obtained by param count
      */
     fun getQuestionsForGame(count: Int, list: List<Question<*>>): List<Question<*>>{
-        if(count > list.size || count < 4 || count > 20) return listOf<Question<*>>()
+        if(count > list.size || count < 1 || count > 20) return listOf<Question<*>>()
 
         var tmpType = "tmpType"
         var tmpCategory = "tmpCategory"
