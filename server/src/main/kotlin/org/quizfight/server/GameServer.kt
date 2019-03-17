@@ -101,10 +101,28 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
                 SocketConnection(incoming, mapOf(
                         MsgGameList::class to { conn, msg -> getOpenGames(conn, msg as MsgGameList) },
                         MsgJoin::class to { conn, msg -> joinGame(conn, msg as MsgJoin) },
-                        MsgCreateGame::class to { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame) }
+                        MsgCreateGame::class to { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame) },
+                        MsgRejoin::class to { conn, msg -> rejoinGame(conn, msg as MsgRejoin) }
                 ))
             }
         }
+    }
+
+    private fun rejoinGame(conn: Connection, msgRejoin: MsgRejoin) {
+        if(games.size == 0) conn.send(MsgGameOver())
+
+        lateinit var gameToJoin: Game
+
+        for(game in games){
+            if(game.id == msgRejoin.gameServerID){
+                gameToJoin = game
+            }
+        }
+
+        if(gameToJoin != null){
+            gameToJoin.addPlayer(msgRejoin.nickname, conn)
+        }
+
     }
 
     private fun connectWithMaster() {
