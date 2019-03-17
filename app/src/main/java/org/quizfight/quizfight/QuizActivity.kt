@@ -92,6 +92,9 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 table_row_fourth, table_row_fifth, table_row_sixth, table_row_seventh, table_row_eight)
 
         timer = timer(millisInFuture, countDownInterval)
+
+        //save gameId
+        saveGameId()
     }
 
 
@@ -348,9 +351,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         val preferences = this.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
         val editor = preferences.edit()
         editor.putString("gameId", gameId)
+        editor.putString("nickname", nickname)
         editor.commit()
 
-        //--READ data
-      //  myvar = preferences.getInt("var1", 0)
     }
 }

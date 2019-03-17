@@ -1,10 +1,17 @@
 package org.quizfight.quizfight
 
+import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import kotlinx.android.synthetic.main.activity_start.*
+import kotlinx.coroutines.launch
+import org.quizfight.common.messages.MsgQuestion
+import org.quizfight.common.question.ChoiceQuestion
+import org.quizfight.common.question.GuessQuestion
+import java.util.ArrayList
+
 
 /**
  * This activity is the first activity of the app
@@ -13,12 +20,21 @@ import kotlinx.android.synthetic.main.activity_start.*
  */
 class StartActivity : AppCompatActivity() {
 
-    var masterServerIp = "192.168.0.32"
+    private var masterServerIp = "192.168.0.30"
+    private var gameId = ""
+    private var nickname = ""
+    private var context = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_start)
+
+      /*  if(readGamesInfo()){
+            Client.send(MsgRejoin(nickname, gameId)
+            val intent = Intent(this, QuizActivity::class.java)
+
+        }*/
     }
 
     /**
@@ -44,5 +60,57 @@ class StartActivity : AppCompatActivity() {
         startActivity(intent)
 
     }
+
+    fun readGamesInfo() : Boolean{
+        val preferences = this.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
+        gameId = preferences.getString("gameId", "")
+        nickname = preferences.getString("nickname", "")
+        if(!gameId.isEmpty()){
+            return true
+        }
+        return false
+    }
+
+   /* fun showQuizActivity(msg: MsgQuestion) = launch{
+
+        val intent = Intent(context, QuizActivity::class.java)
+        intent.putExtra("gameId" , gameId)
+        intent.putExtra("nickname", nickname)
+        intent.putExtra("questionCountTotal", questionCountTotal)
+        intent.putExtra("questionText", msg.question.text)
+        intent.putExtra("Category", msg.question.category.name)
+
+        //put 1st question
+
+        //handle ChoiceQuestion
+        if(msg.question is ChoiceQuestion) {
+
+            val question = msg.question as ChoiceQuestion
+
+            intent.putExtra("isChoiceQuestion", true)
+            intent.putExtra("correctChoice", question.correctChoice)
+            var answers = ArrayList<String>()
+            answers.add(question.choices[0])
+            answers.add(question.choices[1])
+            answers.add(question.choices[2])
+
+            intent.putStringArrayListExtra("answers", answers)
+        }
+
+        //handle GuessQuestion
+        else{
+
+            val question = msg.question as GuessQuestion
+
+            intent.putExtra("isChoiceQuestion", false)
+            intent.putExtra("correctChoice",question.correctValue)
+            intent.putExtra("highest", question.highest)
+            intent.putExtra("lowest", question.lowest)
+        }
+
+        startActivity(intent)
+        context.finish()
+    }*/
+
 
 }
