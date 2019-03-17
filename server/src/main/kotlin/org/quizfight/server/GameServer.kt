@@ -109,12 +109,16 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     }
 
     private fun rejoinGame(conn: Connection, msgRejoin: MsgRejoin) {
+        serverLog("Spieler ${msgRejoin.nickname} möchte rejoinen")
+
         games.forEach {
             if(it.id == msgRejoin.gameServerID){
                 it.addPlayer(msgRejoin.nickname, conn)
                 return
             }
         }
+        
+        serverLog("Sein altes Spiel wurde nicht mehr gefunden\n")
         conn.send(MsgGameOver())
     }
 
