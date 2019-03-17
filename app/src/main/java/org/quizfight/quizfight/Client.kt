@@ -65,11 +65,12 @@ object Client : CoroutineScope, Connection {
     }
 
     fun reconnectToMaster() = launch(Dispatchers.IO) {
-        Log.d("Connection", "(Re)Connecting to master server $masterServerIP...")
 
         val handlers = connection?.handlers
         connection?.close()
 
+        Log.d("Connection", "Connection with gameserver closed ")
+        Log.d("Connection", "(Re)Connecting to master server $masterServerIP...")
         val socket = Socket(masterServerIP!!, masterServerPort!!)
         connection = SocketConnection(socket, handlers ?: emptyMap())
 

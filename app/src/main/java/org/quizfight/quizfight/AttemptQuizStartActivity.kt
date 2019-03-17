@@ -60,9 +60,10 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     fun restartApplication() = launch{
         Toast.makeText(context, "Sorry this game is no more available", Toast.LENGTH_LONG).show()
-       // Client.reconnectToMaster()
-        //context.finish()
-
+        Client.reconnectToMaster()
+        val intent = Intent(context, StartActivity::class.java)
+        startActivity(intent)
+        context.finish()
     }
 
     fun sendMsgStartGame() {
