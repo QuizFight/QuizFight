@@ -58,14 +58,13 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         }
     }
 
-    fun restartApplication() = launch{
-
-        Thread.sleep(1000)
-        val intent = Intent(context, StartActivity::class.java)
+    fun restartApplication() {
+       // Thread.sleep(1000)
+       /* val intent = Intent(context, StartActivity::class.java)
         intent.putExtra("restart" , true)
-        startActivity(intent)
-        context.finish()
-        //Client.reconnectToMaster()
+        startActivity(intent)*/
+        launch{ context.finish() }
+        Client.reconnectToMaster()
     }
 
     fun sendMsgStartGame() {
