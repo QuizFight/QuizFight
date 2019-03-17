@@ -41,7 +41,7 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
 
-        //clearGameInfo()
+        clearGameInfo()
         //Build Client
 
         //if user was already in a game
