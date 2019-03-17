@@ -53,8 +53,8 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
      * Calculates score, removes game's first question and forces the game to send the next question
      */
     private fun receiveAnswer(conn: Connection, msgSendAnswer: MsgScore) {
-        serverLog("Antwort erhalten von ${getIpAndPortFromConnection(conn as SocketConnection)} \n")
-        game.playersAnswered.add(getIpAndPortFromConnection(conn as SocketConnection))
+        serverLog("Antwort erhalten von ${getIpAndPortFromConnection(conn)} \n")
+        game.playersAnswered.add(getIpAndPortFromConnection(conn))
         addToScore(msgSendAnswer.score)
         game.proceed()
     }

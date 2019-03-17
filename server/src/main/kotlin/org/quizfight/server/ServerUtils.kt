@@ -1,5 +1,6 @@
 package org.quizfight.server
 
+import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 
     var serverLogger = true
@@ -10,7 +11,7 @@ import org.quizfight.common.SocketConnection
         }
     }
 
-    fun getIpAndPortFromConnection(conn: SocketConnection): String{
+    fun getIpAndPortFromConnection(conn: Connection): String{
         val sockConn = conn as SocketConnection
         val remoteIpPort = sockConn.socket.remoteSocketAddress.toString().
                 replace("/", "")
