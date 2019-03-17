@@ -101,10 +101,25 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
                 SocketConnection(incoming, mapOf(
                         MsgGameList::class to { conn, msg -> getOpenGames(conn, msg as MsgGameList) },
                         MsgJoin::class to { conn, msg -> joinGame(conn, msg as MsgJoin) },
-                        MsgCreateGame::class to { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame) }
+                        MsgCreateGame::class to { conn, msg -> receiveCreateGame(conn, msg as MsgCreateGame) },
+                        MsgRejoin::class to { conn, msg -> rejoinGame(conn, msg as MsgRejoin) }
                 ))
             }
         }
+    }
+
+    private fun rejoinGame(conn: Connection, msgRejoin: MsgRejoin) {
+        serverLog("Spieler ${msgRejoin.nickname} möchte rejoinen")
+
+        games.forEach {
+            if(it.id == msgRejoin.gameServerID){
+                it.addPlayer(msgRejoin.nickname, conn)
+                return
+            }
+        }
+        
+        serverLog("Sein altes Spiel wurde nicht mehr gefunden\n")
+        conn.send(MsgGameOver())
     }
 
     private fun connectWithMaster() {
