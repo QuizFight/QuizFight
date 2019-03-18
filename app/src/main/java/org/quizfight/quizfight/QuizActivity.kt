@@ -94,7 +94,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 MsgRanking::class to { _, msg -> showRanking(msg as MsgRanking)},
                 MsgGameOver::class to { _, _ -> finishQuiz()},
                 MsgConnectionLost::class to { _, msg -> displayDisconnectedPoll(msg as MsgConnectionLost)},
-                MsgCheckConnection::class to {_,_ -> }
+                MsgCheckConnection::class to {_,_ -> },
+                MsgWait::class to {_, _ -> displayWaitingForReconnection()}
                 ))
 
         //initialize UI elements
@@ -111,8 +112,9 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
         //show question view
         rowList.forEach({tr -> hideTableRows(tr)})
-        showHide(question_outer_layout)
-        showHide(score_outer_layout)
+        score_outer_layout.visibility = View.GONE
+        reconnection_outer_layout.visibility = View.GONE
+        question_outer_layout.visibility = View.VISIBLE
 
         currentQuestion = question
         if (questionCounter < questionCountTotal) {
@@ -216,8 +218,9 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         launch{
 
             //show ranking view
-            showHide(question_outer_layout)
-            showHide(score_outer_layout)
+            question_outer_layout.visibility = View.GONE
+            reconnection_outer_layout.visibility = View.GONE
+            score_outer_layout.visibility = View.VISIBLE
 
             val rowNicknameScoreViews = listOf<Triple<TableRow, TextView, TextView>>(
                     Triple(table_row_first, nickname_view1, score_view1), Triple(table_row_second, nickname_view2, score_view2),
@@ -453,5 +456,12 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         super.onDestroy()
         job.cancel()
     }
+
+    fun displayWaitingForReconnection() {
+        question_outer_layout.visibility = View.GONE
+        score_outer_layout.visibility = View.GONE
+        reconnection_outer_layout.visibility = View.VISIBLE
+    }
+
 
 }

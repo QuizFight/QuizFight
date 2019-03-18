@@ -41,5 +41,6 @@
     <!--Disconnection Poll-->
     <string name="lbl_player_lost_connection">A player has been disconnected. Please vote</string>
 
+    <string name="lbl_waiting_for_player">Waiting for player to reconnect</string>
     
 </resources>

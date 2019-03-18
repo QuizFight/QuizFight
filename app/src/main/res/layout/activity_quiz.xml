@@ -9,6 +9,37 @@
     android:background="@color/background">
 
     <LinearLayout
+        android:id="@+id/reconnection_outer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/waiting_for_player_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_weight="1"
+            android:text="@string/lbl_waiting_for_player"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimary"
+            android:textSize="30dp" />
+
+        <com.mikhaellopez.circularprogressbar.CircularProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="80dp"
+            android:cpb_background_progressbar_width="20dp"
+            android:cpb_progressbar_color="@color/colorPrimary"
+            android:cpb_progressbar_width="20dp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/question_outer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
