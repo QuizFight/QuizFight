@@ -31,7 +31,7 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
-    private var masterServerIp = "192.168.0.38"
+    private var masterServerIp = "192.168.178.87"
     private var gameId = ""
     private var nickname = ""
     private var gameServerIp =""

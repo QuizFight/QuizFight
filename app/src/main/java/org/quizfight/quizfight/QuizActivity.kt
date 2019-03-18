@@ -145,7 +145,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         btn_answer1.isEnabled = false
         btn_answer2.isEnabled = false
         btn_answer3.isEnabled = false
-        btn_answer3.isEnabled = false
+        btn_answer4.isEnabled = false
 
     }
 
@@ -319,8 +319,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     }
 
-    fun displayDisconnectedPoll(msg: MsgConnectionLost) {
-        val builder = AlertDialog.Builder(this)
+    fun displayDisconnectedPoll(msg: MsgConnectionLost) = launch {
+        val builder = AlertDialog.Builder(this@QuizActivity)
         val view = layoutInflater.inflate(R.layout.layout_disconnect_poll, null)
         builder.setView(view)
 
