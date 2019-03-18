@@ -8,13 +8,14 @@ class Voting(var game: Game){
     var playerIsBack = false
 
     fun takeVote(vote: Boolean){
+        serverLog("Vote empfrangen: $vote")
         var count = votes.get(vote)!!
         votes.put(vote, count + 1)
     }
 
     fun evaluateVoting() : Boolean{
         serverLog("Voting wird jetzt ausgewertet\n")
-        serverLog("Es gab ${votes.get(true)!!} Stimmen dafür und ${votes.get(true)!!} dagegen\n")
+        serverLog("Es gab ${votes.get(true)!!} Stimmen dafür und ${votes.get(false)!!} dagegen\n")
         resetVotingLogic()
         return votes.get(true)!! > votes.get(false)!!
     }
