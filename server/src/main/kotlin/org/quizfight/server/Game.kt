@@ -74,9 +74,9 @@ class Game(val id: String, val gameName:String,
                 delay(1000)
                 time++
 
-                /*serverLog("Timer: $time / $receiveAnswersTimer")
+                serverLog("Timer: $time / $receiveAnswersTimer")
                 serverLog("playersAnswered: "  + playersAnswered.size + "\n"
-                        + "players: "          + players.size) */
+                        + "players insgesamt: "          + players.size)
             }
         }
     }
@@ -154,18 +154,18 @@ class Game(val id: String, val gameName:String,
 
         // Only the last player will pass this
         if(playersAnswered.size >= 2 && playerID == playersAnswered[playersAnswered.size - 1]){
-            serverLog("Vorletzter Spieler war: $playerID")
             return
         }
+
+        stopTimer()
 
         if(playerLost){
             var missedPlayer = checkWhichPlayerLeft()
             serverLog("Player verloren: ${missedPlayer.name}")
             missedPlayer.connection.close()
             players.remove(missedPlayer.id)
+            startVoteIfPlayerLeft(missedPlayer)
         }
-
-        stopTimer()
 
         if(questions.size > 0){
             nextRound()
@@ -215,22 +215,17 @@ class Game(val id: String, val gameName:String,
     private fun startVoteIfPlayerLeft(missedPlayer: Player) {
         broadcast(MsgConnectionLost(missedPlayer.name))
 
-        voting.startVoting()
-
-        while(voting.isOpen){
-            Thread.sleep(2000)
-        }
+        serverLog("Warte ${voting.timerSendingVotes / 1000} Sekunden auf Votings der Clients...\n")
+        Thread.sleep(voting.timerSendingVotes)
 
         var waitOrNot = voting.evaluateVoting()
-        continueGameOrWaitForRejoin(waitOrNot, missedPlayer.id)
+        continueGameOrWaitForRejoin(waitOrNot)
     }
 
-    private fun continueGameOrWaitForRejoin(waitOrNot: Boolean, id: String) {
+    private fun continueGameOrWaitForRejoin(waitOrNot: Boolean) {
         if(waitOrNot) {
-            serverLog("Game $gameName wartet $voting.votingWaitingTime Sekunden auf den Spieler")
+            serverLog("Game $gameName wartet ${voting.votingWaitingTime / 1000} Sekunden auf den Spieler")
             Thread.sleep(voting.votingWaitingTime)
-        }else{
-            players.remove(id)
         }
     }
 
