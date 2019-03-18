@@ -158,7 +158,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
 
     fun sendScore() {
-        var timeLeft = 21 - progress_question.progress
+        var timeLeft = 21 - progress_question.progress / 1000
         timer.cancel()
 
         if(currentQuestion.question is ChoiceQuestion){
