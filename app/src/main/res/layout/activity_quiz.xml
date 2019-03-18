@@ -34,9 +34,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="40dp"
             android:layout_marginBottom="80dp"
-            android:cpb_background_progressbar_width="20dp"
-            android:cpb_progressbar_color="@color/colorPrimary"
-            android:cpb_progressbar_width="20dp" />
+         />
     </LinearLayout>
 
     <LinearLayout
