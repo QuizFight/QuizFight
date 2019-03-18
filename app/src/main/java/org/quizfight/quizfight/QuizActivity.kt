@@ -319,8 +319,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     }
 
-    fun displayDisconnectedPoll(msg: MsgConnectionLost) {
-        val builder = AlertDialog.Builder(this)
+    fun displayDisconnectedPoll(msg: MsgConnectionLost) = launch {
+        val builder = AlertDialog.Builder(this@QuizActivity)
         val view = layoutInflater.inflate(R.layout.layout_disconnect_poll, null)
         builder.setView(view)
 
