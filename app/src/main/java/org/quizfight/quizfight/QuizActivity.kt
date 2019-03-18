@@ -372,12 +372,14 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
 
     /**
-     * OnBackpressed displays a confirm dialog first
+     * OnBackpressed
+     * Player can not quit a game voluntary
      */
     override fun onBackPressed() {
         if(isGameOver){
             super.onBackPressed()
-        }else{
+       }
+        /* else{
             //ask for confirmation bevor leave
             var ad = AlertDialog.Builder(context)
             ad.setTitle("Warning")
@@ -392,7 +394,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 ad.setCancelable(true)
             }
             ad.show()
-        }
+        }*/
     }
 
 
