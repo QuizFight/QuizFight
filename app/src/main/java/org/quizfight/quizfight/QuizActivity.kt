@@ -347,13 +347,15 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     }
 
+
     /**
      * display dialog when a player has lost the connection during a game
      * This enable the user to vote to wait for that player or not
      * the game continues when the app becomes a new question
      */
-    fun displayDisconnectedPoll(msg: MsgConnectionLost) = launch{
-        val builder = AlertDialog.Builder(context)
+
+    fun displayDisconnectedPoll(msg: MsgConnectionLost) = launch {
+        val builder = AlertDialog.Builder(this@QuizActivity)
         val view = layoutInflater.inflate(R.layout.layout_disconnect_poll, null)
         builder.setView(view)
 
@@ -369,9 +371,27 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
     }
 
 
+    /**
+     * OnBackpressed displays a confirm dialog first
+     */
     override fun onBackPressed() {
         if(isGameOver){
             super.onBackPressed()
+        }else{
+            //ask for confirmation bevor leave
+            var ad = AlertDialog.Builder(context)
+            ad.setTitle("Warning")
+            ad.setMessage("Are you sure you want to leave this game?")
+
+            ad.setPositiveButton("yes") { _, _ ->
+                context.finish()
+                Client.reconnectToMaster()
+            }
+
+            ad.setNegativeButton("Cancel") { _, _ ->
+                ad.setCancelable(true)
+            }
+            ad.show()
         }
     }
 

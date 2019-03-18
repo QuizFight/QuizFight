@@ -3,6 +3,7 @@ package org.quizfight.server
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
+import java.io.EOFException
 
 /**
  * Player Class. Manages the Connection between a mobile device and the Server.
@@ -12,13 +13,19 @@ import org.quizfight.common.messages.*
 class Player(val name : String, val game: Game, oldConnection: Connection, val id: String) {
 
     var score: Int = 0
-    val connection = oldConnection.withHandlers(mapOf(
-            //TODO: Vote, Timeout, etc
-            MsgStartGame::class to { conn, msg -> startGame(conn, msg as MsgStartGame) },
-            MsgScore::class to { conn, msg -> receiveAnswer(conn, msg as MsgScore) },
-            MsgLeave::class to {conn, msg -> leaveGame(conn, msg as MsgLeave)},
-            MsgVote::class to { conn, msg -> receiveVoteOrNot(conn, msg as MsgVote)}
-    ))
+    lateinit var connection: Connection
+
+    init{
+        try {
+            connection = oldConnection.withHandlers(mapOf(
+                    MsgStartGame::class to { conn, msg -> startGame(conn, msg as MsgStartGame) },
+                    MsgScore::class to { conn, msg -> receiveAnswer(conn, msg as MsgScore) },
+                    MsgLeave::class to { conn, msg -> leaveGame(conn, msg as MsgLeave) },
+                    MsgVote::class to { conn, msg -> receiveVoteOrNot(conn, msg as MsgVote) }))
+        }catch(ex: EOFException){
+
+        }
+    }
 
     private fun receiveVoteOrNot(conn: Connection, msgVote: MsgVote) {
         game.voting.takeVote(msgVote.waitForPlayer)
@@ -53,10 +60,10 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
      * Calculates score, removes game's first question and forces the game to send the next question
      */
     private fun receiveAnswer(conn: Connection, msgSendAnswer: MsgScore) {
-        serverLog("Antwort erhalten von ${getIpAndPortFromConnection(conn as SocketConnection)} \n")
-        game.playersAnswered.add(getIpAndPortFromConnection(conn as SocketConnection))
+        serverLog("Antwort erhalten von ${getIpAndPortFromConnection(conn)} \n")
+        game.playersAnswered.add(getIpAndPortFromConnection(conn))
         addToScore(msgSendAnswer.score)
-        game.proceed()
+        game.proceed(id)
     }
 
 

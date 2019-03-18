@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -21,6 +22,8 @@ import org.quizfight.common.question.GuessQuestion
 import java.util.ArrayList
 
 
+
+
 /**
  * This activity is the first activity of the app
  * It proposes two button to create a game or to join a game
@@ -32,9 +35,10 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
     override val coroutineContext = Dispatchers.Main + job
 
     private var masterServerIp = "192.168.0.32"
+
     private var gameId = ""
     private var nickname = ""
-    private var gameServerIp =""
+    private var gameServerIp = ""
     private var gameServerPort = 0
     private var context = this
 
@@ -51,27 +55,29 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
         //or the app is started for the first time
         //then just create a client
         val restart = intent.getBooleanExtra("restart", false)
-        if(restart){
-            launch {  Toast.makeText(context, "Sorry this game is no more available", Toast.LENGTH_LONG).show()
+        if (restart) {
+            launch {
+                Toast.makeText(context, "Sorry this game is no more available", Toast.LENGTH_LONG).show()
             }
 
-        }else{
+        } else {
 
             //Build Client
 
             //if user was already in a game
             //send RejojnMsg
-           if(readGamesInfo()){
+            if (readGamesInfo()) {
                 Log.d("Connection", "Found aborted game, reconnecting")
                 Log.d("Connection startActivity", "ip  $gameServerIp and port $gameServerPort")
                 Client.reconnectToGameServer(gameServerIp, gameServerPort)
+
                 Client.withHandlers(mapOf(
-                        MsgQuestion ::class to { _, msg -> showQuizActivity(msg as MsgQuestion)},
+                        MsgQuestion::class to { _, msg -> showQuizActivity(msg as MsgQuestion) },
                         MsgGameOver::class to { _, _ -> clearGameInfo(); Client.reconnectToMaster() }
                 ))
                 Client.send(MsgRejoin(gameId, nickname))
             } else {
-               Log.d("Connection", "connect to master ")
+                Log.d("Connection", "connect to master ")
                 Client.setMasterServer(masterServerIp, MASTER_PORT)
             }
         }
@@ -83,7 +89,7 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
      */
     fun showAllGamesActivity(view: View) {
         val intent = Intent(this, AllGamesActivity::class.java)
-        if(!ed_masterServerIp.text.toString().isEmpty()) {
+        if (!ed_masterServerIp.text.toString().isEmpty()) {
             masterServerIp = ed_masterServerIp.text.toString()
         }
         startActivity(intent)
@@ -104,14 +110,14 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
      * Check if the app starts after a connection failure during a game or not
      * and read game's info
      */
-    fun readGamesInfo() : Boolean{
+    fun readGamesInfo(): Boolean {
         val preferences = this.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
 
         gameId = preferences.getString("gameId", "")
         nickname = preferences.getString("nickname", "")
         gameServerIp = preferences.getString("gameServerIp", "")
         gameServerPort = preferences.getInt("gameServerPort", 1)
-        if(!gameId.isEmpty()){
+        if (!gameId.isEmpty()) {
             return true
         }
         return false
@@ -128,10 +134,10 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
     /**
      * Show the next question, if the player could rejoin a game
      */
-    fun showQuizActivity(msg: MsgQuestion) = launch{
+    fun showQuizActivity(msg: MsgQuestion) = launch {
 
         val intent = Intent(context, QuizActivity::class.java)
-        intent.putExtra("gameId" , gameId)
+        intent.putExtra("gameId", gameId)
         intent.putExtra("nickname", nickname)
         intent.putExtra("questionCountTotal", 2)   //to modify
         intent.putExtra("questionText", msg.question.text)
@@ -140,7 +146,7 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
         //put 1st question
 
         //handle ChoiceQuestion
-        if(msg.question is ChoiceQuestion) {
+        if (msg.question is ChoiceQuestion) {
 
             val question = msg.question as ChoiceQuestion
 
@@ -155,12 +161,12 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
         }
 
         //handle GuessQuestion
-        else{
+        else {
 
             val question = msg.question as GuessQuestion
 
             intent.putExtra("isChoiceQuestion", false)
-            intent.putExtra("correctChoice",question.correctValue)
+            intent.putExtra("correctChoice", question.correctValue)
             intent.putExtra("highest", question.highest)
             intent.putExtra("lowest", question.lowest)
         }
@@ -169,10 +175,24 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
         context.finish()
     }
 
+    override fun onBackPressed() {
+        var ad = AlertDialog.Builder(context)
+        ad.setTitle("Warning")
+        ad.setMessage("Are you sure you want to leave the application ?")
 
-    override fun onDestroy() {
-        super.onDestroy()
-        job.cancel()
+        ad.setPositiveButton("yes") { _, _ ->
+            Client.close()
+            context.finish()
+            job.cancel()
+        }
+
+        ad.setNegativeButton("Cancel") { _, _ ->
+            ad.setCancelable(true)
+        }
+
+        ad.show()
     }
+
+
 
 }

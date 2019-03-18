@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.view.View
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_attempt_quiz_start.*
@@ -73,10 +74,26 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         btn_start.isEnabled = false
     }
 
+    /**
+     * Leave a game
+     */
     fun sendMsgLeaveGame() {
-        Client.send(MsgLeave())
-        launch { context.finish() }
-        Client.reconnectToMaster()
+
+        //ask for confirmation bevor leave
+        var ad = AlertDialog.Builder(context)
+        ad.setTitle("Warning")
+        ad.setMessage("Are you sure you want to leave this game?")
+
+        ad.setPositiveButton("yes") { _, _ ->
+            Client.send(MsgLeave())
+            context.finish()
+            Client.reconnectToMaster()
+        }
+
+        ad.setNegativeButton("Cancel") { _, _ ->
+            ad.setCancelable(true)
+        }
+        ad.show()
     }
 
 
@@ -161,6 +178,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         super.onDestroy()
         job.cancel()
     }
+
 
     override fun onBackPressed() {
         sendMsgLeaveGame()

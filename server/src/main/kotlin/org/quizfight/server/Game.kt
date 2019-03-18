@@ -12,7 +12,6 @@ import java.io.IOException
 
 /**
  * Game Class. Manages connections to players, asks Questions and calculates the scores
- * @author Thomas Spanier
  */
 class Game(val id: String, val gameName:String,
            val maxPlayer: Int,
@@ -31,8 +30,7 @@ class Game(val id: String, val gameName:String,
 
     var playersAnswered = mutableListOf<String>()
     var receiveAnswersTimer = 25
-    var playerLost = false
-    var receiveTimeIsOver = false
+    var time =  0
 
 
     /**
@@ -57,8 +55,8 @@ class Game(val id: String, val gameName:String,
 
         if(playerCount == maxPlayer) {
             isOpen = false
-            serverLog("Maximale Spieleranzahl erreicht. Spiel Startet in 3 Sekunden")
-            Thread.sleep(3000)
+            serverLog("Maximale Spieleranzahl erreicht. Spiel Startet in 2 Sekunden")
+            Thread.sleep(2000)
             startGame()
         }
     }
@@ -70,28 +68,15 @@ class Game(val id: String, val gameName:String,
 
     fun startTimerForReceiveAnswers() {
         GlobalScope.launch {
-            var time =  0
+            time = 0
 
             while(time < receiveAnswersTimer){
                 delay(1000)
                 time++
-                if(receiveTimeIsOver) {
-                    break
-                }
 
-                serverLog("Timer bei: $time / $receiveAnswersTimer")
-                serverLog("receiveTimeIsOver: : " + receiveTimeIsOver    + "\n"
-                        + "playersAnswered: "     + playersAnswered.size + "\n"
-                        + "players: "             + players.size)
-
-            }
-            if(receiveTimeIsOver)
-                return@launch
-
-            receiveTimeIsOver = true
-
-            if(playersAnswered.size < players.size){
-                playerLost = true
+                serverLog("Timer: $time / $receiveAnswersTimer")
+                serverLog("playersAnswered: "  + playersAnswered.size + "\n"
+                        + "players insgesamt: "          + players.size + "\n")
             }
         }
     }
@@ -100,8 +85,7 @@ class Game(val id: String, val gameName:String,
      * Send a Message to all Players in this game
      */
     fun broadcast(msg: Message){
-        serverLog("$msg geht an folgende Connections")
-
+        serverLog("${msg.javaClass.simpleName} geht an folgende Connections")
         players.values.forEach { println(getIpAndPortFromConnection(it.connection as SocketConnection)) }
         players.values.forEach{ it.connection.send(msg) }
     }
@@ -111,7 +95,7 @@ class Game(val id: String, val gameName:String,
         conn.close()
         players.remove(id)
 
-        if (id == idOfGameCreator) {
+        if (id == idOfGameCreator && isOpen) {
             serverLog("Es war der Game Creator. Alle bekommen eine MsgGameOver\n")
             broadcast(MsgGameOver())
             terminateGame()
@@ -136,7 +120,7 @@ class Game(val id: String, val gameName:String,
      * Ends all connections between the Server and the mobile devices and clears the players list
      */
     fun terminateGame(){
-        serverLog("Schliesse folgende Verbindungen und beende das Spiel\n")
+        serverLog("Schliesse folgende Verbindungen und beende das Spiel")
         players.values.forEach { println(getIpAndPortFromConnection(it.connection as SocketConnection)) }
         players.values.forEach{ it.connection.close() }
         players = mutableMapOf<String, Player>()
@@ -159,72 +143,96 @@ class Game(val id: String, val gameName:String,
         return rankingSorted
     }
 
-    fun proceed() {
-        waitForTimerOrAnswers()
-
-        if((playerLost && playersAnswered.size < players.size -1) || (!playerLost && playersAnswered.size < players.size))
+    fun proceed(playerID: String) {
+        // Max. 2 players can pass this check, at least 1 player
+        if((playersAnswered.size < players.size - 1)){
             return
+        }
+
+        var playerLost = waitForTimerOrAnswers()
+
+        // Only the last player will pass this
+        if(playersAnswered.size >= 2 && playerID == playersAnswered[playersAnswered.size - 1]){
+            return
+        }
+
+        stopTimer()
+
+        if(questions.size > 0){
+            nextRound(playerLost)
+        }else{
+            gameOver()
+        }
+    }
+
+    private fun stopTimer() {
+        time = receiveAnswersTimer
+        Thread.sleep(1200)
+    }
+
+    private fun gameOver() {
+        broadcast(MsgGameOver())
+        broadcast(MsgRanking(createRanking()))
+        terminateGame()
+    }
+
+    private fun nextRound(playerLost: Boolean) {
+        broadcast(MsgRanking(createRanking()))
 
         if(playerLost){
             var missedPlayer = checkWhichPlayerLeft()
+            serverLog(missedPlayer.name + " hat sich verabschiedet")
             missedPlayer.connection.close()
             players.remove(missedPlayer.id)
-            //startVoteIfPlayerLeft(missedPlayer)
+            startVoteIfPlayerLeft(missedPlayer)
         }
 
-        if(playersAnswered.size < players.size)
-            return
-
-        if(questions.size > 0){
-            broadcast(MsgRanking(createRanking()))
-            broadcast(getNextQuestion())
-            startTimerForReceiveAnswers()
-            playersAnswered = mutableListOf<String>()
-        }else{
-            broadcast(MsgGameOver())
-            broadcast(MsgRanking(createRanking()))
-            terminateGame()
-        }
-
+        broadcast(getNextQuestion())
+        startTimerForReceiveAnswers()
+        playersAnswered = mutableListOf<String>()
     }
 
-    private fun waitForTimerOrAnswers() {
-        var time = 0
-        while(!receiveTimeIsOver ){
-            if(playersAnswered.size == players.size){
-                receiveTimeIsOver = true
-            }
+    private fun checkIfPlayerLost(): Boolean {
+        return playersAnswered.size < players.size
+    }
 
+    /**
+     * Checks every second, if all answers came in
+     * @return true, if player is lost, false all players answered.
+     */
+    private fun waitForTimerOrAnswers() : Boolean {
+        while (time < receiveAnswersTimer) {
             Thread.sleep(1000)
-            time++
+            if (playersAnswered.size == players.size) {
+                time = receiveAnswersTimer
+                return false
+            }
         }
+        return true
     }
 
     private fun startVoteIfPlayerLeft(missedPlayer: Player) {
         broadcast(MsgConnectionLost(missedPlayer.name))
 
-        voting.startVoting()
-
-        while(voting.isOpen){
-            Thread.sleep(2000)
-        }
+        serverLog("Warte ${voting.timerSendingVotes / 1000} Sekunden auf Votings der Clients...\n")
+        Thread.sleep(voting.timerSendingVotes)
 
         var waitOrNot = voting.evaluateVoting()
-        continueGameOrWaitForRejoin(waitOrNot, missedPlayer.id)
+        continueGameOrWaitForRejoin(waitOrNot)
     }
 
-    private fun continueGameOrWaitForRejoin(waitOrNot: Boolean, id: String) {
+    private fun continueGameOrWaitForRejoin(waitOrNot: Boolean) {
         if(waitOrNot) {
-            serverLog("Game $gameName wartet $voting.votingWaitingTime Sekunden auf den Spieler")
+            serverLog("Game $gameName wartet ${voting.votingWaitingTime / 1000} Sekunden auf den Spieler")
             Thread.sleep(voting.votingWaitingTime)
         }else{
-            players.remove(id)
+            serverLog("Die Spieler möchten nicht auf den verlorenen Spieler warten")
         }
     }
 
     private fun checkWhichPlayerLeft() : Player {
-        playerLost = false
-        return players.values.first { !playersAnswered.contains(it.id) }
+        var player = players.values.first { !playersAnswered.contains(it.id) }
+        return player
     }
 
 
