@@ -354,20 +354,32 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
      * the game continues when the app becomes a new question
      */
 
-    fun displayDisconnectedPoll(msg: MsgConnectionLost) = launch {
-        val builder = AlertDialog.Builder(this@QuizActivity)
+    fun displayDisconnectedPoll(msg: MsgConnectionLost) {
+        val builder = AlertDialog.Builder(this)
         val view = layoutInflater.inflate(R.layout.layout_disconnect_poll, null)
         builder.setView(view)
 
         builder.setPositiveButton("wait") { _, _ ->
             Client.send(MsgVote(waitForPlayer = true, name = msg.name))
+
         }
 
         builder.setNegativeButton("don't wait") { _, _ ->
             Client.send(MsgVote(waitForPlayer = false, name = msg.name))
+
+        }
+        var dialog: AlertDialog = builder.create()
+        dialog.show()
+
+        var handler = Handler()
+
+        var run = Runnable {
+            if (dialog.isShowing) {
+                dialog.dismiss()
+            }
         }
 
-        builder.create().show()
+        handler.postDelayed(run, 10000)
     }
 
 
