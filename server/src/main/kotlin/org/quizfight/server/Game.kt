@@ -159,7 +159,9 @@ class Game(val id: String, val gameName:String,
         stopTimer()
 
         if(questions.size > 0){
-            nextRound(playerLost)
+            GlobalScope.launch {
+                nextRound(playerLost)
+            }
         }else{
             gameOver()
         }
