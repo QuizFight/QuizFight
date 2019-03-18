@@ -185,7 +185,8 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
         val game = games.find { game -> game.id == msgJoinGame.gameId }
         if (game == null){
-            serverLog("Game ist null!")
+            serverLog("Game nicht gefunden! Client erhält eine MsgGameOver")
+            conn.send(MsgGameOver())
             return
         }
         game!!.addPlayer(msgJoinGame.nickname, conn)

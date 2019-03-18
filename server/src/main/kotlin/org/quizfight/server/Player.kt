@@ -56,7 +56,7 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
         serverLog("Antwort erhalten von ${getIpAndPortFromConnection(conn)} \n")
         game.playersAnswered.add(getIpAndPortFromConnection(conn))
         addToScore(msgSendAnswer.score)
-        game.proceed()
+        game.proceed(id)
     }
 
 
