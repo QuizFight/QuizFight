@@ -16,7 +16,7 @@ class Voting(var game: Game){
         serverLog("Voting wird jetzt ausgewertet\n")
         serverLog("Es gab ${votes.get(true)!!} Stimmen dafür und ${votes.get(true)!!} dagegen\n")
         resetVotingLogic()
-        return votes.get(true)!! >= votes.get(false)!!
+        return votes.get(true)!! > votes.get(false)!!
     }
 
 

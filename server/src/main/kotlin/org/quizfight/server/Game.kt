@@ -76,7 +76,7 @@ class Game(val id: String, val gameName:String,
 
                 serverLog("Timer: $time / $receiveAnswersTimer")
                 serverLog("playersAnswered: "  + playersAnswered.size + "\n"
-                        + "players insgesamt: "          + players.size)
+                        + "players insgesamt: "          + players.size + "\n")
             }
         }
     }
@@ -88,7 +88,6 @@ class Game(val id: String, val gameName:String,
         serverLog("${msg.javaClass.simpleName} geht an folgende Connections")
         players.values.forEach { println(getIpAndPortFromConnection(it.connection as SocketConnection)) }
         players.values.forEach{ it.connection.send(msg) }
-        serverLog("\n")
     }
 
 
@@ -161,7 +160,7 @@ class Game(val id: String, val gameName:String,
 
         if(playerLost){
             var missedPlayer = checkWhichPlayerLeft()
-            serverLog("Player verloren: ${missedPlayer.name}")
+            serverLog(missedPlayer.name + " hat sich verabschiedet")
             missedPlayer.connection.close()
             players.remove(missedPlayer.id)
             startVoteIfPlayerLeft(missedPlayer)
@@ -226,12 +225,13 @@ class Game(val id: String, val gameName:String,
         if(waitOrNot) {
             serverLog("Game $gameName wartet ${voting.votingWaitingTime / 1000} Sekunden auf den Spieler")
             Thread.sleep(voting.votingWaitingTime)
+        }else{
+            serverLog("Die Spieler möchten nicht auf den verlorenen Spieler warten")
         }
     }
 
     private fun checkWhichPlayerLeft() : Player {
         var player = players.values.first { !playersAnswered.contains(it.id) }
-        serverLog(player.name + " hat sich verabschiedet")
         return player
     }
 
