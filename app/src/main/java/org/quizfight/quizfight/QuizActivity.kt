@@ -355,8 +355,8 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
      * the game continues when the app becomes a new question
      */
 
-    fun displayDisconnectedPoll(msg: MsgConnectionLost) {
-        val builder = AlertDialog.Builder(this)
+    fun displayDisconnectedPoll(msg: MsgConnectionLost) = launch {
+        val builder = AlertDialog.Builder(this@QuizActivity)
         val view = layoutInflater.inflate(R.layout.layout_disconnect_poll, null)
         builder.setView(view)
 
