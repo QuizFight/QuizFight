@@ -145,7 +145,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         btn_answer1.isEnabled = false
         btn_answer2.isEnabled = false
         btn_answer3.isEnabled = false
-        btn_answer3.isEnabled = false
+        btn_answer4.isEnabled = false
 
     }
 
