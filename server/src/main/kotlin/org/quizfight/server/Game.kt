@@ -95,7 +95,7 @@ class Game(val id: String, val gameName:String,
         conn.close()
         players.remove(id)
 
-        if (id == idOfGameCreator) {
+        if (id == idOfGameCreator && isOpen) {
             serverLog("Es war der Game Creator. Alle bekommen eine MsgGameOver\n")
             broadcast(MsgGameOver())
             terminateGame()
@@ -158,16 +158,8 @@ class Game(val id: String, val gameName:String,
 
         stopTimer()
 
-        if(playerLost){
-            var missedPlayer = checkWhichPlayerLeft()
-            serverLog(missedPlayer.name + " hat sich verabschiedet")
-            missedPlayer.connection.close()
-            players.remove(missedPlayer.id)
-            startVoteIfPlayerLeft(missedPlayer)
-        }
-
         if(questions.size > 0){
-            nextRound()
+            nextRound(playerLost)
         }else{
             gameOver()
         }
@@ -184,8 +176,17 @@ class Game(val id: String, val gameName:String,
         terminateGame()
     }
 
-    private fun nextRound() {
+    private fun nextRound(playerLost: Boolean) {
         broadcast(MsgRanking(createRanking()))
+
+        if(playerLost){
+            var missedPlayer = checkWhichPlayerLeft()
+            serverLog(missedPlayer.name + " hat sich verabschiedet")
+            missedPlayer.connection.close()
+            players.remove(missedPlayer.id)
+            startVoteIfPlayerLeft(missedPlayer)
+        }
+
         broadcast(getNextQuestion())
         startTimerForReceiveAnswers()
         playersAnswered = mutableListOf<String>()
@@ -203,7 +204,6 @@ class Game(val id: String, val gameName:String,
         while (time < receiveAnswersTimer) {
             Thread.sleep(1000)
             if (playersAnswered.size == players.size) {
-                //serverLog(playersAnswered.size)
                 time = receiveAnswersTimer
                 return false
             }
