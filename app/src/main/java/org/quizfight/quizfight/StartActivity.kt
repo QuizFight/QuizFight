@@ -156,7 +156,8 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
 
             intent.putExtra("isChoiceQuestion", true)
             intent.putExtra("correctChoice", question.correctChoice)
-            intent.putStringArrayListExtra("answers", question.choices)
+            val list = ArrayList<String>(question.choices.filter { it != null })
+            intent.putStringArrayListExtra("answers", list)
         }
 
         //handle GuessQuestion
