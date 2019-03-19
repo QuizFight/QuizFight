@@ -33,7 +33,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
     //Game's info
     private var gameId = ""
-    private var questionCounter: Int = 0
     private var questionCountTotal: Int = 0
     private var nickname :String = ""
 
@@ -78,13 +77,13 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
             showNextQuestion(MsgQuestion(ChoiceQuestion(questiontext,
                     Category.valueOf(category) ,
                     listOf<String>(answers[0], answers[1], answers[2],answers[3]),
-                    correct)))
+                    correct), 1))
         }else{
             val highest = intent.getIntExtra("highest",100)
             val lowest = intent.getIntExtra("lowest",0)
             val correct = intent.getIntExtra("correctchoice",10)
             showNextQuestion(MsgQuestion(GuessQuestion(questiontext,
-                    Category.valueOf(category), lowest, highest, correct)))
+                    Category.valueOf(category), lowest, highest, correct), 1))
         }
 
 
@@ -117,7 +116,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         question_outer_layout.visibility = View.VISIBLE
 
         currentQuestion = question
-        if (questionCounter < questionCountTotal) {
+        if (question.number < questionCountTotal) {
 
             //check if question ChoiceQuestion or GuessQuestion is
             if (question.question is ChoiceQuestion) {
@@ -127,8 +126,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
             }
 
             //update the question count textView
-            questionCounter++
-            text_view_question_count.text = ("Question: " + questionCounter
+            text_view_question_count.text = ("Question: " + question.number
                     + "/" + questionCountTotal)
 
             //if timer runs, cancel and start a new timer

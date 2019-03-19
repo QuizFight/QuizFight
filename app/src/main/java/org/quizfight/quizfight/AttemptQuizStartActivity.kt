@@ -168,7 +168,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         }
 
         startActivity(intent)
-        saveGameServersInfo()
+        saveGameInfo()
 
         context.finish()
     }
@@ -185,15 +185,12 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     }
 
 
-    fun saveGameServersInfo(){
+    fun saveGameInfo(){
         val preferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
         val editor = preferences.edit()
-        editor.putString("gameServerIp", Client.gameServerIp)
-        editor.putInt("gameServerPort", Client.gameServerPort)
         editor.putString("gameId", gameId)
         editor.putString("nickname", nickname)
         editor.commit()
-
     }
 
 }

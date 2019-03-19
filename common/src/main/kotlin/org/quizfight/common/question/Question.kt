@@ -47,6 +47,9 @@ class GuessQuestion(
         val correctValue: Int
 ) : Question<Int> {
     override fun evaluate(answer: Int, usedTime: Int, totalTime: Int): Int {
+        if (answer < lowest || answer > highest){
+            return 0
+        }
         if(answer == correctValue) {
             return 1000
         }
