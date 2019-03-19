@@ -1,5 +1,6 @@
 package org.quizfight.common
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.quizfight.common.messages.Message
@@ -47,7 +48,7 @@ class SocketConnection(
         receiveAsync()
     }
 
-    private fun receiveAsync() = GlobalScope.launch {
+    private fun receiveAsync() = GlobalScope.launch(Dispatchers.IO) {
         while (!socket.isClosed && handleMessages.get()) {
             val msg = try {
                 inStream.readObject() as? Message ?: throw Exception("Received invalid object")

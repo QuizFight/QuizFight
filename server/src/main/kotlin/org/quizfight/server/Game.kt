@@ -2,7 +2,6 @@ package org.quizfight.server
 
 //import java.util.*
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
@@ -61,16 +60,16 @@ class Game(val id: String, val gameName:String,
 
     fun startGame(){
         maxPlayer = players.size
+
         broadcast(getNextQuestion())
         startTimerForReceiveAnswers()
     }
 
     fun startTimerForReceiveAnswers() {
-        GlobalScope.launch {
+        Thread {
             time = 0
-
             while(time < receiveAnswersTimer){
-                delay(1000)
+                Thread.sleep(1000)
                 time++
 
                 serverLog("Timer: $time / $receiveAnswersTimer")
@@ -83,7 +82,7 @@ class Game(val id: String, val gameName:String,
             if(players.size == 1 && maxPlayer != 1){
                 terminateGame()
             }
-        }
+        }.start()
 
     }
 
