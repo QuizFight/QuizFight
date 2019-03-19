@@ -117,6 +117,7 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         } else {
             serverLog("Sein altes Spiel wurde nicht mehr gefunden\n")
             conn.send(MsgGameOver())
+            conn.close()
         }
     }
 

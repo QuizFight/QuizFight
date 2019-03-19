@@ -30,7 +30,7 @@ data class MsgTransferToGameServer(val gameServer : ServerData) : Message
 data class MsgGameInfo(val game : GameData) : Message
 data class MsgCreateGame(val game : GameRequest, val nickname : String) : Message
 class MsgStartGame : Message
-data class MsgQuestion(val question : Question<*>) : Message
+data class MsgQuestion(val question : Question<*>, val number : Int) : Message
 data class MsgScore(val score : Int) : Message
 data class MsgRanking(val totalScore : Map<String, Int>) : Message
 data class MsgConnectionLost(val name : String) : Message
