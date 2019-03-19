@@ -146,7 +146,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         choiceQuestionAnswer = view.text.toString()
 
         sendScore()
-        val correctAnswer = (currentQuestion.question as ChoiceQuestion).correctChoice
+
         if (choiceQuestionAnswer == (currentQuestion.question as ChoiceQuestion).correctChoice) {
             selectedButton.setBackgroundColor(Color.GREEN)
         } else {
