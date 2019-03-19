@@ -177,7 +177,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
      * evaluate and send score to gameserver
      */
     fun sendScore() {
-        var timeLeft = 21 - progress_timer.progress
+        var timeLeft = 21 - (progress_timer.progress / 1000)
 
         if(currentQuestion.question is ChoiceQuestion){
             Client.send(MsgScore((currentQuestion.question as ChoiceQuestion).evaluate(choiceQuestionAnswer, timeLeft, 21)))
