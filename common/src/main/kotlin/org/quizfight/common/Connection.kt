@@ -52,9 +52,9 @@ class SocketConnection(
             val msg = try {
                 inStream.readObject() as? Message ?: throw Exception("Received invalid object")
             } catch (e: EOFException) {
-                if (!shuttingDown.get()) throw e else break
+                if (!shuttingDown.get()) throw Exception("Connection with ${socket.inetAddress}:${socket.port} broke", e) else break
             } catch (e: SocketException) {
-                if (!shuttingDown.get()) throw e else break
+                if (!shuttingDown.get()) throw Exception("Connection with ${socket.inetAddress}:${socket.port} broke", e) else break
             }
             val handler = handlers[msg::class] ?: throw Exception("No handler found for message type ${msg::class}")
             handler(this@SocketConnection, msg)
