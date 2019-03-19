@@ -55,10 +55,7 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
             startActivity(intent)
         }
 
-        btn_sync.setOnClickListener {
-            sendRequestOpenGame()
-            btn_sync.visibility = View.INVISIBLE
-        }
+
 
         //add refresh swipe
         swiperefresh.setOnRefreshListener(object : SwipeRefreshLayout.OnRefreshListener {
