@@ -8,13 +8,12 @@ import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
 import org.quizfight.common.question.Question
-import java.io.IOException
 
 /**
  * Game Class. Manages connections to players, asks Questions and calculates the scores
  */
 class Game(val id: String, val gameName:String,
-           val maxPlayer: Int,
+           var maxPlayer: Int,
            var questions: MutableList<Question<*>>,
            val idOfGameCreator: String,
            val gameCreatorName: String) {
@@ -29,6 +28,7 @@ class Game(val id: String, val gameName:String,
     var playersAnswered = mutableListOf<String>()
     var receiveAnswersTimer = 25
     var time =  0
+
     val questionCount = questions.size
 
 
@@ -60,6 +60,7 @@ class Game(val id: String, val gameName:String,
     }
 
     fun startGame(){
+        maxPlayer = players.size
         broadcast(getNextQuestion())
         startTimerForReceiveAnswers()
     }
@@ -79,7 +80,7 @@ class Game(val id: String, val gameName:String,
 
             // This is only true, if only one player is still playing
             // AND if he lost connection (because timer ran to maximum)
-            if(players.size == 1){
+            if(players.size == 1 && maxPlayer != 1){
                 terminateGame()
             }
         }
@@ -128,7 +129,8 @@ class Game(val id: String, val gameName:String,
         serverLog("Schliesse folgende Verbindungen und beende das Spiel")
         players.values.forEach { println(getIpAndPortFromConnection(it.connection as SocketConnection)) }
         players.values.forEach{ it.connection.close() }
-        players = mutableMapOf<String, Player>()
+        players.clear()
+        questions.clear()
         TERMINATED = true
     }
 
@@ -183,14 +185,17 @@ class Game(val id: String, val gameName:String,
     }
 
     private fun nextRound(playerLost: Boolean) {
-        broadcast(MsgRanking(createRanking()))
-
         if(playerLost){
             var missedPlayer = checkWhichPlayerLeft()
             serverLog(missedPlayer.name + " hat sich verabschiedet")
             missedPlayer.connection.close()
             players.remove(missedPlayer.id)
-            startVoteIfPlayerLeft(missedPlayer)
+        }
+
+        broadcast(MsgRanking(createRanking()))
+
+        if(playerLost){
+            startVoteIfPlayerLeft(checkWhichPlayerLeft())
         }
 
         broadcast(getNextQuestion())
@@ -230,8 +235,17 @@ class Game(val id: String, val gameName:String,
     private fun continueGameOrWaitForRejoin(waitOrNot: Boolean) {
         if(waitOrNot) {
             serverLog("Game $gameName wartet ${voting.votingWaitingTime / 1000} Sekunden auf den Spieler")
-            //broadcast(MsgWait())
-            Thread.sleep(voting.votingWaitingTime)
+            broadcast(MsgWait())
+
+            var currentTime = 0
+            while(currentTime < voting.votingWaitingTime){
+                Thread.sleep(1000)
+                currentTime++
+                serverLog("Warte noch $currentTime Sekunden auf den Spieler")
+                if(players.size == maxPlayer){
+                    break
+                }
+            }
         }else{
             serverLog("Die Spieler möchten nicht auf den verlorenen Spieler warten")
         }

@@ -4,7 +4,7 @@ class Voting(var game: Game){
 
     var votes = mutableMapOf<Boolean, Int>((false to 0), (true to 0))
     var timerSendingVotes = 12 * 1000L // seconds for clients to vote if wait or not is preferred
-    var votingWaitingTime = 40 * 1000L
+    var votingWaitingTime = 40
 
     fun takeVote(vote: Boolean){
         serverLog("Vote empfangen: $vote")
