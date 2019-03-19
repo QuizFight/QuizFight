@@ -15,6 +15,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.quizfight.common.MASTER_PORT
 import org.quizfight.common.messages.MsgGameOver
+import org.quizfight.common.messages.MsgPlayerCount
 import org.quizfight.common.messages.MsgQuestion
 import org.quizfight.common.messages.MsgRejoin
 import org.quizfight.common.question.ChoiceQuestion
@@ -34,7 +35,7 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
-    private var masterServerIp = "192.168.0.32"
+    private var masterServerIp = "10.9.40.89"
 
     private var gameId = ""
     private var nickname = ""
@@ -46,7 +47,9 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
 
-        clearGameInfo()
+        Client.initialize(masterServerIp, MASTER_PORT)
+        Client.onGameServerLeft += { clearGameInfo() }
+        Client.onGameServerJoined += { ip, port -> saveGameServerInfo(ip, port) }
 
         //check if app is started after attemptQuiz or not
         //if so , show toast else 2 possibilities
@@ -59,26 +62,20 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
             launch {
                 Toast.makeText(context, "Sorry this game is no more available", Toast.LENGTH_LONG).show()
             }
-
         } else {
-
-            //Build Client
-
-            //if user was already in a game
-            //send RejojnMsg
+            // if user was already in a game try rejoining
             if (readGamesInfo()) {
                 Log.d("Connection", "Found aborted game, reconnecting")
-                Log.d("Connection startActivity", "ip  $gameServerIp and port $gameServerPort")
-                Client.reconnectToGameServer(gameServerIp, gameServerPort)
 
-                Client.withHandlers(mapOf(
-                        MsgQuestion::class to { _, msg -> showQuizActivity(msg as MsgQuestion) },
-                        MsgGameOver::class to { _, _ -> clearGameInfo(); Client.reconnectToMaster() }
+                Client.reconnectToGameServer(gameServerIp, gameServerPort, mapOf(
+                    MsgQuestion::class to { _, msg -> showQuizActivity(msg as MsgQuestion) },
+                    MsgGameOver::class to { _, _ -> Client.reconnectToMaster() },
+                    MsgPlayerCount::class to { _, _ -> }
                 ))
                 Client.send(MsgRejoin(gameId, nickname))
             } else {
                 Log.d("Connection", "connect to master ")
-                Client.setMasterServer(masterServerIp, MASTER_PORT)
+                Client.reconnectToMaster()
             }
         }
     }
@@ -103,7 +100,6 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
     fun showCreateGameActivity(view: View) {
         val intent = Intent(this, CreateGameActivity::class.java)
         startActivity(intent)
-
     }
 
     /**
@@ -124,9 +120,19 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
     }
 
     private fun clearGameInfo() {
+        Log.d("Connection", "Clearing old connection info")
         val preferences = this.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
         val editor = preferences.edit()
         editor.clear()
+        editor.commit()
+    }
+
+    private fun saveGameServerInfo(ip: String, port: Int) {
+        Log.d("Connection", "Saving connection info")
+        val preferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
+        val editor = preferences.edit()
+        editor.putString("gameServerIp", ip)
+        editor.putInt("gameServerPort", port)
         editor.commit()
     }
 
