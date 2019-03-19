@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="20dp"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/waiting_for_player_text_view"
@@ -27,14 +27,6 @@
             android:textColor="@color/colorPrimary"
             android:textSize="30dp" />
 
-        <com.mikhaellopez.circularprogressbar.CircularProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="40dp"
-            android:layout_marginBottom="80dp"
-         />
     </LinearLayout>
 
     <LinearLayout
@@ -234,7 +226,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:textColor="@android:color/white"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/score_titel_view"
