@@ -224,7 +224,7 @@ class Game(val id: String, val gameName:String,
     private fun continueGameOrWaitForRejoin(waitOrNot: Boolean) {
         if(waitOrNot) {
             serverLog("Game $gameName wartet ${voting.votingWaitingTime / 1000} Sekunden auf den Spieler")
-            broadcast(MsgWait())
+            //broadcast(MsgWait())
             Thread.sleep(voting.votingWaitingTime)
         }else{
             serverLog("Die Spieler möchten nicht auf den verlorenen Spieler warten")
