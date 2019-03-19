@@ -14,10 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.quizfight.common.MASTER_PORT
-import org.quizfight.common.messages.MsgGameOver
-import org.quizfight.common.messages.MsgPlayerCount
-import org.quizfight.common.messages.MsgQuestion
-import org.quizfight.common.messages.MsgRejoin
+import org.quizfight.common.messages.*
 import org.quizfight.common.question.ChoiceQuestion
 import org.quizfight.common.question.GuessQuestion
 import java.util.ArrayList
@@ -69,8 +66,9 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
 
                 Client.reconnectToGameServer(gameServerIp, gameServerPort, mapOf(
                     MsgQuestion::class to { _, msg -> showQuizActivity(msg as MsgQuestion) },
-                    MsgGameOver::class to { _, _ -> Client.reconnectToMaster() },
-                    MsgPlayerCount::class to { _, _ -> }
+                    MsgRanking::class to { _, _ -> /* Ignore rankings - wait for next question */ },
+                    MsgGameOver::class to { conn, _ -> conn.close(); Client.reconnectToMaster() },
+                    MsgPlayerCount::class to { _, _ -> /* Not relevant for rejoin */ }
                 ))
                 Client.send(MsgRejoin(gameId, nickname))
             } else {
