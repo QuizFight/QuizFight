@@ -143,7 +143,8 @@ class Game(val id: String, val gameName:String,
             ranking.put(player.value.name, player.value.score)
         }
 
-        val rankingSorted = ranking.toList().sortedBy { (_, value) -> value}.toMap()
+        val rankingSorted = ranking.toList().sortedByDescending { (_, value) -> value }.toMap()
+
 
         return rankingSorted
     }
