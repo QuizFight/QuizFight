@@ -345,7 +345,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
 
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
                 // Display the current progress of SeekBar
-                tv_answer.text = "Your answer : $i"
+                tv_answer.text = "$i"
                 guessQuestionAnswer = i
 
             }
