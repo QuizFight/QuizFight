@@ -94,8 +94,9 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
                 MsgGameOver::class to { _, _ -> finishQuiz()},
                 MsgConnectionLost::class to { _, msg -> displayDisconnectedPoll(msg as MsgConnectionLost)},
                 MsgCheckConnection::class to {_,_ -> },
-                MsgWait::class to {_, _ -> displayWaitingForReconnection()}
-                ))
+                MsgWait::class to {_, _ -> displayWaitingForReconnection()},
+                MsgPlayerCount::class to { _ , _ -> }
+        ))
 
         //initialize UI elements
         rowList = listOf<TableRow>(table_row_first, table_row_second, table_row_third,
@@ -456,7 +457,7 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         job.cancel()
     }
 
-    fun displayWaitingForReconnection() {
+    fun displayWaitingForReconnection() = launch {
         question_outer_layout.visibility = View.GONE
         score_outer_layout.visibility = View.GONE
         reconnection_outer_layout.visibility = View.VISIBLE
