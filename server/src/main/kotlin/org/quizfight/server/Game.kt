@@ -190,12 +190,10 @@ class Game(val id: String, val gameName:String,
             serverLog(missedPlayer.name + " hat sich verabschiedet")
             missedPlayer.connection.close()
             players.remove(missedPlayer.id)
-        }
-
-        broadcast(MsgRanking(createRanking()))
-
-        if(playerLost){
-            startVoteIfPlayerLeft(checkWhichPlayerLeft())
+            broadcast(MsgRanking(createRanking()))
+            startVoteIfPlayerLeft(missedPlayer)
+        }else{
+            broadcast(MsgRanking(createRanking()))
         }
 
         broadcast(getNextQuestion())
