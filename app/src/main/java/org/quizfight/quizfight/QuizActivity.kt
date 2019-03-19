@@ -150,7 +150,21 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         if (choiceQuestionAnswer == (currentQuestion.question as ChoiceQuestion).correctChoice) {
             selectedButton.setBackgroundColor(Color.GREEN)
         } else {
+            val correctAnswer = (currentQuestion.question as ChoiceQuestion).correctChoice
             selectedButton.setBackgroundColor(Color.parseColor("#f50a0a"))
+            when {
+                btn_answer1.text == correctAnswer
+                -> btn_answer1.setBackgroundColor(Color.GREEN)
+
+                btn_answer2.text == correctAnswer
+                -> btn_answer2.setBackgroundColor(Color.GREEN)
+
+                btn_answer3.text == correctAnswer
+                -> btn_answer3.setBackgroundColor(Color.GREEN)
+
+                btn_answer4.text == correctAnswer
+                -> btn_answer4.setBackgroundColor(Color.GREEN)
+            }
         }
 
         //disable Buttons
