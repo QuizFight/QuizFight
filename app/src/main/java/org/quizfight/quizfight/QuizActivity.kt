@@ -117,26 +117,22 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
         question_outer_layout.visibility = View.VISIBLE
 
         currentQuestion = question
-        if (question.number < questionCountTotal) {
 
-            //check if question ChoiceQuestion or GuessQuestion is
-            if (question.question is ChoiceQuestion) {
-                showChoiceQuestion(question.question as ChoiceQuestion)
-            } else {
-                showGuessQuestion(question.question as GuessQuestion)
-            }
-
-            //update the question count textView
-            text_view_question_count.text = ("Question: " + question.number
-                    + "/" + questionCountTotal)
-
-            //if timer runs, cancel and start a new timer
-            timer.cancel()
-            timer = timer(millisInFuture, countDownInterval)
-            timer.start()
-        }else {
-            finishQuiz()
+        //check if question ChoiceQuestion or GuessQuestion is
+        if (question.question is ChoiceQuestion) {
+            showChoiceQuestion(question.question as ChoiceQuestion)
+        } else {
+            showGuessQuestion(question.question as GuessQuestion)
         }
+
+        //update the question count textView
+        text_view_question_count.text = ("Question: " + question.number
+                + "/" + questionCountTotal)
+
+        //if timer runs, cancel and start a new timer
+        timer.cancel()
+        timer = timer(millisInFuture, countDownInterval)
+        timer.start()
     }
 
 
