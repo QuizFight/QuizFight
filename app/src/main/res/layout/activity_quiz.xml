@@ -106,21 +106,24 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:layout_width="140dp"
-                    android:layout_height="match_parent"
                     android:id="@+id/btn_answer1"
-                    android:onClick="checkAnswer"
-                    android:layout_margin="5dp"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"/>
-                <Button
-                    android:layout_width="140dp"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:id="@+id/btn_answer2"
-                    android:onClick="checkAnswer"
                     android:layout_margin="5dp"
+                    android:layout_weight=".50"
+                    android:onClick="checkAnswer"
                     android:textAlignment="center"
-                    android:textAllCaps="false"/>
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btn_answer2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:layout_weight=".50"
+                    android:onClick="checkAnswer"
+                    android:textAlignment="center"
+                    android:textAllCaps="false" />
 
             </LinearLayout>
 
@@ -130,21 +133,24 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:layout_width="140dp"
-                    android:layout_height="match_parent"
                     android:id="@+id/btn_answer3"
-                    android:onClick="checkAnswer"
-                    android:layout_margin="5dp"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"/>
-                <Button
-                    android:layout_width="140dp"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:id="@+id/btn_answer4"
-                    android:onClick="checkAnswer"
                     android:layout_margin="5dp"
+                    android:layout_weight=".50"
+                    android:onClick="checkAnswer"
                     android:textAlignment="center"
-                    android:textAllCaps="false"/>
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btn_answer4"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:layout_weight=".50"
+                    android:onClick="checkAnswer"
+                    android:textAlignment="center"
+                    android:textAllCaps="false" />
 
             </LinearLayout>
         </LinearLayout>
@@ -254,8 +260,8 @@
             android:id="@+id/score_table_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/background"
-            android:layout_marginRight="10dp">
+            android:layout_marginRight="10dp"
+            android:background="@color/background">
 
             <TableRow
                 android:id="@+id/table_row_first"
@@ -268,20 +274,22 @@
 
                 <TextView
                     android:id="@+id/nickname_view1"
-                    android:layout_width="200dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
+                    android:layout_weight=".60"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
 
                 <TextView
                     android:id="@+id/score_view1"
-                    android:layout_width="120dp"
+                    android:layout_width="0dp"
+
                     android:layout_height="wrap_content"
 
+                    android:layout_weight=".40"
                     android:background="@drawable/cell_shape"
-
                     android:text="TextView"
                     android:textColor="@android:color/white" />
             </TableRow>
@@ -295,17 +303,19 @@
 
                 <TextView
                     android:id="@+id/nickname_view2"
-                    android:layout_width="200dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
+                    android:layout_weight=".60"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
 
                 <TextView
                     android:id="@+id/score_view2"
-                    android:layout_width="120dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight=".40"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
@@ -320,17 +330,19 @@
 
                 <TextView
                     android:id="@+id/nickname_view3"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
+                    android:layout_weight=".60"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
 
                 <TextView
                     android:id="@+id/score_view3"
-                    android:layout_width="120dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight=".40"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
@@ -346,17 +358,19 @@
 
                 <TextView
                     android:id="@+id/nickname_view4"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
+                    android:layout_weight=".60"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
 
                 <TextView
                     android:id="@+id/score_view4"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight=".40"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
@@ -371,17 +385,19 @@
 
                 <TextView
                     android:id="@+id/nickname_view5"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
+                    android:layout_weight=".60"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
 
                 <TextView
                     android:id="@+id/score_view5"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight=".40"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
@@ -396,17 +412,19 @@
 
                 <TextView
                     android:id="@+id/nickname_view6"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
+                    android:layout_weight=".60"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
 
                 <TextView
                     android:id="@+id/score_view6"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight=".40"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
@@ -421,17 +439,19 @@
 
                 <TextView
                     android:id="@+id/nickname_view7"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
+                    android:layout_weight=".60"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
 
                 <TextView
                     android:id="@+id/score_view7"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight=".40"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
@@ -446,17 +466,19 @@
 
                 <TextView
                     android:id="@+id/nickname_view8"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
+                    android:layout_weight=".60"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
 
                 <TextView
                     android:id="@+id/score_view8"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight=".40"
                     android:background="@drawable/cell_shape"
                     android:text="TextView"
                     android:textColor="@android:color/white" />
