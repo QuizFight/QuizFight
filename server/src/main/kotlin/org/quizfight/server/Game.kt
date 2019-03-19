@@ -46,12 +46,12 @@ class Game(val id: String, val gameName:String,
     fun addPlayer(player: Player) {
         players.put(player.id, player)
 
-        if(players.size > 1) {
+        if(players.size > 1 && isOpen == true) {
             broadcast(MsgPlayerCount(players.size))
             serverLog("Der PlayerCount wurde an alle Spieler versendet, aktuell sind ${players.size} im Spiel\n")
         }
 
-        if(players.size == maxPlayer) {
+        if(players.size == maxPlayer && isOpen == true) {
             isOpen = false
             serverLog("Maximale Spieleranzahl erreicht. Spiel Startet in 2 Sekunden")
             Thread.sleep(2000)
@@ -152,7 +152,6 @@ class Game(val id: String, val gameName:String,
     fun proceed(playerID: String) {
         // Max. 2 players can pass this check, at least 1 player
         if((playersAnswered.size < players.size - 1)){
-            println("Letzte Zeile1")
             return
         }
 
@@ -160,17 +159,14 @@ class Game(val id: String, val gameName:String,
 
         // Only the last player will pass this
         if(playersAnswered.size >= 2 && playerID == playersAnswered[playersAnswered.size - 1]){
-            println("Letzte Zeile2")
             return
         }
 
         stopTimer()
 
         if(questions.size > 0){
-            println("Letzte Zeile3")
             GlobalScope.launch { nextRound(playerLost) }
         }else{
-            println("Letzte Zeile4")
             gameOver()
         }
     }
