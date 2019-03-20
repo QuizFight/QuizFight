@@ -28,6 +28,8 @@ class Game(val id: String, val gameName:String,
 
     val questionCount = questions.size
 
+    var secondFilter = mutableListOf<String>()
+
 
     /**
      * Adds a player to the game
@@ -147,7 +149,7 @@ class Game(val id: String, val gameName:String,
         return rankingSorted
     }
 
-    var secondFilter = mutableListOf<String>()
+
     fun proceed(playerID: String) {
         // Max. 2 players can pass this check, at least 1 player
         if((playersAnswered.size < players.size - 1)){
