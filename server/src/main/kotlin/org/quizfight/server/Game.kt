@@ -91,8 +91,21 @@ class Game(val id: String, val gameName:String,
     fun broadcast(msg: Message){
         serverLog("${msg.javaClass.simpleName} geht an folgende Connections")
         players.values.forEach { println(getIpAndPortFromConnection(it.connection as SocketConnection)) }
-        players.values.forEach{ it.connection.send(msg) }
-    }
+
+        var connID = ""
+        players.values.forEach {
+            try {
+                it.connection.send(msg)
+            } catch (ex: Exception) {
+                serverLog("Beim Broadcasten wurde mind. eine fehlerhafte Verbindung entdeckt\n")
+                connID = it.id
+            }
+        }
+
+        if(connID != "") {
+            playersAnswered.remove(connID)
+        }
+     }
 
 
     fun removePlayer(id: String, conn: Connection){
