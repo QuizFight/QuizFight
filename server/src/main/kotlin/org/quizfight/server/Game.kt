@@ -1,8 +1,6 @@
 package org.quizfight.server
 
 //import java.util.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
@@ -51,7 +49,6 @@ class Game(val id: String, val gameName:String,
         }
 
         if(players.size == maxPlayer && isOpen == true) {
-            isOpen = false
             serverLog("Maximale Spieleranzahl erreicht. Spiel Startet in 2 Sekunden")
             Thread.sleep(2000)
             startGame()
@@ -60,7 +57,7 @@ class Game(val id: String, val gameName:String,
 
     fun startGame(){
         maxPlayer = players.size
-
+        isOpen = false
         broadcast(getNextQuestion())
         startTimerForReceiveAnswers()
     }
@@ -150,23 +147,27 @@ class Game(val id: String, val gameName:String,
         return rankingSorted
     }
 
+    var secondFilter = mutableListOf<String>()
     fun proceed(playerID: String) {
         // Max. 2 players can pass this check, at least 1 player
         if((playersAnswered.size < players.size - 1)){
             return
         }
 
-        var playerLost = waitForTimerOrAnswers()
+        secondFilter.add(playerID)
 
-        // Only the last player will pass this
-        if(playersAnswered.size >= 2 && playerID == playersAnswered[playersAnswered.size - 1]){
-            return
-        }
+        var playerLost = waitForTimerOrAnswers()
 
         stopTimer()
 
+        // Only ONE player may pass! So remove the second, if 2 players reached this point
+        if(secondFilter.size == 2 && secondFilter[0] == playerID){
+            return
+        }
+        secondFilter.clear()
+
         if(questions.size > 0){
-            GlobalScope.launch { nextRound(playerLost) }
+            Thread{ nextRound(playerLost) }.start()
         }else{
             gameOver()
         }
@@ -174,7 +175,7 @@ class Game(val id: String, val gameName:String,
 
     private fun stopTimer() {
         time = receiveAnswersTimer
-        Thread.sleep(1200)
+        Thread.sleep(2000)
     }
 
     private fun gameOver() {
@@ -194,15 +195,12 @@ class Game(val id: String, val gameName:String,
         }else{
             broadcast(MsgRanking(createRanking()))
         }
-
+        Thread.sleep(4000)
+        playersAnswered = mutableListOf<String>()
         broadcast(getNextQuestion())
         startTimerForReceiveAnswers()
-        playersAnswered = mutableListOf<String>()
     }
 
-    private fun checkIfPlayerLost(): Boolean {
-        return playersAnswered.size < players.size
-    }
 
     /**
      * Checks every second, if all answers came in
@@ -236,9 +234,9 @@ class Game(val id: String, val gameName:String,
 
             var currentTime = 0
             while(currentTime < voting.votingWaitingTime){
+                serverLog("Warte noch ${voting.votingWaitingTime - currentTime} Sekunden auf den Spieler")
                 Thread.sleep(1000)
                 currentTime++
-                serverLog("Warte noch $currentTime Sekunden auf den Spieler")
                 if(players.size == maxPlayer){
                     break
                 }
@@ -253,22 +251,4 @@ class Game(val id: String, val gameName:String,
         return player
     }
 
-
-    /**
-     * Sends a voting message to all clients still connected
-     * @param id is the missed client
-     */
-    private fun sendVoting(id: String) {
-        var nickname = ""
-
-        players.forEach{
-            if(id == it.value.id) {
-                players.remove(id)
-                nickname = it.value.name
-            }
-        }
-
-        serverLog("Sende Voting zu allen verbliebenen Clients, da Spieler $nickname das Spiel verlassen hat\n")
-        broadcast(MsgConnectionLost(nickname))
-    }
 }
