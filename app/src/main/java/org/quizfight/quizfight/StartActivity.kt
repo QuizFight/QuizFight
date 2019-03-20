@@ -32,7 +32,7 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
-    private var masterServerIp = "192.168.0.166"
+    private var masterServerIp = "10.9.40.228"
 
     private var gameId = ""
     private var nickname = ""
@@ -84,9 +84,6 @@ class StartActivity : CoroutineScope, AppCompatActivity() {
      */
     fun showAllGamesActivity(view: View) {
         val intent = Intent(this, AllGamesActivity::class.java)
-        if (!ed_masterServerIp.text.toString().isEmpty()) {
-            masterServerIp = ed_masterServerIp.text.toString()
-        }
         startActivity(intent)
 
     }
