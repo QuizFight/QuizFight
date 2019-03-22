@@ -10,7 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.quizfight.common.MASTER_PORT
 import org.quizfight.common.messages.*
 import android.support.v4.widget.SwipeRefreshLayout
 
@@ -74,7 +73,7 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
     fun sendRequestOpenGame() {
         while (!Client.connected);
         Client.withHandlers(mapOf(
-                MsgGameList ::class to { conn, msg -> showGames((msg as MsgGameList).games)}
+                MsgGameList ::class to { _, msg -> showGames((msg as MsgGameList).games)}
         ))
         Client.send(MsgRequestOpenGames())
 

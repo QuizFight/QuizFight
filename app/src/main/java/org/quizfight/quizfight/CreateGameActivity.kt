@@ -11,7 +11,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.quizfight.common.MASTER_PORT
 import org.quizfight.common.messages.*
 
 class CreateGameActivity : CoroutineScope, AppCompatActivity() {
@@ -32,6 +31,9 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
     }
 
 
+    /**
+     * check the editViews before sending message create game
+     */
     fun validateForm(){
 
         //reset errors
@@ -102,6 +104,10 @@ class CreateGameActivity : CoroutineScope, AppCompatActivity() {
     }
 
 
+    /**
+     * switch to AttemptQuizActivity
+     * after creating a game
+     */
     fun showAttemptQuizStartActivity(gameInfo: GameData) = launch{
 
         val intent = Intent(context,  AttemptQuizStartActivity::class.java)

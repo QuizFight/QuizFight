@@ -20,15 +20,15 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     private var context = this
 
-    private var questionCountTotal : Int = 5
-    private var gameId : String = ""
+    private var questionCountTotal = 0
+    private var gameId = ""
     private lateinit var nickname: String
     private var gameName = ""
     private var maxPlayers = 0
     private var playerCount = 0
-    private var creator =""
+    private var creator = ""
 
-    private var nicknameEntered: Boolean = false
+    private var nicknameEntered = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,6 +36,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         setContentView(R.layout.activity_game_detail)
         updateUi()
 
+        //enter nickname
         btn_join.setOnClickListener {
             if (nicknameEntered == false) {
                 displayAlert()
@@ -46,6 +47,10 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     }
 
+
+    /**
+     * Update UI
+     */
     fun updateUi(){
 
         questionCountTotal = intent.getIntExtra("questionCountTotal",0 )
@@ -62,6 +67,9 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
     }
 
 
+    /**
+     * switch to AttemptQuizStartActivity after join
+     */
     fun showAttemptQuizStart() = launch{
 
         val intent = Intent(context, AttemptQuizStartActivity::class.java)
@@ -86,6 +94,10 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         job.cancel()
     }
 
+
+    /**
+     * displays dialog to enter the nickname
+     */
     fun displayAlert() {
         val builder = AlertDialog.Builder(this)
         val view = layoutInflater.inflate(R.layout.layout_alert_enter_nickname, null)

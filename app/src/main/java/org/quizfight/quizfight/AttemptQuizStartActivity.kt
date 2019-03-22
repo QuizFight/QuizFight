@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.view.View
-import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_attempt_quiz_start.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,9 +24,9 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     private val context = this
 
     private var maxPlayers: Int = 0
-    private var nickname : String = ""
+    private var nickname = ""
     private var questionCountTotal = 0
-    private var startGameEnable : Boolean = false
+    private var startGameEnable = false
 
     private var gameId = ""
 
@@ -35,30 +34,37 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_attempt_quiz_start)
 
+        //set handlers for the client
         Client.withHandlers(
                 mapOf( MsgQuestion ::class to { _, msg -> showQuizActivity(msg as MsgQuestion)},
                         MsgPlayerCount ::class to { _, msg -> updateProgressBar((msg as MsgPlayerCount).playerCount)},
                         MsgGameOver ::class to { _, _ -> restartApplication()}
                 ))
 
-        var createdBy = intent.getStringExtra("creator")
+        val createdBy = intent.getStringExtra("creator")
         nickname = intent.getStringExtra("nickname")
-        var gameName = intent.getStringExtra("gameName")
+        val gameName = intent.getStringExtra("gameName")
         maxPlayers = intent.getIntExtra("maxPlayers",0)
         questionCountTotal = intent.getIntExtra("questionCountTotal",0)
         startGameEnable = intent.getBooleanExtra("startEnable", false)
         val playerCount = intent.getIntExtra("playerCount", 0)
-
         gameId = intent.getStringExtra("gameId")
 
+        //update UI
         updateUI(nickname, createdBy, gameName, questionCountTotal)
         updateProgressBar(playerCount + 1)
 
+        //send request all open games when a user click on button leave
         btn_leave.setOnClickListener {
             sendMsgLeaveGame()
         }
     }
 
+
+    /**
+     * by connection lost, reconnect the client to the master server
+     * and restart the application
+     */
     fun restartApplication() {
         launch{
             Client.reconnectToMaster()
@@ -69,6 +75,13 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         }
     }
 
+
+    /**
+     * send message start Game
+     * is only enable for the creator of the game.
+     * It enable the creator to start a game,
+     * without waiting all players to join the game
+     */
     fun sendMsgStartGame() {
         Client.send(MsgStartGame())
         btn_start.isEnabled = false
@@ -76,6 +89,7 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
 
     /**
      * Leave a game
+     * ask  the user to confirm the choice first
      */
     fun sendMsgLeaveGame() {
 
@@ -97,6 +111,12 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     }
 
 
+    /**
+     * update the UI
+     * if the player is creator of the game,
+     * then show the start button
+     * else hide it
+     */
     fun updateUI(nickname: String, createdBy:String, gameName:String, questionCountTotal: Int){
 
         tv_nickname.setText(nickname)
@@ -114,6 +134,11 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
         }
     }
 
+
+    /**
+     * update the progressbar to show the current count of players
+     * that have joined the game
+     */
     fun updateProgressBar(players: Int)= launch {
 
         //update text
@@ -129,6 +154,9 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     }
 
 
+    /**
+     * Switch to the quizactivity and display the first question of the game
+     */
     fun showQuizActivity(msg: MsgQuestion) = launch{
 
         val intent = Intent(context, QuizActivity::class.java)
@@ -185,6 +213,9 @@ class AttemptQuizStartActivity :CoroutineScope, AppCompatActivity() {
     }
 
 
+    /**
+     * by connection lost, save game's info on the device
+     */
     fun saveGameInfo(){
         val preferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
         val editor = preferences.edit()

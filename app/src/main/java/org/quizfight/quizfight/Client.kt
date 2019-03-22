@@ -7,14 +7,15 @@ import kotlinx.coroutines.launch
 import org.quizfight.common.Connection
 import org.quizfight.common.SocketConnection
 import org.quizfight.common.messages.*
-import java.lang.Exception
 import java.net.Socket
 import kotlin.reflect.KClass
 
 
 object Client : CoroutineScope, Connection {
+
     override val coroutineContext = Dispatchers.Main
     private var connection: SocketConnection? = null
+
     private var lastMessage: Message? = null
     private var masterServerIP: String? = null
     private var masterServerPort: Int? = null
