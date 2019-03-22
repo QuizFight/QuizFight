@@ -19,7 +19,7 @@ class MasterServer(private val port : Int) {
     private var gameServers = mutableListOf<ServerData>()
 
     /**
-     * Inizializes handlers for listening to requests of clients and game servers
+     * Inizializes handlers for listening to requests of clients and game servers.
      */
     init{
         acceptConnections()
@@ -41,6 +41,12 @@ class MasterServer(private val port : Int) {
         }
     }
 
+    /**
+     * Handler for receiving an update from a game server.
+     * The method will update the gamelist of a master server.
+     * @param conn is the connection of the game server
+     * @param msgGameList is the current gamelist of open games from a game server.
+     */
     private fun receiveGameServerUpdate(conn: Connection, msgGameList: MsgGameList) {
         val remoteIpPort = getIpAndPortFromConnection(conn as SocketConnection)
         val remoteIp     = remoteIpPort.split(":")[0]
@@ -53,6 +59,8 @@ class MasterServer(private val port : Int) {
 
     /**
      * Checks if a gameServer already is known.
+     * @param gameServer is the server data of a game server
+     * @return true, if server is known, false else
      */
     private fun gameServerIsKnown(gameServer: ServerData) : Boolean {
         val knownGameServer = gameServers.find {gs -> gs.ip == gameServer.ip && gs.port == gameServer.port}
@@ -61,19 +69,23 @@ class MasterServer(private val port : Int) {
 
     /**
      * Adds a game server to gameServers.
+     * @param gameServer is the server data of a game server.
      */
     private fun addServerToList(gameServer: ServerData){
         gameServers.add(gameServer)
     }
 
     /**
-     * Removes a game server from gameServers.
+     * Removes a game server from the list.
+     * @param gameServer is the server data of the game server. It will be deleted from the list.
      */
     private fun removeServerFromList(gameServer: ServerData){
         gameServers.remove(gameServer)
     }
+
     /**
-     * returns a List with all open Games from all game servers.
+     * List all open games for clients.
+     * @return is the list of open games.
      */
     private fun listAllOpenGames(): List<GameData>{
         return gameServers.map {gameServer -> gameServer.games}.flatten()
@@ -81,6 +93,7 @@ class MasterServer(private val port : Int) {
 
     /**
      * Returns the game server with the lowest amount of games.
+     * @return is the least used game server.
      */
     private fun getLeastUsedGameServer() : ServerData {
         gameServers.sortBy { it.games.size }
@@ -89,6 +102,8 @@ class MasterServer(private val port : Int) {
 
     /**
      * Returns the server that hosts the game with param gameId.
+     * @param gameId is the game id to look for.
+     * @return is the optional server data.
      */
     private fun getServerByGameId(gameId : String) : ServerData? {
         return gameServers.find{ gameServer -> gameServer.hasGameWithId(gameId)}
@@ -96,6 +111,8 @@ class MasterServer(private val port : Int) {
 
     /**
      * Extension method for ServerData. This way we don't have to get the actual game server.
+     * @param gameId is the gameId to look for.
+     * @return is a boolean, true if server has this game, false if not.
      */
     private fun ServerData.hasGameWithId(gameId: String) : Boolean {
         return games.find { it.id == gameId} != null
@@ -116,14 +133,17 @@ class MasterServer(private val port : Int) {
     /**
      * Handler method for Join Game requests.
      * Sends the server that manages the game in question.
+     * @param conn is the connection from client
+     * @param msgJoinGame is the message MsgJoin
      */
     private fun transferToGameServer(conn : Connection, msgJoinGame: MsgJoin) {
         val gameServer  = getServerByGameId(msgJoinGame.gameId)
 
-        //TODO: What if == null?
         if (gameServer != null) {
             conn.send(MsgTransferToGameServer(gameServer))
             conn.close()
+            serverLog("Spieler konnte dem Spiel nicht joinen\n")
+            return
         }
 
         serverLog("Spieler ${msgJoinGame.nickname} möchte dem Spiel ${msgJoinGame.gameId} joinen")
@@ -133,6 +153,8 @@ class MasterServer(private val port : Int) {
     /**
      * Handler function for Create Game requests.
      * Sends the server with the lowest amount of games.
+     * @param conn is the connection from the client
+     * @param msgCreateGame is the MsgCreateGame from client.
      */
     private fun sendLeastUsedGameServer(conn : Connection, msgCreateGame: MsgCreateGame) {
         serverLog("Client möchte Spiel erstellen: ${msgCreateGame.game.name}")
@@ -146,9 +168,10 @@ class MasterServer(private val port : Int) {
     /**
      * Handler function for Register game server requests.
      * Accepts a GameServerData object and updates its gameServers list accordingly.
+     * @param conn is the connection of a game server,
+     * @param msg is the message MsgRegisterGameServer holding information about the game server
      */
     private fun registerGameServer(conn: Connection, msg : MsgRegisterGameServer) {
-        // TODO ip und port werden wahrscheinlich anders mitgegeben, rücksprache!
         val remoteIpPort = getIpAndPortFromConnection(conn as SocketConnection)
         val remoteIp     = remoteIpPort.split(":")[0]
         val remotePort   = msg.port

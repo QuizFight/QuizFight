@@ -1,7 +1,12 @@
 package org.quizfight.server
 
-import org.quizfight.common.*
+import org.quizfight.common.GAME_SERVER_PORT
+import org.quizfight.common.MASTER_PORT
 
+/**
+ * Class for user-interaction.
+ * Selecting between master server or game server is possible.
+ */
 class Dialog{
 
     private val QUIT             = "q"
@@ -12,10 +17,16 @@ class Dialog{
     private val BAD_INPUT        = "Bad Input, try again"
     private val EXIT             = "Bye"
 
+    /**
+     * Starts the user-interaction after calling a Dialog-constructor
+     */
     init{
         start()
     }
 
+    /**
+     * Starts the user-interaction. Menu is printed and possibilities to interact are shown.
+     */
     private fun start(){
         println(MENU_MSG)
         var selection = readLine()
@@ -31,6 +42,9 @@ class Dialog{
         println(EXIT)
     }
 
+    /**
+     * User has decided to start a game server
+     */
     private fun startGameServer() {
         println(TYPE_MASTER_IP)
         val masterIp = readLine()
@@ -40,10 +54,17 @@ class Dialog{
         }
     }
 
+    /**
+     * User has decided to start a master server
+     */
     private fun startMasterServer() {
         MasterServer(MASTER_PORT)
     }
 
+    /**
+     * This function is called if the user makes a bad input.
+     * The menu is shown again.
+     */
     private fun selectAgain(): String? {
         println("${BAD_INPUT} \n${MENU_MSG}")
         return readLine()
