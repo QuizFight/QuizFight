@@ -11,8 +11,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".QuizActivity" />
-        <activity android:name=".StartActivity">
+        <activity android:name=".QuizActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".StartActivity"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -21,19 +24,23 @@
         </activity>
         <activity
             android:name=".AllGamesActivity"
-            android:label="@string/title_all_games_activity">
+            android:label="@string/title_all_games_activity"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".GameDetailActivity"
-            android:label="@string/title_game_details_activity">
+            android:label="@string/title_game_details_activity"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".CreateGameActivity"
-            android:label="@string/title_create_game_activity">
+            android:label="@string/title_create_game_activity"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".AttemptQuizStartActivity"
-            android:label="@string/title_attempt_start_activity">
+            android:label="@string/title_attempt_start_activity"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 
