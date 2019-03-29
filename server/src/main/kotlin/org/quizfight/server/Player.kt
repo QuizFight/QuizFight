@@ -6,41 +6,64 @@ import org.quizfight.common.messages.MsgLeave
 import org.quizfight.common.messages.MsgScore
 import org.quizfight.common.messages.MsgStartGame
 import org.quizfight.common.messages.MsgVote
+import java.io.EOFException
 
 /**
  * Player Class. Manages the Connection between a mobile device and the Server.
- * Includes player's score
- * @author Thomas Spanier
+ * @param name is the name of a player
+ * @param game is the game which the player joines
+ * @param oldConnection is the players connection from a point he was not part of a game.
+ * This connection carries old handlers, which will be updated in this class.
+ * @param id is an unique id of a player.
  */
 class Player(val name : String, val game: Game, oldConnection: Connection, val id: String) {
 
     var score: Int = 0
-    val connection = oldConnection.withHandlers(mapOf(
-            //TODO: Vote, Timeout, etc
-            MsgStartGame::class to { conn, msg -> startGame(conn, msg as MsgStartGame) },
-            MsgScore::class to { conn, msg -> receiveAnswer(conn, msg as MsgScore) },
-            MsgLeave::class to {conn, msg -> leaveGame(conn, msg as MsgLeave)},
-            MsgVote::class to { conn, msg -> receiveVoteOrNot(conn, msg as MsgVote)}
-    ))
+    lateinit var connection: Connection
 
+    /**
+     * Initializes new handlers for a player joined a game.
+     */
+    init{
+        try {
+            connection = oldConnection.withHandlers(mapOf(
+                    MsgStartGame::class to { conn, msg -> startGame(conn, msg as MsgStartGame) },
+                    MsgScore::class to { conn, msg -> receiveAnswer(conn, msg as MsgScore) },
+                    MsgLeave::class to { conn, msg -> leaveGame(conn, msg as MsgLeave) },
+                    MsgVote::class to { conn, msg -> receiveVoteOrNot(conn, msg as MsgVote) }))
+        }catch(ex: EOFException){
+
+        }
+    }
+
+    /**
+     * If a player wants to wait or wants not to wait for another lost player,
+     * this method will receive the decision.
+     * @param conn is the connection of the player.
+     * @param msgVote is the Message if it wants to wait or not.
+     */
     private fun receiveVoteOrNot(conn: Connection, msgVote: MsgVote) {
         game.voting.takeVote(msgVote.waitForPlayer)
     }
 
 
     /**
-     * Forces the game to send the first question
+     * Forces the game to send the first question.
+     * @param conn is the connection of the player which forced the start.
+     * @param msgStartGame is the MsgStartGame-object.
      */
     private fun startGame(conn: Connection, msgStartGame: MsgStartGame) {
         serverLog("Ein Spieler hat das Spiel gestartet. Die erste Question wird gesendet\n")
-        game.answersIncome = 0
-        game.broadcast(game.getNextQuestion())
+        game.startGame()
     }
 
     /**
-     * Player leaves game
+     * If a player leaves a game it will send a MsgLeave-message.
+     * After, it will be kicked from the waiting room after joining a game (which has not started yet!)
      */
     private fun leaveGame(conn: Connection, msgLeave: MsgLeave) {
+        serverLog("Spieler verlässt das Game")
+
         val ipAndPort = getIpAndPortFromConnection(conn as SocketConnection)
 
         for(player in game.players){
@@ -52,39 +75,32 @@ class Player(val name : String, val game: Game, oldConnection: Connection, val i
     }
 
     /**
-     * Calculates score, removes game's first question and forces the game to send the next question
+     * Handler for receiving the score of a player.
+     * Further, this method will trigger the proceed-method of the running game.
+     * @param conn is the connection to the player.
+     * @param msgSendAnswer is the score for an answered question.
      */
     private fun receiveAnswer(conn: Connection, msgSendAnswer: MsgScore) {
-        serverLog("Antwort erhalten von ${getIpAndPortFromConnection(conn as SocketConnection)} \n")
+        serverLog("Antwort erhalten von ${getIpAndPortFromConnection(conn)} \n")
+        game.playersAnswered.add(getIpAndPortFromConnection(conn))
         addToScore(msgSendAnswer.score)
-        game.proceed()
+        game.proceed(id)
     }
 
 
     /**
      * Adds value to the player's score
-     * @param value
+     * @param value is the value to add.
      */
-    fun addToScore(value:Int){
+    private fun addToScore(value:Int){
         score += value
     }
 
 
     /**
-     * returns true, if player name and game name are equal
+     * Returns information about a player.
+     * @return is a string with information about player name and its score.
      */
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Player
-
-        if (name != other.name) return false
-        if(game.gameName != other.game.gameName) return false
-
-        return true
-    }
-
     override fun toString(): String {
         return "Player(name='$name', score=$score)"
     }

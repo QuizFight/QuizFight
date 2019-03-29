@@ -1,6 +1,6 @@
 package org.quizfight.questionStore
 
-import org.quizfight.common.question.*
+import org.quizfight.common.question.Question
 
 /**
  * Random selection of questions from the question list of the QuestionStore
@@ -11,12 +11,13 @@ import org.quizfight.common.question.*
 class QuestionSelector {
 
     /**
-     * Returns a question list for a whole game. The count of questions is limited
+     * Returns a question list for a whole game. The count of questions is limited.
+     * The types of the questions are diversified by the algorithm.
      * @param count is the count of questions a game will use
      * @return is the list of questions. Its size is obtained by param count
      */
     fun getQuestionsForGame(count: Int, list: List<Question<*>>): List<Question<*>>{
-        if(count > list.size || count < 1 || count > 20) return listOf<Question<*>>()
+        if(count > list.size || count < 4 || count > 20) return listOf<Question<*>>()
 
         var tmpType = "tmpType"
         var tmpCategory = "tmpCategory"

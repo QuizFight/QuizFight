@@ -9,7 +9,8 @@ data class GameData(val id: String,
                     val name:String,
                     val maxPlayers: Int,
                     val players: List<String>,
-                    val questionCount: Int) : Serializable
+                    val questionCount: Int,
+                    val gameCreator: String) : Serializable
 
 data class GameRequest(val name : String,
                        val maxPlayers : Int,
@@ -29,13 +30,13 @@ data class MsgTransferToGameServer(val gameServer : ServerData) : Message
 data class MsgGameInfo(val game : GameData) : Message
 data class MsgCreateGame(val game : GameRequest, val nickname : String) : Message
 class MsgStartGame : Message
-data class MsgQuestion(val question : Question<*>) : Message
+data class MsgQuestion(val question : Question<*>, val number : Int) : Message
 data class MsgScore(val score : Int) : Message
 data class MsgRanking(val totalScore : Map<String, Int>) : Message
 data class MsgConnectionLost(val name : String) : Message
 class MsgCheckConnection() : Message
 data class MsgVote(val waitForPlayer : Boolean, val name : String): Message
 data class MsgRejoin(val gameServerID: String, val nickname: String) : Message
-data class MsgWait(val name : String): Message
+class MsgWait : Message
 data class MsgConnectionResumed(val name : String) : Message
 class MsgGameOver : Message

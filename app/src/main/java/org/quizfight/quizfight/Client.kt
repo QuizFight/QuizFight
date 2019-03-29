@@ -12,11 +12,16 @@ import kotlin.reflect.KClass
 
 
 object Client : CoroutineScope, Connection {
+
     override val coroutineContext = Dispatchers.Main
     private var connection: SocketConnection? = null
+
     private var lastMessage: Message? = null
     private var masterServerIP: String? = null
     private var masterServerPort: Int? = null
+
+    var onGameServerJoined: List<(String, Int) -> Unit> = emptyList()
+    var onGameServerLeft: List<() -> Unit> = emptyList()
 
     val connected: Boolean
         get() = connection != null
@@ -24,18 +29,23 @@ object Client : CoroutineScope, Connection {
     val ip: String?
         get() = connection?.ip
 
+    fun initialize(masterServerIP: String, masterServerPort: Int) {
+        this.masterServerIP = masterServerIP
+        this.masterServerPort = masterServerPort
+    }
+
     override fun send(msg: Message) {
         while (!connected);
 
         lastMessage = msg
         launch(Dispatchers.IO) {connection?.send(msg) }
-        Log.d("Connection", "Sent message $msg to ${connection?.ip}")
+        Log.d("Connection", "Sent message $msg to ${connection?.ip}:${connection?.socket?.port}")
     }
 
     override fun withHandlers(handlers: Map<KClass<*>, (Connection, Message) -> Unit>): Connection {
         val extHandlers = handlers + (
-                MsgTransferToGameServer::class to { _, msg -> handleServerTransfer(msg as MsgTransferToGameServer) }
-                )
+            MsgTransferToGameServer::class to { _, msg -> handleServerTransfer(msg as MsgTransferToGameServer) }
+        )
 
         val withLogging = extHandlers.mapValues {
             { conn: Connection, msg: Message ->
@@ -43,8 +53,11 @@ object Client : CoroutineScope, Connection {
                 it.value(conn, msg)
             }
         }
-        //launch(Dispatchers.IO) { connection?.withHandlers(extHandlers) }
-        launch(Dispatchers.IO) { connection?.withHandlers(withLogging) }
+
+        launch(Dispatchers.IO) {
+            Log.d("Connection", "Updated handlers")
+            connection?.withHandlers(withLogging)
+        }
         return this
     }
 
@@ -58,28 +71,33 @@ object Client : CoroutineScope, Connection {
         // Resend last message that caused transfer
         if (lastMessage != null)
             send(lastMessage!!)
+
+        onGameServerJoined.forEach { it(serverData.ip, serverData.port) }
     }
 
     fun reconnectToMaster() = launch(Dispatchers.IO) {
-        Log.d("Connection", "(Re)Connecting to master server $masterServerIP...")
-
         val handlers = connection?.handlers
-        connection?.close()
 
-        val socket = Socket(masterServerIP!!, masterServerPort!!)
-        connection = SocketConnection(socket, emptyMap())
-        if (handlers != null) {
-            connection!!.withHandlers(handlers)
+        connection?.close()
+        if (connection != null) {
+            Log.d("Connection", "Connection with gameserver closed ")
+            onGameServerLeft.forEach { it() }
         }
+
+        Log.d("Connection", "(Re)Connecting to master server $masterServerIP...")
+        val socket = Socket(masterServerIP!!, masterServerPort!!)
+        connection = SocketConnection(socket, handlers ?: emptyMap())
 
         Log.d("Connection", "Connected to $masterServerIP")
     }
 
-    fun setMasterServer(ip: String, port: Int) {
-        masterServerIP = ip
-        masterServerPort = port
+    fun reconnectToGameServer(ip: String, port: Int, handlers: Map<KClass<*>, (Connection, Message) -> Unit>) = launch(Dispatchers.IO) {
+        Log.d("Connection", "Reconnecting to GameServer $ip and port $port" )
+        connection?.close()
+        connection = null
 
-        reconnectToMaster()
+        val socket = Socket(ip, port)
+        connection = SocketConnection(socket, handlers)
     }
 
     override fun close() { launch(Dispatchers.IO) { connection?.close() } }

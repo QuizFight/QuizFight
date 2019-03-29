@@ -1,5 +1,6 @@
 package org.quizfight.common
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.quizfight.common.messages.Message
@@ -47,14 +48,14 @@ class SocketConnection(
         receiveAsync()
     }
 
-    private fun receiveAsync() = GlobalScope.launch {
+    private fun receiveAsync() = GlobalScope.launch(Dispatchers.IO) {
         while (!socket.isClosed && handleMessages.get()) {
             val msg = try {
                 inStream.readObject() as? Message ?: throw Exception("Received invalid object")
             } catch (e: EOFException) {
-                if (!shuttingDown.get()) throw e else break
+                if (!shuttingDown.get()) throw Exception("Connection with ${socket.inetAddress}:${socket.port} broke", e) else break
             } catch (e: SocketException) {
-                if (!shuttingDown.get()) throw e else break
+                if (!shuttingDown.get()) throw Exception("Connection with ${socket.inetAddress}:${socket.port} broke", e) else break
             }
             val handler = handlers[msg::class] ?: throw Exception("No handler found for message type ${msg::class}")
             handler(this@SocketConnection, msg)

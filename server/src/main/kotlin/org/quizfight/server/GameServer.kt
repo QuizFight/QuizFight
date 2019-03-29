@@ -13,8 +13,10 @@ import java.net.Socket
 import java.net.SocketException
 
 /**
- * Game Server Class. Manages several Games.
- * @author Thomas Spanier
+ * Game Server Class. Manages several Games and connects to the master server.
+ * @param masterIp is the IP of the master server
+ * @param ownPort is the port of this server (can be chosen freely)
+ * @param masterPort is the port of the master
  */
 open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: Int){
     val questionStore = QuestionStore()    // hat ab diesem Zeitpunkt schon ALLE Fragen der XML-Dateien
@@ -24,30 +26,42 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     val socket = ServerSocket(ownPort)
     var games= mutableListOf<Game>()
 
-    val UPDATE_INTERVALL = 4000L
+    val UPDATE_INTERVALL = 2000L
 
+    /**
+     * After calling a GameServer()-constructor the server will...
+     * ... connect to master
+     * ... send periodical updates of the own gamelist
+     * ... initialize connection handlers for receiving messages
+     */
     init {
         connectWithMaster()
         sendUpdate()
         start()
     }
 
+    /**
+     * Peridoically sending the current gamelist to master server within a coroutine.
+     */
     private fun sendUpdate(){
         GlobalScope.launch {
             while(true) {
                 deleteTerminatedGames()
                 masterConn.send(MsgGameList(gameListToGameDataList()))
-                serverLog("Sende diese GameList zum Master: " + games + "\n")
+                //serverLog("Sende diese GameList zum Master: " + games + "\n")
                 delay(UPDATE_INTERVALL)
             }
         }
     }
 
+    /**
+     * Deletes terminated games from the gamelist.
+     */
     private fun deleteTerminatedGames() {
         try{
             games.forEach { if (it.TERMINATED) { games.remove(it) }}
         }catch(ex: ConcurrentModificationException){
-            //TODO tritt auf, funktioniert aber.
+            //TODO Not the best way for deleting objects from this list but currently works
         }
 
 
@@ -55,10 +69,10 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
 
     /**
-     * lists all open games running on this server
-     * @return List of all games in GameData format
+     * Lists all open games running on this server
+     * @return List of all games in GameData format.
      */
-    fun listOpenGames(): List<GameData> {
+    private fun listOpenGames(): List<GameData> {
         val openGames: List<Game> = games.filter { it.isOpen }
         val gameData: MutableList<GameData> = mutableListOf()
         openGames.forEach { gameData.add(gameToGameData(it))  }
@@ -66,7 +80,9 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     }
 
     /**
-     * converts a game into gameData
+     * Converts a game into a gameData object. These objects are used by clients for showing
+     * game information.
+     * @param g is the Game which is going to be transformed to GameData
      */
     private fun gameToGameData(g: Game): GameData {
         var players = mutableListOf<String>()
@@ -75,9 +91,13 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
             players.add(player.value.name)
         }
 
-        return GameData(g.id, g.gameName, g.maxPlayer, players, g.questions.size)
+        return GameData(g.id, g.gameName, g.maxPlayer, players, g.questions.size, g.gameCreatorName)
     }
 
+    /**
+     * Takes the whole game list and transforms it to a gameData-list
+     * @return is the gameData-list
+     */
     private fun gameListToGameDataList(): List<GameData>{
         var gameDataList = mutableListOf<GameData>()
 
@@ -91,9 +111,9 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
 
     /**
-     * starts Slave Server
+     * Starts listening. The connections gets its handlers for handling messages from clients.
      */
-    open fun start(){
+    private fun start(){
         while (!socket.isClosed) {
             val incoming = socket.accept()
             GlobalScope.launch {
@@ -107,20 +127,29 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
         }
     }
 
+    /**
+     * After a player looses its connection, it may try to rejoin the game.
+     * This function is the handler for this procedure.
+     * @param conn is the connection of the rejoining player.
+     * @param msgRejoin is the rejoin-message
+     */
     private fun rejoinGame(conn: Connection, msgRejoin: MsgRejoin) {
         serverLog("Spieler ${msgRejoin.nickname} möchte rejoinen")
 
-        games.forEach {
-            if(it.id == msgRejoin.gameServerID){
-                it.addPlayer(msgRejoin.nickname, conn)
-                return
-            }
+        val game = games.find { it.id == msgRejoin.gameServerID }
+
+        if(game != null) {
+            game.addPlayer(msgRejoin.nickname, conn)
+        } else {
+            serverLog("Sein altes Spiel wurde nicht mehr gefunden\n")
+            conn.send(MsgGameOver())
+            conn.close()
         }
-        
-        serverLog("Sein altes Spiel wurde nicht mehr gefunden\n")
-        conn.send(MsgGameOver())
     }
 
+    /**
+     * Connects with the master server.
+     */
     private fun connectWithMaster() {
         try {
             masterConn.send(MsgRegisterGameServer(GAME_SERVER_PORT))
@@ -131,9 +160,11 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
     }
 
     /**
-     * Gets called, if MsgCreateGame incomes.
+     * Gets called, if MsgCreateGame is coming in.
      * Creates a new game and adds it to the games list
-     * Sends feedback to Client
+     * After,it send feedback to Client.
+     * @param conn is the connection of the client.
+     * @param msg is the MsgCreateGame coming from client.
      */
 
     private fun receiveCreateGame(conn: Connection, msg: MsgCreateGame) {
@@ -146,12 +177,12 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
         val gameQuestions = questionStore.getQuestionsForGame(questionCount).toMutableList()
 
-        val game = Game(id, gameName, maxPlayers, gameQuestions, id)
+        val game = Game(id, gameName, maxPlayers, gameQuestions, id, gameCreator)
         game.addPlayer(gameCreator, conn)
 
         addNewGame(game)
 
-        val gameData = GameData(id, gameName, maxPlayers, listOf<String>(gameCreator), questionCount)
+        val gameData = GameData(id, gameName, maxPlayers, listOf<String>(gameCreator), questionCount, gameCreator)
 
         serverLog("Game erstellt: ${msg.game}")
         serverLog("Der Game-Creator ist ${gameCreator} und dieser wurde dem Game hinzugefügt\n")
@@ -160,49 +191,39 @@ open class GameServer(val masterIp: String, val ownPort: Int, val masterPort: In
 
     /**
      * Adds a new game to gamesList
+     * @param game is the new Game
      */
-    fun addNewGame(game: Game){
+    private fun addNewGame(game: Game){
         games.add(game)
     }
 
 
     /**
      *  Gets called, if MsgGetOpenGames Message incomes.
-     *  Sends the list of open games over own connection object
-     *  TODO: use conn or connection?
+     *  The handler sends the whole list of currently open games the client could join.
+     *  @param conn is the connection to the client.
+     *  @param msgGetOpenGames is the list of open games.
      */
     private fun getOpenGames(conn: Connection, msgGetOpenGames: MsgGameList) {
         conn.send(MsgGameList(listOpenGames()))
-        //connection.send(MsgSendOpenGames(listOpenGames()))
     }
 
 
     /**
-     * Gets called, if MsgJoinGame incomes.
-     * Adds the Player to a Game
+     * Handler for MsgJoinGame.
+     * If a player wants to join an open game, this method will add him to this game.
+     * @param conn is the connection of the player.
+     * @param msgJoinGame is the message MsgJoinGame
      */
     private fun joinGame(conn: Connection, msgJoinGame: MsgJoin) {
         serverLog("Join Game Anfrage von ${msgJoinGame.nickname}")
 
         val game = games.find { game -> game.id == msgJoinGame.gameId }
         if (game == null){
-            serverLog("Game ist null!")
+            serverLog("Game nicht gefunden! Client erhält eine MsgGameOver")
+            conn.send(MsgGameOver())
             return
         }
         game!!.addPlayer(msgJoinGame.nickname, conn)
-
-        serverLog("Spieler ${msgJoinGame.nickname} möchte dem Spiel ${game.gameName} joinen")
     }
-
-    fun removeGame(id: String) {
-        for(game in games){
-            if(game.id == id){
-                games.remove(game)
-                serverLog("Spiel ${game.gameName} entfernt\n")
-                return
-            }
-        }
-    }
-
-
 }

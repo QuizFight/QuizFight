@@ -20,14 +20,15 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     private var context = this
 
-    private var questionCountTotal : Int = 5
-    private var gameId : String = ""
+    private var questionCountTotal = 0
+    private var gameId = ""
     private lateinit var nickname: String
     private var gameName = ""
     private var maxPlayers = 0
     private var playerCount = 0
+    private var creator = ""
 
-    private var nicknameEntered: Boolean = false
+    private var nicknameEntered = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +36,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         setContentView(R.layout.activity_game_detail)
         updateUi()
 
+        //enter nickname
         btn_join.setOnClickListener {
             if (nicknameEntered == false) {
                 displayAlert()
@@ -45,6 +47,10 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
 
     }
 
+
+    /**
+     * Update UI
+     */
     fun updateUi(){
 
         questionCountTotal = intent.getIntExtra("questionCountTotal",0 )
@@ -52,13 +58,18 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         gameName = intent.getStringExtra("gameName")
         maxPlayers = intent.getIntExtra("maxPlayers", 0 )
         playerCount= intent.getIntExtra("playerCount",0)
+        creator = intent.getStringExtra("creator")
 
         text_view_actual_no_players.text = ""+ maxPlayers
         text_view_actual_no_questions.text = ""+ questionCountTotal
         text_view_game_name.text = gameName
+        text_view_creator_name.text = creator
     }
 
 
+    /**
+     * switch to AttemptQuizStartActivity after join
+     */
     fun showAttemptQuizStart() = launch{
 
         val intent = Intent(context, AttemptQuizStartActivity::class.java)
@@ -69,7 +80,7 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         intent.putExtra("questionCountTotal" , questionCountTotal)
         intent.putExtra("gameName" , gameName)
         intent.putExtra("nickname" , nickname)
-        intent.putExtra("createdBy" , "")
+        intent.putExtra("creator" , creator)
         intent.putExtra("startEnable", false)
         intent.putExtra("playerCount", playerCount)
 
@@ -83,6 +94,10 @@ class GameDetailActivity : CoroutineScope, AppCompatActivity() {
         job.cancel()
     }
 
+
+    /**
+     * displays dialog to enter the nickname
+     */
     fun displayAlert() {
         val builder = AlertDialog.Builder(this)
         val view = layoutInflater.inflate(R.layout.layout_alert_enter_nickname, null)

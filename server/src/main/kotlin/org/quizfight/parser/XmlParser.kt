@@ -1,6 +1,9 @@
 package org.quizfight.parser
 
-import org.quizfight.common.question.*
+import org.quizfight.common.question.Category
+import org.quizfight.common.question.ChoiceQuestion
+import org.quizfight.common.question.GuessQuestion
+import org.quizfight.common.question.Question
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.xml.sax.InputSource
@@ -35,7 +38,7 @@ class XmlParser() {
      * Finds out the paths of every single xml-file including questions
      * @return is a list with the paths to every xml-file
      */
-    fun getPaths() : List<String> {
+    private fun getPaths() : List<String> {
         var paths = mutableListOf<String>()
 
 
@@ -55,7 +58,7 @@ class XmlParser() {
      * The function parses the content of these files to a Document-object
      * @param path is the array with paths
      */
-    fun getDocumentsFromPaths(paths: List<String>): List<Document>{
+    private fun getDocumentsFromPaths(paths: List<String>): List<Document>{
         var documents = mutableListOf<Document>()
 
         for(path in paths){
@@ -68,7 +71,7 @@ class XmlParser() {
      * Reads a xml-document and transforms its content to Document-object
      * @return The Document-object
      */
-    fun readXmlFile(path: String): Document {
+    private fun readXmlFile(path: String): Document {
         val xmlFile = File(path)
 
         val factory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance()
@@ -84,7 +87,7 @@ class XmlParser() {
      * The attribute type of the xml-node 'questions' is read for getting the
      * correct case.
      */
-    fun createQuestionObjectList(documents: List<Document>): List<Question<*>>{
+    private fun createQuestionObjectList(documents: List<Document>): List<Question<*>>{
         var resultList = mutableListOf<Question<*>>()
 
         for(document in documents){
@@ -137,7 +140,7 @@ class XmlParser() {
      * @param document is the xml-representation
      * @return is the question list parsed from xml
      */
-    fun getGuessQuestions(document: Document): MutableList<GuessQuestion>{
+    private fun getGuessQuestions(document: Document): MutableList<GuessQuestion>{
         var questionList = mutableListOf<GuessQuestion>()
 
         val questionNodes = document.getElementsByTagName("question")

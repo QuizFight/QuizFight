@@ -10,7 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.quizfight.common.MASTER_PORT
 import org.quizfight.common.messages.*
 import android.support.v4.widget.SwipeRefreshLayout
 
@@ -23,27 +22,24 @@ import android.support.v4.widget.SwipeRefreshLayout
  */
 class AllGamesActivity : CoroutineScope, AppCompatActivity() {
 
+    //coroutine
     private var job = Job()
     override val coroutineContext = Dispatchers.Main + job
 
     private val context = this
-    private lateinit var allOpenGames : List<GameData>
 
-    var masterServerIp = ""
+    //Server's info
+    private lateinit var allOpenGames : List<GameData>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_all_games)
 
-        masterServerIp = intent.getStringExtra("masterServerIP")
-        Client.setMasterServer(masterServerIp, MASTER_PORT)
-
         sendRequestOpenGame()
 
         // Set an item click listener for ListView
+        //and displays the game's info
         all_games_container.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-            // Get the selected item text from ListView
-           // val selected= parent.getItemAtPosition(position) as String
 
             val selectedGame = allOpenGames[position]
 
@@ -53,35 +49,31 @@ class AllGamesActivity : CoroutineScope, AppCompatActivity() {
             intent.putExtra("questionCountTotal", selectedGame.questionCount)
             intent.putExtra("maxPlayers", selectedGame.maxPlayers)
             intent.putExtra("playerCount", selectedGame.players.size)
-
-            intent.putExtra("masterServerIP", masterServerIp)
+            intent.putExtra("creator", selectedGame.gameCreator)
 
             startActivity(intent)
         }
 
-        btn_sync.setOnClickListener {
-            sendRequestOpenGame()
-            btn_sync.visibility = View.INVISIBLE
-        }
 
 
         //add refresh swipe
-
         swiperefresh.setOnRefreshListener(object : SwipeRefreshLayout.OnRefreshListener {
             override fun onRefresh() {
-                //Here you can update your data from internet or from local SQLite data
                 sendRequestOpenGame()
-                swiperefresh.setRefreshing(false)
+                swiperefresh.isRefreshing =  false
             }
         })
 
-
     }
 
+
+    /**
+     * send MsgRequestOpenGame to master server
+     */
     fun sendRequestOpenGame() {
         while (!Client.connected);
         Client.withHandlers(mapOf(
-                MsgGameList ::class to { conn, msg -> showGames((msg as MsgGameList).games)}
+                MsgGameList ::class to { _, msg -> showGames((msg as MsgGameList).games)}
         ))
         Client.send(MsgRequestOpenGames())
 

@@ -15,6 +15,9 @@ class QuestionStore{
 
     var questions = mutableListOf<Question<*>>()
 
+    /**
+     * Constructor initializes the question store. Store has after calling it an updated question list.
+     */
     constructor(){
         refreshQuestionList()
     }
@@ -22,27 +25,8 @@ class QuestionStore{
     /**
      * Allows the refreshment by reloading the Xml-Files
      */
-    fun refreshQuestionList(){
+    private fun refreshQuestionList(){
         questions = XmlParser().convertXmlToQuestions().toMutableList()
-    }
-
-    /**
-     * Returns the size of the loaded questions
-     * @return the count of loaded question
-     */
-    fun getSize(): Int = questions.size
-
-    /**
-     * Counts the questions from concrete type
-     * @param ID is the type of a question.
-     * @see Question for ID Info
-     * @return count is the count of the questions of this type
-     */
-    fun countQuestionsOfType(ID: String): Int{
-        for(question in questions){
-            //TODO implement counting
-        }
-        return 0
     }
 
     /**
@@ -55,16 +39,9 @@ class QuestionStore{
     }
 
     /**
-     * Creates an information string about the currently loaded questions in the QuestionStore
-     * Information includes: Count, Count of every Type
-     * @return information is the information String
+     * Returns the size of the loaded questions
+     * @return the count of loaded question
      */
-    override fun toString(): String{
-        return "Counted " + getSize() + " questions\n"
-        //TODO implement amount of types
-                /* +
-               "Type FourAnswers: "   + countQuestionsOfType(Type.FOUR_ANSWERS_QUESTION.name)     + "\n" +
-               "Type Ranged: "        + countQuestionsOfType(Type.RANGED_QUESTION.name) + "\n" */
-    }
+    fun getSize(): Int = questions.size
 
 }
