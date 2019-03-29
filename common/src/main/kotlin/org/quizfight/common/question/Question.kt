@@ -50,9 +50,11 @@ class GuessQuestion(
         if(answer == correctValue) {
             return 1000
         }
+
         if (answer < lowest || answer > highest){
             return 0
         }
+
         if( answer < correctValue) {
             val score = (answer - lowest).toDouble() / (correctValue - lowest).toDouble() * 1000
             return score.toInt()
