@@ -186,7 +186,6 @@ class QuizActivity : CoroutineScope, AppCompatActivity() {
      * evaluate and send score to gameserver
      */
     fun sendScore() {
-        var timeLeft = 21 - progress_question.progress / 1000
         timer.cancel()
         var timeLeft = (progress_timer.progress / 1000)
 
